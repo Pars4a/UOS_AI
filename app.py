@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from chatgpt_api import ask_openai  # Your function to get answers from OpenAI or KB
+from chatgpt_api import ask_openai  
 
 app = FastAPI()
 
@@ -12,14 +12,12 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Include Messenger webhook router
 
-# Web page (home)
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Web form submission (ask OpenAI)
 @app.post("/ask", response_class=HTMLResponse)
 async def ask(request: Request, question: str = Form(...)):
     answer = ask_openai(question)
@@ -29,7 +27,7 @@ async def ask(request: Request, question: str = Form(...)):
         "answer": answer
     })
 
-# API endpoint (for testing OpenAI manually)
+
 @app.post("/test_openai")
 async def test_openai(request: Request):
     data = await request.json()
@@ -37,7 +35,6 @@ async def test_openai(request: Request):
     answer = ask_openai(question)
     return {"answer": answer}
 
-# New route for website chat API
 class ChatMessage(BaseModel):
     message: str
 

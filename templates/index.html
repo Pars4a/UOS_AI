@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Haawalli Zanko - University AI Assistant</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">Haawalli Zanko</div>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Ask Haawalli Zanko — Your University AI Assistant</h1>
+      <form method="post" action="/ask">
+        <input type="text" name="question" placeholder="Type your question here..." required />
+        <button type="submit">Ask</button>
+      </form>
+      {% if question %}
+      <div class="answer">
+        <h3>Q: {{ question }}</h3>
+        <p>A: {{ answer }}</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="samples">
+      <h2>Try asking:</h2>
+      <ul>
+        <li>What are the library opening hours?</li>
+        <li>How do I register for courses?</li>
+        <li>What is the exam schedule this semester?</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 University of Sulaimani | Contact: info@university.edu</p>
+  </footer>
+</body>
+</html>

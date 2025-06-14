@@ -19,14 +19,7 @@ templates = Jinja2Templates(directory="templates")
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-#@app.post("/ask", response_class=HTMLResponse)
-#async def ask(request: Request, question: str ):
-    answer = ask_claude(question)
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "question": question,
-        "answer": answer
-    })
+
 
 
 

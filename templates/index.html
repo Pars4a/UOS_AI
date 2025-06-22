@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haawall - University Assistant</title>
+    <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
+      
+        <nav class="main-nav left desktop-only">
+          <a href="#" class="nav-link active">Home</a>
+          <a href="#" class="nav-link">About</a>
+        </nav>
+      
+        <div class="logo">
+          <div class="logo-icon">
+          </div>
+        </div>
+      
+        <nav class="main-nav right desktop-only">
+          <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">
+            کوردی
+          </button>
+          <a href="#" class="nav-link contact-btn">Contact Us</a>
+        </nav>
+
+        <!-- Mobile controls - always visible on mobile -->
+        <div class="mobile-controls">
+          <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">
+            کوردی
+          </button>
+        </div>
+      
+        <div class="mobile-menu hidden" id="mobileMenu">
+          <a href="#" class="nav-link active">Home</a>
+          <a href="#" class="nav-link">About</a>
+          <a href="#" class="nav-link contact-btn">Contact Us</a>
+        </div>
+      </div>
+      
+    <!-- Quick Actions Bar - Horizontal prompts -->
+    <div class="quick-actions">
+        <div class="quick-actions-container">
+            <div class="quick-action-btn" onclick="sendExamplePrompt('What courses are available in Computer Engineering?')">
+                <div class="quick-action-title">Course Information</div>
+                <div class="quick-action-text">What courses are available in Computer Engineering?</div>
+            </div>
+            <div class="quick-action-btn" onclick="sendExamplePrompt('What are the library hours?')">
+                <div class="quick-action-title">Campus Services</div>
+                <div class="quick-action-text">What are the library hours?</div>
+            </div>
+            <div class="quick-action-btn" onclick="sendExamplePrompt('How do I register for courses?')">
+                <div class="quick-action-title">Registration Help</div>
+                <div class="quick-action-text">How do I register for courses?</div>
+            </div>
+            <div class="quick-action-btn" onclick="sendExamplePrompt('Where is the Computer Engineering building?')">
+                <div class="quick-action-title">Campus Navigation</div>
+                <div class="quick-action-text">Where is the Computer Engineering building?</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-logo"> <img src="static/images/uoswelcomelogo.png" alt="Logo"> </div>
+            <h1 class="welcome-title">How can I help you today?</h1>
+            <p class="welcome-subtitle">I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.</p>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="messages" id="messages">  </div>
+        
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-avatar"> <div style="background-image: url('/templates/images/uoswelcomelogo.png'); width: 100px; height: 100px;"></div>
+          </div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <div class="input-container">
+            <textarea 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="Message Haawall..."
+                rows="1"
+                onkeydown="handleKeyDown(event)"
+                oninput="adjustTextareaHeight()"
+            ></textarea>
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+<script>
+        
+     
+  let currentLang = 'en';
+
+  const translations = {
+    en: {
+      switchText: "کوردی",
+      welcomeTitle: "How can I help you today?",
+      welcomeSubtitle: "I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.",
+      prompts: [
+        { title: "Course Information", text: "What courses are available in Computer Engineering?" },
+        { title: "Campus Services", text: "What are the library hours?" },
+        { title: "Registration Help", text: "How do I register for courses?" },
+        { title: "Campus Navigation", text: "Where is the Computer Engineering building?" },
+      ],
+      inputPlaceholder: "Message Haawall..."
+    },
+    ku: {
+      switchText: "English",
+      welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
+      welcomeSubtitle: "من هاوالم، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
+      prompts: [
+        { title: "زانیاری وانە", text: "وانەکانی ئەندازیاری کۆمپیوتەر چییە؟" },
+        { title: "خزمەتگوزاری زانکۆ", text: "کاتەکانی کتێبخانە چەندە؟" },
+        { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
+        { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
+      ],
+      inputPlaceholder: "..پەیامێک بنێرە بۆ هاوال"
+    }
+  };
+
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function adjustTextareaHeight() {
+    const textarea = document.getElementById('messageInput');
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  }
+
+  function sendExamplePrompt(englishPrompt) {
+    const prompt = currentLang === 'ku'
+      ? translations.ku.prompts.find(p => p.text === englishPrompt)?.text || englishPrompt
+      : englishPrompt;
+
+    document.getElementById('messageInput').value = prompt;
+    sendMessage(prompt);
+  }
+
+  function sendMessage(customMessage = null) {
+    const input = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const message = customMessage ?? input.value.trim();
+
+    if (message === '') return;
+
+    document.getElementById('welcomeScreen').classList.add('hidden');
+    input.disabled = true;
+    sendButton.disabled = true;
+
+    addMessage(message, 'user');
+    input.value = '';
+    input.style.height = 'auto';
+
+    showTypingIndicator();
+
+    fetch('/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: message })
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        hideTypingIndicator();
+        if (data.response) {
+          addMessage(data.response, 'assistant');
+        } else if (data.error) {
+          const errorMsg = currentLang === 'ku'
+            ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
+            : 'I apologize, but I encountered an error: ' + data.error;
+          addMessage(errorMsg, 'assistant', true);
+        } else {
+          const unexpectedMsg = currentLang === 'ku'
+            ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
+            : 'I received an unexpected response. Please try again.';
+          addMessage(unexpectedMsg, 'assistant', true);
+        }
+      })
+      .catch(error => {
+        hideTypingIndicator();
+        console.error('Error:', error);
+        const connectionErrorMsg = currentLang === 'ku'
+          ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
+          : 'I\'m having trouble connecting right now. Please check your connection and try again.';
+        addMessage(connectionErrorMsg, 'assistant', true);
+      })
+      .finally(() => {
+        input.disabled = false;
+        sendButton.disabled = false;
+        input.focus();
+      });
+  }
+
+  function addMessage(message, sender, isError = false) {
+    const messagesContainer = document.getElementById('messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = sender === 'user' ? 'U' : 'H';
+
+    const content = document.createElement('div');
+    content.className = isError ? 'error-message' : 'message-content';
+    content.textContent = message;
+
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(content);
+    messagesContainer.appendChild(messageDiv);
+
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function showTypingIndicator() {
+    document.getElementById('typingIndicator').style.display = 'flex';
+  }
+
+  function hideTypingIndicator() {
+    document.getElementById('typingIndicator').style.display = 'none';
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ku' : 'en';
+    const t = translations[currentLang];
+
+    // Update both desktop and mobile language buttons
+    document.getElementById('langSwitchBtn').innerText = t.switchText;
+    document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
+    
+    document.querySelector('.welcome-title').innerText = t.welcomeTitle;
+    document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
+    document.getElementById('messageInput').placeholder = t.inputPlaceholder;
+
+    // Update quick action buttons
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    quickActionBtns.forEach((btn, i) => {
+      btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
+      btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('messageInput').focus();
+  });
+</script>
+
+
+</body>
+</html>

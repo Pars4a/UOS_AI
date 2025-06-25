@@ -1,5 +1,6 @@
-python
 fastapi
 uvicorn
-anthrobic
+anthropic
 openai
+dotenv
+Jinja2

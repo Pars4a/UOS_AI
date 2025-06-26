@@ -4,7 +4,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from claude_api import ask_claude
+import logging
 
+
+logging.basicConfig(filename='chat_logs.log',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 from chatgpt_api import ask_openai  
 
 app = FastAPI()
@@ -38,6 +41,8 @@ class ChatMessage(BaseModel):
 async def chat_api(msg: ChatMessage):
     try:
         answer = ask_claude(msg.message)
+        logging.info(msg.message)
+        logging.info(answer)
         return {"response": answer}
     except Exception as e:
         return {"error": str(e)}

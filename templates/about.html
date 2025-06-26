@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About - Haawall University Assistant</title>
+  <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="static/styleabout.css">
+</head>
+
+<body>
+  <!-- Updated Header matching home page -->
+  <div class="header">
+    <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
+  
+    <nav class="main-nav left desktop-only">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link active">About</a>
+    </nav>
+  
+    <div class="logo"> 
+      <div class="logo-icon"></div>
+    </div>
+  
+    <nav class="main-nav right desktop-only">
+      <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
+      <a href="contact.html" class="nav-link contact-btn">Contact Us</a>
+    </nav>
+
+    <div class="mobile-controls">
+      <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
+    </div>
+  
+    <div class="mobile-menu hidden" id="mobileMenu">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link active">About</a>
+      <a href="contact.html" class="nav-link contact-btn">Contact Us</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="hero-section scroll-animate">
+      <h1 class="hero-title" id="aboutTitle">About Haawall</h1>
+      <p class="hero-subtitle" id="aboutSubtitle">Your intelligent University of Sulaimani assistant, designed to make campus life easier and more accessible.</p>
+      <div class="hero-badge" id="aboutBadge">AI-Powered University Assistant</div>
+    </div>
+
+    <div class="content-grid">
+      <div class="content-card scroll-animate-left">
+        <div class="card-icon">🤖</div>
+        <h3 class="card-title" id="card1Title">Smart AI Assistant</h3>
+        <p class="card-text" id="card1Text">Haawall uses advanced AI technology to understand and respond to your university-related questions with accuracy and helpful context.</p>
+      </div>
+
+      <div class="content-card scroll-animate-right">
+        <div class="card-icon">🎓</div>
+        <h3 class="card-title" id="card2Title">University Focused</h3>
+        <p class="card-text" id="card2Text">Specifically designed for University of Sulaimani students, faculty, and staff with comprehensive knowledge of campus resources and procedures.</p>
+      </div>
+    </div>
+
+    <div class="aims-section scroll-animate-scale">
+      <h2 class="section-title" id="aimsTitle">Our Mission & Aims</h2>
+      <div class="aims-grid" id="aimsGrid">
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim1Title">Enhance Student Experience</h4>
+            <p id="aim1Text">Provide instant access to university information, making student life more convenient and efficient.</p>
+          </div>
+        </div>
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim2Title">Great Research Platform</h4>
+            <p id="aim2Text">Providing a local AI model for the researchers to conduct various AI researches, voice-recognition,image-analysis etc... </p>
+          </div>
+        </div>
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim3Title">Support Academic Success</h4>
+            <p id="aim3Text">Help students find courses, understand requirements, and access academic resources more easily.</p>
+          </div>
+        </div>
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim4Title">24/7 Availability</h4>
+            <p id="aim4Text">Provide round-the-clock assistance for urgent questions and continuous support throughout the academic year.</p>
+          </div>
+        </div>
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim5Title">Reduce Administrative Workload</h4>
+
+            <p id="aim5Text">By handling common questions automatically, our chatbot lightens the workload on university staff, allowing them to focus on more complex tasks and personalized student support.</p>
+          </div>
+        </div>
+        <div class="aim-item">
+          <div class="aim-icon"></div>
+          <div class="aim-content">
+            <h4 id="aim6Title">Continuous Improvement</h4>
+            <p id="aim6Text">Evolve and improve based on user feedback and changing university needs to provide better service.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-section scroll-animate">
+      <h2 class="team-title" id="teamTitle">Built with Care</h2>
+      <p class="team-description" id="teamDescription">
+        Haawall is developed by a dedicated team passionate about improving the university experience. 
+        We combine cutting-edge AI technology with deep understanding of academic environments to create 
+        a tool that truly serves the university community.
+      </p>
+      <div class="team-badge" id="teamBadge">Made for University of Sulaimani</div>
+    </div>
+  </div>
+
+  <script>
+    let currentLang = 'en';
+
+    const translations = {
+      en: {
+        switchText: "کوردی",
+        aboutTitle: "About Haawall",
+        aboutSubtitle: "Your intelligent University of Sulaimani assistant, designed to make campus life easier and more accessible.",
+        aboutBadge: "AI-Powered University Assistant",
+        card1Title: "Smart AI Assistant",
+        card1Text: "Haawall uses advanced AI technology to understand and respond to your university-related questions with accuracy and helpful context.",
+        card2Title: "University Focused",
+        card2Text: "Specifically designed for University of Sulaimani students, faculty, and staff with comprehensive knowledge of campus resources and procedures.",
+        aimsTitle: "Our Mission & Aims",
+        aim1Title: "Enhance Student Experience",
+        aim1Text: "Provide instant access to university information, making student life more convenient and efficient.",
+        aim2Title: "Great Research Platform",
+        aim2Text: "Providing a local AI model for the researchers to conduct various AI researches.",
+        aim3Title: "Support Academic Success",
+        aim3Text: "Help students find courses, understand requirements, and access academic resources more easily.",
+        aim4Title: "24/7 Availability",
+        aim4Text: "Provide round-the-clock assistance for urgent questions and continuous support throughout the academic year.",
+        aim5Title: "Reduce Administrative Workload",
+        aim5Text: "By handling common questions automatically, our chatbot lightens the workload on university staff, allowing them to focus on more complex tasks and personalized student support.",
+        aim6Title: "Continuous Improvement",
+        aim6Text: "Evolve and improve based on user feedback and changing university needs to provide better service.",
+        teamTitle: "Built with Care",
+        teamDescription: "Haawall is developed by a dedicated team passionate about improving the university experience. We combine cutting-edge AI technology with deep understanding of academic environments to create a tool that truly serves the university community.",
+        teamBadge: "Made for University of Sulaimani"
+      },
+      ku: {
+        switchText: "English",
+        aboutTitle: " دەربارەی هاوەڵ",
+        aboutSubtitle: "یاریدەدەرە زیرەکەکەی زانکۆی سلێمانی، داڕێژراوە بۆ ئاسانکردنی ژیانی ئەکادیمی لە ڕێگەی تەکنەلۆژیای پێشکەوتووەوە",
+        aboutBadge: " یاریدەدەری پێشکەوتوی زانکۆی ",
+        card1Title: "یاریدەدەری زیرەکی ئەی ئای",
+        card1Text: " هاوەڵ تەکنەلۆژیای ئەی ئای پێشکەوتوو بەکاردەهێنێت بۆ تێگەیشتن و وەڵامدانەوەی پرسیارەکانی پەیوەندیدار بە بابەتەکانی زانکۆ، ودابینکردنی چوارچێوەیەکی بەسوود ",
+        card2Title: "بۆ زانکۆ",
+        card2Text: "بەتایبەتی بۆ خوێندکاران و ئەندامانی دەستەی وانەبێژی و کارمەندانی زانکۆی سلێمانی دروستکراوە و تێگەیشتنێکی تەواو لە سەرچاوە و ڕێوشوێنەکانی زانکۆ دابین دەکات",
+        aimsTitle: "ئامانج و مەبەستی ئێمە",
+        aim1Title: "باشترکردنی ئەزموونی قوتابی",
+        aim1Text: "دەستنیشانکردنی زانیاریە زانکۆییەکان بە خێرایی بۆ ئاسانکردنی ژیانی قوتابی.",
+        aim2Title: "پلاتفۆرمی توێژینەوەی بەسوود",
+        aim2Text: "بەستنەوەی قوتابیان بە زانیاری پێویست، کەمکردنەوەی سەرلێشێوان و بەهێزکردنی توانایان بۆ گەڕان بەناو زانکۆدا.",
+        aim3Title: "پاڵپشتی سەرکەوتنی ئەکادیمی ",
+        aim3Text: "یارمەتیدانی قوتابیان لە دۆزینەوەی کۆرسەکان، تێگەیشتن لە پێداویستییەکان، و ئاسانی دەستگەیشتن بە سەرچاوە ئەکادیمییەکان.",
+        aim4Title: "بەردەست بوونی ٢٤/٧",
+        aim4Text: "یارمەتی 24/7 پێشکەش دەکات بۆ پرسیاری بەپەلە و پشتگیری بەردەوام لە ماوەی ساڵی خوێندن.",
+        aim5Title: "که مکردنه وه ی ڕاده ی ئه رکه ئیدارییه کان",
+        aim5Text: "کەمان ئەرکی وەڵامدانەوەی پرسیارە باوەکانی خوێنکاران سەر شانی کارمندانی زانکۆ کام دەکاتەوە ئەمەش رێیان پێدەدات جەختی بخەنە سەر ئرکە ئاڵۆزەکان و هاوکاری خوێندکاران",
+        aim6Title: "باشترکردنی بەردەوام",
+        aim6Text: " پەرەپێدانی خزمەتگوزاریەکان بەپێی فیدباکی بەکارهێنەران و پێداویستییە گەشەسەندووەکانی زانکۆ بۆ دابینکردنی خزمەتگوزاری باشتر",
+        teamTitle: " بە وریاییەوە دروستکراوە",
+        teamDescription: "   هاوەڵ لەلایەن گروپێکی دڵسۆزەوە دروستکراوە کە بە پەرۆشن بۆ باشترکردنی ئەزموونی زانکۆ. ئێمە تەکنەلۆژیای پێشکەوتووی ئەی ئای لەگەڵ زانیارییەکی قووڵ لە ڕێکخستنی ئەکادیمی تێکەڵ دەکەین بۆ پەرەپێدانی ئامرازێک کە بەڕاستی سوود بە کۆمەڵگەی زانکۆ بگەیەنێت ",
+        teamBadge: "دروستکراو بۆ زانکۆی سلێمانی"
+      }
+    };
+
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ku' : 'en';
+      const t = translations[currentLang];
+
+      document.getElementById('langSwitchBtn').innerText = t.switchText;
+      document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
+
+      Object.keys(t).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = t[id];
+      });
+    }
+
+    function handleScrollAnimations() {
+      const elements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      elements.forEach(el => observer.observe(el));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      handleScrollAnimations();
+    });
+  </script>
+</body>
+</html>

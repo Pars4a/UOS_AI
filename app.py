@@ -27,6 +27,7 @@ async def home(request: Request):
         "question": question,
         "answer": answer
     })
+    
 
 
 
@@ -41,4 +42,21 @@ async def chat_api(msg: ChatMessage):
     except Exception as e:
         return {"error": str(e)}
 
+#app.get for aboutus.html 
+
+@app.get("/about.html")
+async def about(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
+#app.get for aboutus.html 
+
+@app.get("/index.html")
+async def about(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+#app.get for aboutus.html
+
+@app.get("/contact.html")
+async def contact(request: Request):
+    return templates.TemplateResponse("contact.html", {"request": request})
 

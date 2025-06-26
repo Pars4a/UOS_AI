@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Haawall University Assistant</title>
+    <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/stylecontact.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="main-nav left desktop-only">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="about.html" class="nav-link">About</a>
+        </nav>
+        <div class="logo">
+            <div class="logo-icon">Haawall</div>
+        </div>
+        <nav class="main-nav right desktop-only">
+            <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
+            <a href="contact.html" class="nav-link active">Contact Us</a>
+        </nav>
+        <div class="mobile-controls">
+            <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
+        </div>
+        <div class="mobile-menu hidden" id="mobileMenu">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="about.html" class="nav-link">About</a>
+            <a href="contact.html" class="nav-link active">Contact Us</a>
+        </div>
+    </div>
+
+    <!-- Contact Content -->
+    <div class="contact-container">
+        <div class="contact-header">
+            <h1 class="contact-title" id="contactTitle">Get in Touch</h1>
+            <p class="contact-subtitle" id="contactSubtitle">
+                We'd love to hear from you! Send us your feedback, questions, or suggestions and help us improve Haawall.
+            </p>
+        </div>
+
+        <div class="contact-content">
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <div class="info-card">
+                    <h2 class="info-title" id="infoTitle">Contact Information</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div class="info-text">
+                            <div class="info-label" id="addressLabel">Address</div>
+                            <div class="info-value" id="addressValue">
+                                College of Engineering, University of Sulaimani<br>
+                                (New Campus), Tasluja Street 1, Zone 501<br>
+                                Sulaymaniyah, Kurdistan Region of Iraq
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">✉️</div>
+                        <div class="info-text">
+                            <div class="info-label" id="emailLabel">Email</div>
+                            <div class="info-value">
+                                <a href="mailto:haawell.bot@gmail.com">haawell.bot@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">🎓</div>
+                        <div class="info-text">
+                            <div class="info-label" id="departmentLabel">Department</div>
+                            <div class="info-value" id="departmentValue">Computer Engineering</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">🤖</div>
+                        <div class="info-text">
+                            <div class="info-label" id="serviceLabel">Service Hours</div>
+                            <div class="info-value" id="serviceValue">24/7 AI Assistant Available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Form -->
+            <div class="contact-form">
+                <div class="form-card">
+                    <h2 class="form-title" id="formTitle">Send us your Feedback</h2>
+                    
+                    <div id="messageContainer"></div>
+
+                    <form id="feedbackForm">
+                        <div class="form-group">
+                            <label for="name" class="form-label" id="nameLabel">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label" id="emailFieldLabel">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category" class="form-label" id="categoryLabel">Category</label>
+                            <select id="category" name="category" class="form-select" required>
+                                <option value="" id="selectCategory">Select a category</option>
+                                <option value="feedback" id="feedbackOption">General Feedback</option>
+                                <option value="suggestion" id="suggestionOption">Suggestion</option>
+                                <option value="bug" id="bugOption">Bug Report</option>
+                                <option value="feature" id="featureOption">Feature Request</option>
+                                <option value="other" id="otherOption">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="form-label" id="subjectLabel">Subject</label>
+                            <input type="text" id="subject" name="subject" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label" id="messageLabel">Message</label>
+                            <textarea id="message" name="message" class="form-textarea" placeholder="Tell us what you think..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span id="submitText">Send Message</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Script -->
+    <script>
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                switchText: "کوردی",
+                contactTitle: "Get in Touch",
+                contactSubtitle: "We'd love to hear from you! Send us your feedback, questions, or suggestions and help us improve Haawall.",
+                infoTitle: "Contact Information",
+                addressLabel: "Address",
+                addressValue: "College of Engineering, University of Sulaimani<br>(New Campus), Tasluja Street 1, Zone 501<br>Sulaymaniyah, Kurdistan Region of Iraq",
+                emailLabel: "Email",
+                departmentLabel: "Department",
+                departmentValue: "Computer Engineering",
+                serviceLabel: "Service Hours",
+                serviceValue: "24/7 AI Assistant Available",
+                formTitle: "Send us your Feedback",
+                nameLabel: "Full Name",
+                emailFieldLabel: "Email Address",
+                categoryLabel: "Category",
+                selectCategory: "Select a category",
+                feedbackOption: "General Feedback",
+                suggestionOption: "Suggestion",
+                bugOption: "Bug Report",
+                featureOption: "Feature Request",
+                otherOption: "Other",
+                subjectLabel: "Subject",
+                messageLabel: "Message",
+                submitText: "Send Message",
+                messagePlaceholder: "Tell us what you think..."
+            },
+            ku: {
+                switchText: "English",
+                contactTitle: "پەیوەندیمان پێوە بکە",
+                contactSubtitle: "خۆشحاڵ دەبین پەیوەندیت پێوە بکەین! ڕا و پێشنیار و پرسیارەکانت بنێرە بۆمان بۆ باشترکردنی هاوال.",
+                infoTitle: "زانیاری پەیوەندی",
+                addressLabel: "ناونیشان",
+                addressValue: "کۆلێژی ئەندازیاری، زانکۆی سلێمانی<br>(کەمپی نوێ)، شەقامی تاسلوژا ژمارە ١، ناوچە ٥٠١<br>سلێمانی، هەرێمی کوردستان، عێراق",
+                emailLabel: "ئیمەیل",
+                departmentLabel: "بەش",
+                departmentValue: "ئەندازیاری کۆمپیوتەر",
+                serviceLabel: "کاتی خزمەتگوزاری",
+                serviceValue: "یارمەتیدەری ئای ئای ٢٤/٧ بەردەستە",
+                formTitle: "ڕا و پێشنیارەکانت بنێرە",
+                nameLabel: "ناوی تەواو",
+                emailFieldLabel: "ناونیشانی ئیمەیل",
+                categoryLabel: "جۆر",
+                selectCategory: "جۆرێک هەڵبژێرە",
+                feedbackOption: "ڕای گشتی",
+                suggestionOption: "پێشنیار",
+                bugOption: "گوزارشتی هەڵە",
+                featureOption: "داواکاری تایبەتمەندی",
+                otherOption: "هیتر",
+                subjectLabel: "سەردێڕ",
+                messageLabel: "پەیام",
+                submitText: "پەیام بنێرە",
+                messagePlaceholder: "ئۆزموونی خۆت بنووسە..."
+            }
+        };
+
+        function toggleMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ku' : 'en';
+            const t = translations[currentLang];
+
+            document.getElementById("langSwitchBtn").innerText = t.switchText;
+            document.getElementById("langSwitchBtnMobile").innerText = t.switchText;
+            document.getElementById("contactTitle").innerText = t.contactTitle;
+            document.getElementById("contactSubtitle").innerText = t.contactSubtitle;
+            document.getElementById("infoTitle").innerText = t.infoTitle;
+            document.getElementById("addressLabel").innerText = t.addressLabel;
+            document.getElementById("addressValue").innerHTML = t.addressValue;
+            document.getElementById("emailLabel").innerText = t.emailLabel;
+            document.getElementById("departmentLabel").innerText = t.departmentLabel;
+            document.getElementById("departmentValue").innerText = t.departmentValue;
+            document.getElementById("serviceLabel").innerText = t.serviceLabel;
+            document.getElementById("serviceValue").innerText = t.serviceValue;
+            document.getElementById("formTitle").innerText = t.formTitle;
+            document.getElementById("nameLabel").innerText = t.nameLabel;
+            document.getElementById("emailFieldLabel").innerText = t.emailFieldLabel;
+            document.getElementById("categoryLabel").innerText = t.categoryLabel;
+            document.getElementById("selectCategory").innerText = t.selectCategory;
+            document.getElementById("feedbackOption").innerText = t.feedbackOption;
+            document.getElementById("suggestionOption").innerText = t.suggestionOption;
+            document.getElementById("bugOption").innerText = t.bugOption;
+            document.getElementById("featureOption").innerText = t.featureOption;
+            document.getElementById("otherOption").innerText = t.otherOption;
+            document.getElementById("subjectLabel").innerText = t.subjectLabel;
+            document.getElementById("messageLabel").innerText = t.messageLabel;
+            document.getElementById("submitText").innerText = t.submitText;
+            document.getElementById("message").placeholder = t.messagePlaceholder;
+        }
+    </script>
+</body>
+</html>

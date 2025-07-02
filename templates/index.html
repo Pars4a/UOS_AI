@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Haawall - University Assistant</title>
     <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/style.css">
@@ -36,7 +36,7 @@
             کوردی
           </button>
         </div>
-      
+      <!-- Mobile controls - mobile menu -->
         <div class="mobile-menu hidden" id="mobileMenu">
           <a href="index.html" class="nav-link active">Home</a>
           <a href="about.html" class="nav-link">About</a>
@@ -44,22 +44,22 @@
         </div>
       </div>
       
-    <!-- Quick Actions Bar - Horizontal prompts -->
+    <!-- Quick Actions Bar - Horizontal prompts -scrollable on mobile -->
     <div class="quick-actions">
         <div class="quick-actions-container">
-            <div class="quick-action-btn" onclick="sendExamplePrompt('What courses are available in Computer Engineering?')">
+            <div class="quick-action-btn" onclick="sendExamplePrompt(0)">
                 <div class="quick-action-title">Course Information</div>
                 <div class="quick-action-text">What courses are available in Computer Engineering?</div>
             </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt('What are the library hours?')">
+            <div class="quick-action-btn" onclick="sendExamplePrompt(1)">
                 <div class="quick-action-title">Campus Services</div>
                 <div class="quick-action-text">What are the library hours?</div>
             </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt('How do I register for courses?')">
+            <div class="quick-action-btn" onclick="sendExamplePrompt(2)">
                 <div class="quick-action-title">Registration Help</div>
                 <div class="quick-action-text">How do I register for courses?</div>
             </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt('Where is the Computer Engineering building?')">
+            <div class="quick-action-btn" onclick="sendExamplePrompt(3)">
                 <div class="quick-action-title">Campus Navigation</div>
                 <div class="quick-action-text">Where is the Computer Engineering building?</div>
             </div>
@@ -67,7 +67,8 @@
     </div>
 
     <div class="chat-container">
-        <!-- Welcome Screen -->
+
+        <!-- Welcome Screen AKA welcome-tab -->
         <div class="welcome-screen" id="welcomeScreen">
             <div class="welcome-logo"> <img src="static/images/uoswelcomelogo.png" alt="Logo"> </div>
             <h1 class="welcome-title">How can I help you today?</h1>
@@ -75,11 +76,12 @@
         </div>
 
         <!-- Chat Messages -->
+         <!-- these are messages that are shown through out the chat -->
         <div class="messages" id="messages">  </div>
         
         <!-- Typing Indicator -->
         <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-avatar"> <div style="background-image: url('/templates/images/uoswelcomelogo.png'); width: 100px; height: 100px;"></div>
+            <div class="typing-avatar">  
           </div>
             <div class="typing-dots">
                 <div class="typing-dot"></div>
@@ -129,14 +131,14 @@
     ku: {
       switchText: "English",
       welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
-      welcomeSubtitle: "من هاوالم، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
+      welcomeSubtitle: "من هاوام، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
       prompts: [
         { title: "زانیاری وانە", text: "وانەکانی ئەندازیاری کۆمپیوتەر چییە؟" },
         { title: "خزمەتگوزاری زانکۆ", text: "کاتەکانی کتێبخانە چەندە؟" },
         { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
         { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
       ],
-      inputPlaceholder: "..پەیامێک بنێرە بۆ هاوال"
+      inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ"
     }
   };
 
@@ -158,11 +160,10 @@
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
   }
 
-  function sendExamplePrompt(englishPrompt) {
-    const prompt = currentLang === 'ku'
-      ? translations.ku.prompts.find(p => p.text === englishPrompt)?.text || englishPrompt
-      : englishPrompt;
-
+  function sendExamplePrompt(promptIndex) {
+    // Get the current language prompt based on the index
+    const prompt = translations[currentLang].prompts[promptIndex].text;
+    
     document.getElementById('messageInput').value = prompt;
     sendMessage(prompt);
   }
@@ -279,8 +280,21 @@
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('messageInput').focus();
   });
-</script>
 
-
-</body>
+  // iOS Safari fixes
+if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+  // Prevent zoom on input focus
+  document.addEventListener('touchstart', function() {}, {passive: true});
+  
+  // Handle viewport height changes
+  function setViewportHeight() {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  }
+  
+  setViewportHeight();
+  window.addEventListener('resize', setViewportHeight);
+  window.addEventListener('orientationchange', setViewportHeight);
+}
+   </script>
+ </body>
 </html>

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -40,19 +40,32 @@ async def chat_api(msg: ChatMessage):
 
 #app.get for aboutus.html 
 
-@app.get("/about.html")
-async def about(request: Request):
-    return templates.TemplateResponse("about.html", {"request": request})
-
-#app.get for aboutus.html 
-
-@app.get("/index.html")
+@app.get("/")
 async def about(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/index.html")
+async def redirect_home():
+    return RedirectResponse(url="/")
 #app.get for aboutus.html
 
-@app.get("/contact.html")
+@app.get("/about")
+async def about(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/about.html")
+async def redirect_about():
+    return RedirectResponse(url="/about")
+
+
+#app.get for aboutus.html 
+
+
+
+@app.get("/contact")
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
+@app.get("/contact.html")
+async def redirect_contact():
+    return RedirectResponse(url="/contact")
 

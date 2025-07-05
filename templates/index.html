@@ -29,6 +29,21 @@
           </button>
           <a href="contact.html" class="nav-link contact-btn">Contact Us</a>
         </nav>
+        
+        <!-- FAQ Button - Keep only this one -->
+        <button class="faq-button" onclick="toggleFAQ()" id="faqButton">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+          </svg>
+        </button>
+        
+        <!-- FAQ Dropdown - Keep only this one -->
+        <div class="faq-dropdown" id="faqDropdown">
+          <div class="faq-header">Frequently Asked Questions</div>
+          <div class="faq-list" id="faqList">
+            <!-- FAQ items will be populated here -->
+          </div>
+        </div>
 
         <!-- Mobile controls - always visible on mobile -->
         <div class="mobile-controls">
@@ -92,7 +107,7 @@
     </div>
 
     <!-- Input Area -->
-    <div class="input-area">
+    <div class="input-area" id="inputArea">
         <div class="input-container">
             <textarea 
                 class="message-input" 
@@ -101,6 +116,8 @@
                 rows="1"
                 onkeydown="handleKeyDown(event)"
                 oninput="adjustTextareaHeight()"
+                onfocus="handleInputFocus()"
+                onblur="handleInputBlur()"
             ></textarea>
             <button class="send-button" id="sendButton" onclick="sendMessage()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -110,10 +127,89 @@
         </div>
     </div>
 
+    <!-- REMOVED: Duplicate FAQ button and dropdown that were here -->
+
 <script>
         
      
   let currentLang = 'en';
+  // FAQ functionality
+let faqOpen = false;
+
+const faqQuestions = {
+  en: [
+    "Engineering College Foundation Building?",
+    "Where are the statistic staffs?", 
+    "Where is the board of department heads?",
+    "When does the semester start?",
+    "When is the employees' sessions?",
+    "What are the library hours?",
+    "What departments does the engineering college have?",
+    "Where is the registration?",
+    "Parallel Program Prices",
+    "Where is the central cafeteria?"
+  ],
+  ku: [
+    "بنای کۆلێژی ئەندازیاری",
+    "ژمێریاری لە کوێیە؟",
+    "ژووری سەرۆک  بەشەکان لەکوێیە؟",
+    "کەی وەرزی خوێندن دەستپێدەکات؟",
+    "داوامی کارمەندان کەی بۆ کایە؟",
+    "کاتەکانی کتێبخانە چەندە؟",
+    "بەشەکانی کۆلێژی ئەندازیاری چین؟ ",
+    "تۆمار لەکوێیە؟ ",
+    "کرێی پاراڵێل چەندە؟",
+    "کافتریای ناوەند لەکوێیە؟ "
+  ]
+};
+
+function toggleFAQ() {
+  const dropdown = document.getElementById('faqDropdown');
+  const button = document.getElementById('faqButton');
+  
+  faqOpen = !faqOpen;
+  
+  if (faqOpen) {
+    dropdown.classList.add('show');
+    button.style.transform = 'rotate(180deg)';
+    populateFAQList();
+  } else {
+    dropdown.classList.remove('show');
+    button.style.transform = 'rotate(0deg)';
+  }
+}
+
+function populateFAQList() {
+  const faqList = document.getElementById('faqList');
+  faqList.innerHTML = '';
+  
+  const currentFaqQuestions = faqQuestions[currentLang];
+  
+  currentFaqQuestions.forEach((question, index) => {
+    const faqItem = document.createElement('div');
+    faqItem.className = 'faq-item';
+    faqItem.textContent = question;
+    faqItem.onclick = () => {
+      sendFAQQuestion(question);
+      toggleFAQ();
+    };
+    faqList.appendChild(faqItem);
+  });
+}
+
+function sendFAQQuestion(question) {
+  document.getElementById('messageInput').value = question;
+  sendMessage(question);
+}
+
+document.addEventListener('click', function(event) {
+  const dropdown = document.getElementById('faqDropdown');
+  const button = document.getElementById('faqButton');
+  
+  if (faqOpen && !dropdown.contains(event.target) && !button.contains(event.target)) {
+    toggleFAQ();
+  }
+});
 
   const translations = {
     en: {
@@ -126,7 +222,8 @@
         { title: "Registration Help", text: "How do I register for courses?" },
         { title: "Campus Navigation", text: "Where is the Computer Engineering building?" },
       ],
-      inputPlaceholder: "Message Haawall..."
+      inputPlaceholder: "Message Haawall...",
+      faqHeader: "Frequently Asked Questions"
     },
     ku: {
       switchText: "English",
@@ -138,7 +235,8 @@
         { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
         { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
       ],
-      inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ"
+      inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ",
+      faqHeader: "پرسیارە دووبارەکان"
     }
   };
 
@@ -158,6 +256,27 @@
     const textarea = document.getElementById('messageInput');
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  }
+
+  // Handle input focus for mobile keyboard
+  function handleInputFocus() {
+    if (window.innerWidth <= 768) {
+      const inputArea = document.getElementById('inputArea');
+      inputArea.classList.add('keyboard-open');
+      
+      // Scroll to bottom when keyboard opens
+      setTimeout(() => {
+        document.body.scrollTop = document.body.scrollHeight;
+        document.documentElement.scrollTop = document.documentElement.scrollHeight;
+      }, 300);
+    }
+  }
+
+  function handleInputBlur() {
+    if (window.innerWidth <= 768) {
+      const inputArea = document.getElementById('inputArea');
+      inputArea.classList.remove('keyboard-open');
+    }
   }
 
   function sendExamplePrompt(promptIndex) {
@@ -261,7 +380,7 @@
     currentLang = currentLang === 'en' ? 'ku' : 'en';
     const t = translations[currentLang];
 
-    // Update both desktop and mobile language buttons
+    // Update for both desktop and mobile language buttons
     document.getElementById('langSwitchBtn').innerText = t.switchText;
     document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
     
@@ -269,7 +388,18 @@
     document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
     document.getElementById('messageInput').placeholder = t.inputPlaceholder;
 
-    // Update quick action buttons
+    // Update FAQ header
+    const faqHeader = document.querySelector('.faq-header');
+    if (faqHeader) {
+      faqHeader.textContent = t.faqHeader;
+    }
+
+    // Update FAQ questions if dropdown is open
+    if (faqOpen) {
+      populateFAQList();
+    }
+
+    // Update for quick action buttons
     const quickActionBtns = document.querySelectorAll('.quick-action-btn');
     quickActionBtns.forEach((btn, i) => {
       btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
@@ -281,20 +411,77 @@
     document.getElementById('messageInput').focus();
   });
 
-  // iOS Safari fixes
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-  // Prevent zoom on input focus
-  document.addEventListener('touchstart', function() {}, {passive: true});
-  
-  // Handle viewport height changes
-  function setViewportHeight() {
-    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  // Enhanced mobile fixes for Android and iOS
+  function initializeMobileFixes() {
+    // Handle viewport height changes
+    function setViewportHeight() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(setViewportHeight, 100);
+    });
+
+    // Handle keyboard visibility on mobile
+    let initialViewportHeight = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+      const currentHeight = window.innerHeight;
+      const heightDifference = initialViewportHeight - currentHeight;
+      
+      if (heightDifference > 150) {
+        // Keyboard is likely open
+        document.body.classList.add('keyboard-open');
+      } else {
+        // Keyboard is likely closed
+        document.body.classList.remove('keyboard-open');
+      }
+    });
   }
-  
-  setViewportHeight();
-  window.addEventListener('resize', setViewportHeight);
-  window.addEventListener('orientationchange', setViewportHeight);
-}
+
+  // Initialize mobile fixes
+  if (window.innerWidth <= 768) {
+    initializeMobileFixes();
+  }
+
+  // iOS Safari specific fixes 
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    // Prevent zoom on input focus
+    document.addEventListener('touchstart', function() {}, {passive: true});
+    
+    // Additional iOS fixes
+    document.addEventListener('focusin', function(e) {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+        setTimeout(() => {
+          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    });
+  }
+
+  // Android specific fixes
+  if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
+    // Handle Android keyboard
+    const originalHeight = window.innerHeight;
+    
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      const diff = originalHeight - currentHeight;
+      
+      if (diff > 150) {
+        // Keyboard is open
+        document.body.style.paddingBottom = '0px';
+      } else {
+        // Keyboard is closed
+        document.body.style.paddingBottom = '';
+      }
+    });
+  }
+
+
    </script>
  </body>
 </html>

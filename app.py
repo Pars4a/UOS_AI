@@ -58,9 +58,6 @@ async def redirect_about():
     return RedirectResponse(url="/about")
 
 
-#app.get for aboutus.html 
-
-
 
 @app.get("/contact")
 async def contact(request: Request):

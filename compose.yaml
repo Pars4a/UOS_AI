@@ -1,15 +1,13 @@
 services:
   server:
     build: 
-      context: . #location of the docker file .: is it in current folder
+      context: .
+      dockerfile: Dockerfile 
+    image: hawall_server
+    container_name: hawall_server
+    pull_policy: never
     ports:
       - 8000:8000
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-
-    develop:
-      watch:
-        - path: ./templates
-          target: /app/templates
-          action: sync 
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

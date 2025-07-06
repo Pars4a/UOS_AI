@@ -1,23 +1,28 @@
-FROM python:alpine AS builder 
+FROM python:3.12-alpine AS builder 
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip wheel --no-cache --wheel-dir wheels -r requirements.txt
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install -r requirements.txt
 
 
-FROM python:alpine AS runner
+FROM python:3.12-alpine AS runner
 
 WORKDIR /app
 
 RUN addgroup usr_grp && adduser -S -g usr_grp usr
 
-COPY --from=builder /app/wheels /wheels
-RUN pip install /wheels/* && rm -rf /wheels
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 
-COPY . .
+COPY app.py claude_api.py chatgpt_api.py /app/
+COPY templates/ /app/templates
+COPY static/ /app/static
 
 RUN  chown -R usr:usr_grp .
 

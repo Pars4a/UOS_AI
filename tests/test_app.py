@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from UOS_AI.app import app
+from app import app
 
 
 client = TestClient(app)

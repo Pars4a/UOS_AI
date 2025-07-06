@@ -23,6 +23,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY app.py claude_api.py chatgpt_api.py /app/
 COPY templates/ /app/templates
 COPY static/ /app/static
+COPY tests/ /app/tests
 
 RUN  chown -R usr:usr_grp .
 

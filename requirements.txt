@@ -4,3 +4,4 @@ anthropic
 openai
 Jinja2
 dotenv
+pytest

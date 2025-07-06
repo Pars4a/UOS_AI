@@ -18,11 +18,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 
-@app.get("/", )
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
 
-
+@app.get("/health")
+async def health_check():
+    checks = {
+        "status": "healthy",
+    }
+    return checks
 
 
 class ChatMessage(BaseModel):

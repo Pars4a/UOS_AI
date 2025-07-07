@@ -45,20 +45,16 @@ async def chat_api(msg: ChatMessage):
 @app.get("/")
 async def about(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/index.html")
-async def redirect_home():
-    return RedirectResponse(url="/")
-#app.get for aboutus.html
+#@app.get("/index.html")
+#async def redirect_home():
+#    return RedirectResponse(url="/")
 
 @app.get("/about")
 async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
-
 @app.get("/about.html")
 async def redirect_about():
     return RedirectResponse(url="/about")
-
 
 
 @app.get("/contact")

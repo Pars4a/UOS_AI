@@ -1,6 +1,0 @@
-2025-07-07 11:31:51,617 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
-2025-07-07 11:31:51,624 - INFO - hello
-2025-07-07 11:31:51,624 - INFO - Hello! I'm an AI assistant for the University of Sulaimani. How can I help you today? Would you like information about our departments, admissions, or anything related to the university?
-2025-07-07 11:32:32,893 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
-2025-07-07 11:32:32,908 - INFO - nigga
-2025-07-07 11:32:32,908 - INFO - I apologize, but I do not use or respond to offensive language. Let's please communicate respectfully.

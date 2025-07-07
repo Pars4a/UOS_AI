@@ -23,6 +23,4 @@ services:
           target: /app/templates 
           action: sync
     volumes:
-      - chat_logs:/app/logs
-volumes:
-  chat_logs:
+      - ./logs:/app/logs 

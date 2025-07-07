@@ -7,7 +7,7 @@ from claude_api import ask_claude
 import logging
 
 
-logging.basicConfig(filename='chat_logs.log',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(filename='/app/logs/chat_logs.txt',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 from chatgpt_api import ask_openai  
 
 app = FastAPI()

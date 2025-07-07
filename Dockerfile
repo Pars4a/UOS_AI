@@ -13,7 +13,7 @@ FROM python:3.12-alpine AS runner
 
 WORKDIR /app
 
-RUN addgroup usr_grp && adduser -S -g usr_grp usr
+RUN mkdir /app/logs && addgroup usr_grp && adduser -S -g usr_grp usr
 
 
 COPY --from=builder /opt/venv /opt/venv

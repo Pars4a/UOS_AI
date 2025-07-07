@@ -22,3 +22,5 @@ services:
         - path: ./templates
           target: /app/templates 
           action: sync
+    volumes:
+      - ./logs:/app/logs

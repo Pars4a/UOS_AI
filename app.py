@@ -4,11 +4,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from claude_api import ask_claude
+from chatgpt_api import ask_openai  
 import logging
 
 
-logging.basicConfig(filename='/app/logs/chat_logs.txt',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-from chatgpt_api import ask_openai  
+logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
 
@@ -45,9 +45,9 @@ async def chat_api(msg: ChatMessage):
 @app.get("/")
 async def about(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-#@app.get("/index.html")
-#async def redirect_home():
-#    return RedirectResponse(url="/")
+@app.get("/index.html")
+async def redirect_home():
+    return RedirectResponse(url="/")
 
 @app.get("/about")
 async def about(request: Request):

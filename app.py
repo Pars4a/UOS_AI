@@ -38,7 +38,10 @@ async def chat_api(msg: ChatMessage):
         logging.info(answer)
         return {"response": answer}
     except Exception as e:
-        return {"error": str(e)}
+        answer = ask_openai(msg.message)
+        logging.info(msg.message)
+        logging.info(answer)
+        return {"response": answer}
 
 #app.get for aboutus.html 
 

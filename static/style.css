@@ -462,6 +462,7 @@ body {
   background: linear-gradient(135deg, #1a1b20 0%, #2d3748 100%);
   color: white;
   animation: pulse 2s ease-in-out infinite;
+ 
 }
 
 @keyframes pulse {
@@ -686,7 +687,7 @@ body {
 
 .typing-dot {
   width: 10px; /* Increased size */
-  height: 10px; /* Increased size */
+  height: 10px; 
   background: #9ca3af;
   border-radius: 50%;
   animation: typing 1.4s ease-in-out infinite;
@@ -703,12 +704,12 @@ body {
 .error-message {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   color: #dc2626;
-  padding: 16px 20px; /* Increased padding */
+  padding: 16px 20px; 
   border-radius: 18px;
   border: 1px solid #fecaca;
-  margin-right: 60px; /* Increased margin */
+  margin-right: 60px; 
   animation: errorShake 0.5s ease-in-out;
-  font-size: 16px; /* Increased font size */
+  font-size: 16px; 
 }
 
 @keyframes errorShake {
@@ -725,7 +726,7 @@ body {
 
   .mobile-menu-icon {
     display: block;
-    font-size: 28px; /* Adjusted for mobile */
+    font-size: 28px; /*  mobile */
   }
 
   .mobile-controls {
@@ -733,13 +734,13 @@ body {
   }
 
   .logo {
-    font-size: 22px; /* Adjusted for mobile */
+    font-size: 22px; /*  mobile */
   }
 
   .header {
     justify-content: flex-start;
     gap: 16px;
-    height: 80px; /* Adjusted for mobile */
+    height: 80px; /*  mobile */
     padding: 0 20px;
   }
 
@@ -762,7 +763,7 @@ body {
 
   .quick-actions {
     padding: 16px 20px;
-    min-height: 90px; /* Adjusted for mobile */
+    min-height: 90px; /*  mobile */
   }
 
   .quick-actions-container {
@@ -770,7 +771,7 @@ body {
   }
 
   .quick-action-btn {
-    min-width: 180px; /* Adjusted for mobile */
+    min-width: 180px; /*  mobile */
     padding: 14px 16px;
   }
 
@@ -792,12 +793,12 @@ body {
     margin-left: 0;
     margin-right: 0;
     max-width: 85%;
-    font-size: 15px; /* Adjusted for mobile */
+    font-size: 15px; /*  mobile */
     padding: 14px 16px;
   }
 
   .message-avatar {
-    width: 36px; /* Adjusted for mobile */
+    width: 36px; /*  mobile */
     height: 36px;
     font-size: 14px;
   }
@@ -829,7 +830,7 @@ body {
   }
 
   .welcome-title {
-    font-size: 32px; /* Adjusted for mobile */
+    font-size: 32px; /*  mobile */
   }
 
   .welcome-subtitle {
@@ -877,7 +878,7 @@ html, body {
   height: calc(var(--vh, 1vh) * 100);
 }
 
-/* FAQ UPDATED */
+/* FAQ  */
 
 .faq-button {
   position: fixed;
@@ -1035,7 +1036,7 @@ body {
   padding-right: var(--safe-area-inset-right);
 }
 
-/* Fix input area positioning */
+/*input area positioning */
 .input-area {
   position: fixed;
   bottom: 0;
@@ -1102,3 +1103,8 @@ body {
       position: fixed;
   }
 }
+
+
+
+
+

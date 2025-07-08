@@ -3,13 +3,13 @@ set -e
 
 source .env
 
-cd "$0_PATH"
+cd "$H_PATH"
 
 source "$VENV_PATH"
 
 pkill uvicorn
 
-cd "$1_PATH"
+cd "$R_PATH"
 
 git pull
 

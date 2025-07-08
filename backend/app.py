@@ -12,8 +12,8 @@ logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="frontend/templates")
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 
 

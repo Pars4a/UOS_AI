@@ -17,7 +17,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 
-#docker health check simple test
 @app.get("/health")
 async def health_check():
     checks = {

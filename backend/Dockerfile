@@ -13,7 +13,7 @@ FROM python:3.12-alpine AS runner
 
 WORKDIR /app
 
-RUN addgroup usr_grp && adduser -S -g usr_grp usr
+RUN mkdir /app/logs && addgroup usr_grp && adduser -S -g usr_grp usr
 
 
 COPY --from=builder /opt/venv /opt/venv
@@ -21,9 +21,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 
 COPY app.py claude_api.py chatgpt_api.py /app/
-COPY templates/ /app/templates
-COPY static/ /app/static
-COPY tests/ /app/tests
+
 
 RUN  chown -R usr:usr_grp .
 

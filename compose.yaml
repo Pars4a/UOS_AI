@@ -1,24 +1,39 @@
 services:
-  server:
+  frontend:
+    depends_on:
+      - backend
     build: 
-      context: .
+      context: frontend/
       dockerfile: Dockerfile 
-    image: hawall_server
-    container_name: hawall_server
+    image: aramk0/front_end:latest
+    container_name: front_end
     pull_policy: never
     ports:
-      - 8000:8000
+      - 80:80
+  backend:
+    build: 
+      context: backend/
+      dockerfile: Dockerfile
+    image: aramk0/back_end:latest
+    container_name: back_end
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://127.0.0.1:8000/health"]
+      test: ["CMD", "wget", "--spider", "http//127.0.0.1:8000/health"]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 30s
     develop:
       watch:
-        - path: ./templates
-          target: /app/templates 
+        - path: app/frontend/templates
+          target: app/frontend/templates
           action: sync
+    ports:
+      - 8000:8000
+    volumes:
+     - ./logs:/app/logs
+     - ./frontend:/app/frontend
+
+   

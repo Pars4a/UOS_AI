@@ -12,7 +12,6 @@ logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(
 
 app = FastAPI()
 
-# Templates and static files setup
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -43,7 +42,6 @@ async def chat_api(msg: ChatMessage):
         logging.info(answer)
         return {"response": answer}
 
-#app.get for aboutus.html 
 
 @app.get("/")
 async def about(request: Request):

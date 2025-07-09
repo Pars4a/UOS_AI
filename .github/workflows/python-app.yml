@@ -26,6 +26,9 @@ jobs:
       - name: Set up Docker Compose
         run: docker compose up -d --build
 
+      - name: check running containers
+        run: docker ps -a
+
       - name: wait for backend to be rdy
         run: |
           for i in {1..10}; do

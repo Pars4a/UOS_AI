@@ -9,7 +9,7 @@ services:
     container_name: front_end
     pull_policy: never
     ports:
-      - 80:80
+      - 5000:5000
   backend:
     build: 
       context: backend/

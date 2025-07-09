@@ -19,17 +19,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up python
-        uses: actions/setuo-python@v4
+        uses: actions/setup-python@v4
         with:
             python-version: '3.12'
 
       - name: set up docker compose
-        run:
+        run: | 
           docker compose up -d --build
 
       - name: install dependacies
         run: | 
-          pip install -r requirements-dev.txt
+          pip install -r backend/requirements-dev.txt
 
       - name: integration test
         run:

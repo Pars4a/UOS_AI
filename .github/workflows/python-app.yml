@@ -30,7 +30,7 @@ jobs:
         run: |
           for i in {1..10}; do
             echo "checking backend health.."
-            curl -sSf http://localhost:8000/health && break
+            curl -sSf http://localhost:8000 && break
             sleep 5
           done
 

@@ -127,8 +127,6 @@
         </div>
     </div>
 
-    <!-- REMOVED: Duplicate FAQ button and dropdown that were here -->
-
 <script>
 // Replace your existing JavaScript with these fixes:
 
@@ -243,7 +241,7 @@ function handleKeyDown(event) {
   }
 }
 
-// FIXED: Better textarea height adjustment
+// FIXED: Better textarea height adjustment with proper scroll compensation
 function adjustTextareaHeight() {
   const textarea = document.getElementById('messageInput');
   
@@ -251,41 +249,59 @@ function adjustTextareaHeight() {
   textarea.style.height = 'auto';
   
   // Set new height with limits
-  const newHeight = Math.min(textarea.scrollHeight, 120); // Max 120px instead of 200px
+  const newHeight = Math.min(textarea.scrollHeight, 120);
   textarea.style.height = newHeight + 'px';
   
-  // Force scroll to bottom on mobile after adjustment
+  // Immediately update scroll position when textarea changes size
+  requestAnimationFrame(() => {
+    scrollToBottom();
+  });
+  
+  // Additional scroll for mobile after textarea adjustment
   if (window.innerWidth <= 768) {
     setTimeout(() => {
       scrollToBottom();
-    }, 50);
+    }, 100);
   }
 }
 
-// FIXED: Improved mobile input handling
+// FIXED: Enhanced input focus handling with proper scroll management
 function handleInputFocus() {
   const inputArea = document.getElementById('inputArea');
   
   if (window.innerWidth <= 768) {
     inputArea.classList.add('keyboard-open');
     
-    // Delay scroll to allow keyboard animation
+    // Multiple scroll attempts for keyboard opening with longer delays
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
     setTimeout(() => {
       scrollToBottom();
     }, 300);
+    
+    setTimeout(() => {
+      scrollToBottom();
+    }, 500);
+    
+    setTimeout(() => {
+      scrollToBottom();
+    }, 800);
   }
 }
 
+// FIXED: Better input blur handling
 function handleInputBlur() {
   const inputArea = document.getElementById('inputArea');
   
   if (window.innerWidth <= 768) {
     inputArea.classList.remove('keyboard-open');
     
-    // Small delay to prevent flickering
+    // Longer delay to prevent flickering and ensure proper scroll
     setTimeout(() => {
       scrollToBottom();
-    }, 100);
+    }, 400);
   }
 }
 
@@ -356,7 +372,7 @@ function sendMessage(customMessage = null) {
     });
 }
 
-//  Improved message adding with better scrolling
+// FIXED: Improved message adding with better scrolling
 function addMessage(message, sender, isError = false) {
   const messagesContainer = document.getElementById('messages');
   const messageDiv = document.createElement('div');
@@ -374,44 +390,91 @@ function addMessage(message, sender, isError = false) {
   messageDiv.appendChild(content);
   messagesContainer.appendChild(messageDiv);
 
-  //  Better scrolling with animation frame and proper spacing
+  // Force multiple scroll attempts to ensure proper positioning
   requestAnimationFrame(() => {
     scrollToBottom();
   });
   
-  // Additional scroll after DOM update
+  setTimeout(() => {
+    scrollToBottom();
+  }, 10);
+  
   setTimeout(() => {
     scrollToBottom();
   }, 100);
+  
+  // Final scroll attempt for stubborn cases
+  setTimeout(() => {
+    scrollToBottom();
+  }, 300);
 }
 
-//  Improved scroll to bottom function
+// FIXED: Improved scroll to bottom function with proper input area compensation
 function scrollToBottom() {
   const messagesContainer = document.getElementById('messages');
-  if (messagesContainer) {
+  const inputArea = document.getElementById('inputArea');
+  
+  if (messagesContainer && inputArea) {
+    // Get the actual input area height including any dynamic changes
+    const inputAreaHeight = inputArea.getBoundingClientRect().height;
+    
+    // Add substantial padding to ensure messages don't get cut off
+    const extraPadding = 30;
+    
+    // Set bottom padding dynamically based on actual input area height
+    messagesContainer.style.paddingBottom = `${inputAreaHeight + extraPadding}px`;
+    
+    // Force immediate scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Force scroll for mobile devices
+    // Additional scroll attempts for mobile devices
     if (window.innerWidth <= 768) {
+      // Multiple attempts with increasing delays for mobile
       setTimeout(() => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }, 50);
+      
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 150);
+      
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 300);
     }
   }
 }
 
+// FIXED: Enhanced typing indicator with better scroll management
 function showTypingIndicator() {
   const indicator = document.getElementById('typingIndicator');
   indicator.style.display = 'flex';
   
-  // Scroll to show typing indicator
+  // Multiple scroll attempts to show typing indicator properly
   setTimeout(() => {
     scrollToBottom();
-  }, 100);
+  }, 50);
+  
+  setTimeout(() => {
+    scrollToBottom();
+  }, 150);
+  
+  setTimeout(() => {
+    scrollToBottom();
+  }, 300);
 }
 
 function hideTypingIndicator() {
   document.getElementById('typingIndicator').style.display = 'none';
+  
+  // Ensure proper scroll after hiding typing indicator
+  setTimeout(() => {
+    scrollToBottom();
+  }, 50);
+  
+  setTimeout(() => {
+    scrollToBottom();
+  }, 150);
 }
 
 function toggleLanguage() {
@@ -445,7 +508,7 @@ function toggleLanguage() {
   });
 }
 
-// FIXED: Better mobile viewport handling
+// FIXED: Better mobile viewport handling with dynamic padding updates
 function initializeMobileFixes() {
   // More reliable viewport height calculation
   function setViewportHeight() {
@@ -455,7 +518,7 @@ function initializeMobileFixes() {
   
   setViewportHeight();
   
-  // Handle resize with debouncing
+  // Handle resize with debouncing and scroll adjustment
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -465,15 +528,15 @@ function initializeMobileFixes() {
     }, 100);
   });
   
-  // Handle orientation change
+  // Handle orientation change with longer delay
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
       setViewportHeight();
       scrollToBottom();
-    }, 200);
+    }, 700); // Increased delay for orientation change
   });
   
-  // FIXED: Better keyboard detection
+  // Better keyboard detection with scroll management
   let initialViewportHeight = window.innerHeight;
   let keyboardOpen = false;
   
@@ -487,14 +550,20 @@ function initializeMobileFixes() {
       document.body.classList.add('keyboard-open');
       setTimeout(() => {
         scrollToBottom();
-      }, 200);
+      }, 300);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 600);
     } else if (heightDifference < 150 && keyboardOpen) {
       // Keyboard closed
       keyboardOpen = false;
       document.body.classList.remove('keyboard-open');
       setTimeout(() => {
         scrollToBottom();
-      }, 200);
+      }, 300);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 600);
     }
   });
 }
@@ -512,7 +581,13 @@ function initializeIOSFixes() {
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
       setTimeout(() => {
         scrollToBottom();
-      }, 300);
+      }, 100);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 400);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 700);
     }
   });
   
@@ -560,14 +635,51 @@ document.addEventListener('click', function(event) {
   }
 });
 
-// Initialize everything when DOM is loaded
+// Initialize everything when DOM is loaded with proper scroll setup
 document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('messageInput').focus();
   
-  // FIXED: Add proper styling to prevent message cutoff
+  // Add improved styling to prevent message cutoff
   const style = document.createElement('style');
   style.textContent = `
-   
+    .messages {
+      padding-bottom: 140px !important; /* Increased initial padding */
+      scroll-behavior: smooth;
+    }
+    
+    .chat-container {
+      padding-bottom: 0 !important;
+      position: relative;
+    }
+    
+    .message:last-child {
+      margin-bottom: 20px !important; /* More space for last message */
+    }
+    
+    .input-area {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 1000 !important;
+      background: white !important;
+      border-top: 1px solid #eee !important;
+      padding: 1rem !important;
+    }
+    
+    @media (max-width: 768px) {
+      .messages {
+        padding-bottom: 160px !important; /* Even more padding on mobile */
+      }
+      
+      .keyboard-open .messages {
+        padding-bottom: 200px !important; /* Maximum padding when keyboard is open */
+      }
+      
+      .input-area {
+        padding: 0.75rem !important;
+      }
+    }
   `;
   document.head.appendChild(style);
   
@@ -585,10 +697,20 @@ document.addEventListener('DOMContentLoaded', function () {
   if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
     initializeAndroidFixes();
   }
+  
+  // Initial scroll setup with multiple attempts
+  setTimeout(() => {
+    scrollToBottom();
+  }, 100);
+  
+  setTimeout(() => {
+    scrollToBottom();
+  }, 300);
+  
+  setTimeout(() => {
+    scrollToBottom();
+  }, 500);
 });
-
-
-
-   </script>
- </body>
+</script>
+</body>
 </html>

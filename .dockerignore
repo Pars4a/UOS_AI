@@ -20,10 +20,10 @@
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
-**/bin
+**/binS
 **/charts
 **/docker-compose*
-**/compose.y*ml
+ **/compose.y*ml
 **/Dockerfile*
 **/node_modules
 **/npm-debug.log

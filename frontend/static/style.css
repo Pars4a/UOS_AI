@@ -372,6 +372,7 @@ body {
   opacity: 0;
   transform: translateY(20px);
   animation: messageSlideIn 0.5s ease-out forwards;
+  
 }
 
 @keyframes messageSlideIn {

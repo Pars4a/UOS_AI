@@ -5,7 +5,7 @@ services:
     build: 
       context: frontend/
       dockerfile: Dockerfile 
-    image: aramk0/front_end:latest
+    image: aramk0/front_end
     container_name: front_end
     pull_policy: never
     ports:
@@ -14,7 +14,7 @@ services:
     build: 
       context: backend/
       dockerfile: Dockerfile
-    image: aramk0/back_end:latest
+    image: aramk0/back_end
     container_name: back_end
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}

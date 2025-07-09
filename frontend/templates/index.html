@@ -130,10 +130,9 @@
     <!-- REMOVED: Duplicate FAQ button and dropdown that were here -->
 
 <script>
-        
-     
-  let currentLang = 'en';
-  // FAQ functionality
+// Replace your existing JavaScript with these fixes:
+
+let currentLang = 'en';
 let faqOpen = false;
 
 const faqQuestions = {
@@ -163,6 +162,36 @@ const faqQuestions = {
   ]
 };
 
+const translations = {
+  en: {
+    switchText: "کوردی",
+    welcomeTitle: "How can I help you today?",
+    welcomeSubtitle: "I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.",
+    prompts: [
+      { title: "Course Information", text: "What courses are available in Computer Engineering?" },
+      { title: "Campus Services", text: "What are the library hours?" },
+      { title: "Registration Help", text: "How do I register for courses?" },
+      { title: "Campus Navigation", text: "Where is the Computer Engineering building?" },
+    ],
+    inputPlaceholder: "Message Haawall...",
+    faqHeader: "Frequently Asked Questions"
+  },
+  ku: {
+    switchText: "English",
+    welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
+    welcomeSubtitle: "من هاوام، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
+    prompts: [
+      { title: "زانیاری وانە", text: "وانەکانی ئەندازیاری کۆمپیوتەر چییە؟" },
+      { title: "خزمەتگوزاری زانکۆ", text: "کاتەکانی کتێبخانە چەندە؟" },
+      { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
+      { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
+    ],
+    inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ",
+    faqHeader: "پرسیارە دووبارەکان"
+  }
+};
+
+// FAQ functionality
 function toggleFAQ() {
   const dropdown = document.getElementById('faqDropdown');
   const button = document.getElementById('faqButton');
@@ -202,6 +231,326 @@ function sendFAQQuestion(question) {
   sendMessage(question);
 }
 
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  menu.classList.toggle('hidden');
+}
+
+function handleKeyDown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+}
+
+// FIXED: Better textarea height adjustment
+function adjustTextareaHeight() {
+  const textarea = document.getElementById('messageInput');
+  
+  // Reset height to get proper scrollHeight
+  textarea.style.height = 'auto';
+  
+  // Set new height with limits
+  const newHeight = Math.min(textarea.scrollHeight, 120); // Max 120px instead of 200px
+  textarea.style.height = newHeight + 'px';
+  
+  // Force scroll to bottom on mobile after adjustment
+  if (window.innerWidth <= 768) {
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+  }
+}
+
+// FIXED: Improved mobile input handling
+function handleInputFocus() {
+  const inputArea = document.getElementById('inputArea');
+  
+  if (window.innerWidth <= 768) {
+    inputArea.classList.add('keyboard-open');
+    
+    // Delay scroll to allow keyboard animation
+    setTimeout(() => {
+      scrollToBottom();
+    }, 300);
+  }
+}
+
+function handleInputBlur() {
+  const inputArea = document.getElementById('inputArea');
+  
+  if (window.innerWidth <= 768) {
+    inputArea.classList.remove('keyboard-open');
+    
+    // Small delay to prevent flickering
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+  }
+}
+
+function sendExamplePrompt(promptIndex) {
+  const prompt = translations[currentLang].prompts[promptIndex].text;
+  document.getElementById('messageInput').value = prompt;
+  sendMessage(prompt);
+}
+
+function sendMessage(customMessage = null) {
+  const input = document.getElementById('messageInput');
+  const sendButton = document.getElementById('sendButton');
+  const message = customMessage ?? input.value.trim();
+
+  if (message === '') return;
+
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  input.disabled = true;
+  sendButton.disabled = true;
+
+  addMessage(message, 'user');
+  input.value = '';
+  input.style.height = 'auto';
+
+  showTypingIndicator();
+
+  fetch('/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message: message })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      hideTypingIndicator();
+      if (data.response) {
+        addMessage(data.response, 'assistant');
+      } else if (data.error) {
+        const errorMsg = currentLang === 'ku'
+          ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
+          : 'I apologize, but I encountered an error: ' + data.error;
+        addMessage(errorMsg, 'assistant', true);
+      } else {
+        const unexpectedMsg = currentLang === 'ku'
+          ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
+          : 'I received an unexpected response. Please try again.';
+        addMessage(unexpectedMsg, 'assistant', true);
+      }
+    })
+    .catch(error => {
+      hideTypingIndicator();
+      console.error('Error:', error);
+      const connectionErrorMsg = currentLang === 'ku'
+        ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
+        : 'I\'m having trouble connecting right now. Please check your connection and try again.';
+      addMessage(connectionErrorMsg, 'assistant', true);
+    })
+    .finally(() => {
+      input.disabled = false;
+      sendButton.disabled = false;
+      input.focus();
+    });
+}
+
+//  Improved message adding with better scrolling
+function addMessage(message, sender, isError = false) {
+  const messagesContainer = document.getElementById('messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${sender}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'message-avatar';
+  avatar.textContent = sender === 'user' ? 'U' : 'H';
+
+  const content = document.createElement('div');
+  content.className = isError ? 'error-message' : 'message-content';
+  content.textContent = message;
+
+  messageDiv.appendChild(avatar);
+  messageDiv.appendChild(content);
+  messagesContainer.appendChild(messageDiv);
+
+  //  Better scrolling with animation frame and proper spacing
+  requestAnimationFrame(() => {
+    scrollToBottom();
+  });
+  
+  // Additional scroll after DOM update
+  setTimeout(() => {
+    scrollToBottom();
+  }, 100);
+}
+
+//  Improved scroll to bottom function
+function scrollToBottom() {
+  const messagesContainer = document.getElementById('messages');
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Force scroll for mobile devices
+    if (window.innerWidth <= 768) {
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 50);
+    }
+  }
+}
+
+function showTypingIndicator() {
+  const indicator = document.getElementById('typingIndicator');
+  indicator.style.display = 'flex';
+  
+  // Scroll to show typing indicator
+  setTimeout(() => {
+    scrollToBottom();
+  }, 100);
+}
+
+function hideTypingIndicator() {
+  document.getElementById('typingIndicator').style.display = 'none';
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'ku' : 'en';
+  const t = translations[currentLang];
+
+  // Update for both desktop and mobile language buttons
+  document.getElementById('langSwitchBtn').innerText = t.switchText;
+  document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
+  
+  document.querySelector('.welcome-title').innerText = t.welcomeTitle;
+  document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
+  document.getElementById('messageInput').placeholder = t.inputPlaceholder;
+
+  // Update FAQ header
+  const faqHeader = document.querySelector('.faq-header');
+  if (faqHeader) {
+    faqHeader.textContent = t.faqHeader;
+  }
+
+  // Update FAQ questions if dropdown is open
+  if (faqOpen) {
+    populateFAQList();
+  }
+
+  // Update for quick action buttons
+  const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+  quickActionBtns.forEach((btn, i) => {
+    btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
+    btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
+  });
+}
+
+// FIXED: Better mobile viewport handling
+function initializeMobileFixes() {
+  // More reliable viewport height calculation
+  function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+  
+  setViewportHeight();
+  
+  // Handle resize with debouncing
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      setViewportHeight();
+      scrollToBottom();
+    }, 100);
+  });
+  
+  // Handle orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      setViewportHeight();
+      scrollToBottom();
+    }, 200);
+  });
+  
+  // FIXED: Better keyboard detection
+  let initialViewportHeight = window.innerHeight;
+  let keyboardOpen = false;
+  
+  window.addEventListener('resize', () => {
+    const currentHeight = window.innerHeight;
+    const heightDifference = initialViewportHeight - currentHeight;
+    
+    if (heightDifference > 150 && !keyboardOpen) {
+      // Keyboard opened
+      keyboardOpen = true;
+      document.body.classList.add('keyboard-open');
+      setTimeout(() => {
+        scrollToBottom();
+      }, 200);
+    } else if (heightDifference < 150 && keyboardOpen) {
+      // Keyboard closed
+      keyboardOpen = false;
+      document.body.classList.remove('keyboard-open');
+      setTimeout(() => {
+        scrollToBottom();
+      }, 200);
+    }
+  });
+}
+
+// FIXED: iOS Safari specific fixes
+function initializeIOSFixes() {
+  // Prevent zoom on input focus
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (viewportMeta) {
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0';
+  }
+  
+  // Better focus handling for iOS
+  document.addEventListener('focusin', function(e) {
+    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 300);
+    }
+  });
+  
+  // Handle iOS keyboard hiding
+  document.addEventListener('focusout', function(e) {
+    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 300);
+    }
+  });
+}
+
+// FIXED: Android specific fixes
+function initializeAndroidFixes() {
+  let originalHeight = window.innerHeight;
+  
+  window.addEventListener('resize', function() {
+    const currentHeight = window.innerHeight;
+    const diff = originalHeight - currentHeight;
+    
+    if (diff > 150) {
+      // Keyboard is open
+      document.body.style.paddingBottom = '0px';
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } else {
+      // Keyboard is closed
+      document.body.style.paddingBottom = '';
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  });
+}
+
+// Event listeners for FAQ dropdown
 document.addEventListener('click', function(event) {
   const dropdown = document.getElementById('faqDropdown');
   const button = document.getElementById('faqButton');
@@ -211,275 +560,33 @@ document.addEventListener('click', function(event) {
   }
 });
 
-  const translations = {
-    en: {
-      switchText: "کوردی",
-      welcomeTitle: "How can I help you today?",
-      welcomeSubtitle: "I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.",
-      prompts: [
-        { title: "Course Information", text: "What courses are available in Computer Engineering?" },
-        { title: "Campus Services", text: "What are the library hours?" },
-        { title: "Registration Help", text: "How do I register for courses?" },
-        { title: "Campus Navigation", text: "Where is the Computer Engineering building?" },
-      ],
-      inputPlaceholder: "Message Haawall...",
-      faqHeader: "Frequently Asked Questions"
-    },
-    ku: {
-      switchText: "English",
-      welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
-      welcomeSubtitle: "من هاوام، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
-      prompts: [
-        { title: "زانیاری وانە", text: "وانەکانی ئەندازیاری کۆمپیوتەر چییە؟" },
-        { title: "خزمەتگوزاری زانکۆ", text: "کاتەکانی کتێبخانە چەندە؟" },
-        { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
-        { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
-      ],
-      inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ",
-      faqHeader: "پرسیارە دووبارەکان"
-    }
-  };
-
-  function toggleMenu() {
-    const menu = document.getElementById('mobileMenu');
-    menu.classList.toggle('hidden');
-  }
-
-  function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  }
-
-  function adjustTextareaHeight() {
-    const textarea = document.getElementById('messageInput');
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-  }
-
-  // Handle input focus for mobile keyboard
-  function handleInputFocus() {
-    if (window.innerWidth <= 768) {
-      const inputArea = document.getElementById('inputArea');
-      inputArea.classList.add('keyboard-open');
-      
-      // Scroll to bottom when keyboard opens
-      setTimeout(() => {
-        document.body.scrollTop = document.body.scrollHeight;
-        document.documentElement.scrollTop = document.documentElement.scrollHeight;
-      }, 300);
-    }
-  }
-
-  function handleInputBlur() {
-    if (window.innerWidth <= 768) {
-      const inputArea = document.getElementById('inputArea');
-      inputArea.classList.remove('keyboard-open');
-    }
-  }
-
-  function sendExamplePrompt(promptIndex) {
-    // Get the current language prompt based on the index
-    const prompt = translations[currentLang].prompts[promptIndex].text;
-    
-    document.getElementById('messageInput').value = prompt;
-    sendMessage(prompt);
-  }
-
-  function sendMessage(customMessage = null) {
-    const input = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const message = customMessage ?? input.value.trim();
-
-    if (message === '') return;
-
-    document.getElementById('welcomeScreen').classList.add('hidden');
-    input.disabled = true;
-    sendButton.disabled = true;
-
-    addMessage(message, 'user');
-    input.value = '';
-    input.style.height = 'auto';
-
-    showTypingIndicator();
-
-    fetch('/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: message })
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        hideTypingIndicator();
-        if (data.response) {
-          addMessage(data.response, 'assistant');
-        } else if (data.error) {
-          const errorMsg = currentLang === 'ku'
-            ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
-            : 'I apologize, but I encountered an error: ' + data.error;
-          addMessage(errorMsg, 'assistant', true);
-        } else {
-          const unexpectedMsg = currentLang === 'ku'
-            ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
-            : 'I received an unexpected response. Please try again.';
-          addMessage(unexpectedMsg, 'assistant', true);
-        }
-      })
-      .catch(error => {
-        hideTypingIndicator();
-        console.error('Error:', error);
-        const connectionErrorMsg = currentLang === 'ku'
-          ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
-          : 'I\'m having trouble connecting right now. Please check your connection and try again.';
-        addMessage(connectionErrorMsg, 'assistant', true);
-      })
-      .finally(() => {
-        input.disabled = false;
-        sendButton.disabled = false;
-        input.focus();
-      });
-  }
-
-  function addMessage(message, sender, isError = false) {
-    const messagesContainer = document.getElementById('messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = sender === 'user' ? 'U' : 'H';
-
-    const content = document.createElement('div');
-    content.className = isError ? 'error-message' : 'message-content';
-    content.textContent = message;
-
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(content);
-    messagesContainer.appendChild(messageDiv);
-
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
-
-  function showTypingIndicator() {
-    document.getElementById('typingIndicator').style.display = 'flex';
-  }
-
-  function hideTypingIndicator() {
-    document.getElementById('typingIndicator').style.display = 'none';
-  }
-
-  function toggleLanguage() {
-    currentLang = currentLang === 'en' ? 'ku' : 'en';
-    const t = translations[currentLang];
-
-    // Update for both desktop and mobile language buttons
-    document.getElementById('langSwitchBtn').innerText = t.switchText;
-    document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
-    
-    document.querySelector('.welcome-title').innerText = t.welcomeTitle;
-    document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
-    document.getElementById('messageInput').placeholder = t.inputPlaceholder;
-
-    // Update FAQ header
-    const faqHeader = document.querySelector('.faq-header');
-    if (faqHeader) {
-      faqHeader.textContent = t.faqHeader;
-    }
-
-    // Update FAQ questions if dropdown is open
-    if (faqOpen) {
-      populateFAQList();
-    }
-
-    // Update for quick action buttons
-    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
-    quickActionBtns.forEach((btn, i) => {
-      btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
-      btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('messageInput').focus();
-  });
-
-  // Enhanced mobile fixes for Android and iOS
-  function initializeMobileFixes() {
-    // Handle viewport height changes
-    function setViewportHeight() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-    
-    setViewportHeight();
-    window.addEventListener('resize', setViewportHeight);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(setViewportHeight, 100);
-    });
-
-    // Handle keyboard visibility on mobile
-    let initialViewportHeight = window.innerHeight;
-    
-    window.addEventListener('resize', () => {
-      const currentHeight = window.innerHeight;
-      const heightDifference = initialViewportHeight - currentHeight;
-      
-      if (heightDifference > 150) {
-        // Keyboard is likely open
-        document.body.classList.add('keyboard-open');
-      } else {
-        // Keyboard is likely closed
-        document.body.classList.remove('keyboard-open');
-      }
-    });
-  }
-
-  // Initialize mobile fixes
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('messageInput').focus();
+  
+  // FIXED: Add proper styling to prevent message cutoff
+  const style = document.createElement('style');
+  style.textContent = `
+   
+  `;
+  document.head.appendChild(style);
+  
+  // Initialize mobile fixes based on device
   if (window.innerWidth <= 768) {
     initializeMobileFixes();
   }
-
-  // iOS Safari specific fixes 
+  
+  // iOS specific fixes
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    // Prevent zoom on input focus
-    document.addEventListener('touchstart', function() {}, {passive: true});
-    
-    // Additional iOS fixes
-    document.addEventListener('focusin', function(e) {
-      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-        setTimeout(() => {
-          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-      }
-    });
+    initializeIOSFixes();
   }
-
+  
   // Android specific fixes
   if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
-    // Handle Android keyboard
-    const originalHeight = window.innerHeight;
-    
-    window.addEventListener('resize', function() {
-      const currentHeight = window.innerHeight;
-      const diff = originalHeight - currentHeight;
-      
-      if (diff > 150) {
-        // Keyboard is open
-        document.body.style.paddingBottom = '0px';
-      } else {
-        // Keyboard is closed
-        document.body.style.paddingBottom = '';
-      }
-    });
+    initializeAndroidFixes();
   }
+});
+
 
 
    </script>

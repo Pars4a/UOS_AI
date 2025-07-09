@@ -33,6 +33,10 @@ jobs:
             curl -sSf http://localhost:8000 && break
             sleep 5
           done
+      - name: Show backend logs if test fails
+        if: failure()
+        run: docker logs back_end
+
 
 
       - name: Install dependencies

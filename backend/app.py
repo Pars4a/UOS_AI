@@ -17,12 +17,7 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 
 
-@app.get("/health")
-async def health_check():
-    checks = {
-        "status": "healthy",
-    }
-    return checks
+
 
 
 class ChatMessage(BaseModel):

@@ -23,6 +23,7 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 class ChatMessage(BaseModel):
     message: str
 
+#dont touch these
 @app.post("/chat")
 async def chat_api(msg: ChatMessage):
     try:

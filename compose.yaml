@@ -30,5 +30,6 @@ services:
     volumes:
      - ./logs:/app/logs
      - ./frontend:/app/frontend
+     - ./tests:/app/tests
 
    

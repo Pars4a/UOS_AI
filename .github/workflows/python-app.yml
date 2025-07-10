@@ -61,4 +61,4 @@ jobs:
      
 
       - name: Integration tests
-        run: docker exec pytest
+        run: pytest

@@ -25,30 +25,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r backend/requirements.txt
+          pip install -r backend/requirements-dev.txt
          
 
       - name: Set up Docker Compose
         run: docker compose up -d --build
       
-      - name: Ensure log file exists
+      - name: fix file perms
         run: |
           mkdir -p logs
           touch logs/chat_logs.txt
           sudo chmod 777 logs/
           sudo chmod 777 logs/chat_logs.txt
-
-      - name: check running containers
-        run: |
-          docker ps -a
-          ls
+ 
           
-          
-      - name: Wait for backend to be ready
+      - name: Wait for backend
         run: |
           for i in {1..10}; do
             if curl -s http://127.0.0.1:8000; then
-              echo "Backend is up!";
+              echo "Backend is up";
              exit 0;
             fi
             echo "Waiting for backend...";
@@ -62,3 +57,8 @@ jobs:
 
       - name: Integration tests
         run: pytest
+
+
+      - name: kill containers
+        if: always()
+        run: docker compose down

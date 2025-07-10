@@ -30,13 +30,19 @@ jobs:
 
       - name: Set up Docker Compose
         run: docker compose up -d --build
+      
+      - name: Ensure log file exists
+        run: |
+          mkdir -p logs
+          touch logs/chat_logs.txt
+          sudo chmod 777 logs/
+          sudo chmod 777 logs/chat_logs.txt
 
       - name: check running containers
         run: |
           docker ps -a
           ls
-          sudo chmod 777 logs/
-          sudo chmod 777 logs/chat_logs.txt
+          
           
       - name: Wait for backend to be ready
         run: |

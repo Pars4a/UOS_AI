@@ -14,7 +14,9 @@ FROM python:3.12-alpine AS runner
 WORKDIR /app
 
 RUN mkdir /app/logs && addgroup usr_grp && adduser -S -g usr_grp usr
-RUN chmod 777 /app/logs
+RUN touch /app/logs/chat_logs.txt
+RUN chmod 777 /app/logs && chmod 777 /app/logs/chat_logs.txt
+
 
 
 COPY --from=builder /opt/venv /opt/venv

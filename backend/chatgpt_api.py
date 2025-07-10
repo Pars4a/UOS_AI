@@ -19,7 +19,7 @@ def ask_openai(prompt: str) -> str:
     )
 
 	response = client.chat.completions.create(
-    		model="fake-model",
+    		model="gpt-3.5-turbo-0125",
     		messages=[
         	{
             	"role": "system","content": system_message

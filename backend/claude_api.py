@@ -20,7 +20,7 @@ def ask_claude(prompt: str):
     """
     try: 
         message = client.messages.create(
-        model="fake-model",
+        model="claude-3-5-haiku-20241022",
         max_tokens=1000,
         temperature=1,
         system= system_message,

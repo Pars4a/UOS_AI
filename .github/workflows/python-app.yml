@@ -26,6 +26,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r backend/requirements.txt
+          sudo chmod 777 logs/
+          sudo chmod 777 logs/chat_logs.txt
 
       - name: Set up Docker Compose
         run: docker compose up -d --build

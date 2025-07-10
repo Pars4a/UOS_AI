@@ -30,6 +30,7 @@ jobs:
         run: |
           docker ps -a
           ls
+          curl http://127.0.0.1:8000
 
       - name: wait for backend to be rdy
         run: |

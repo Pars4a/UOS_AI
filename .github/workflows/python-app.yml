@@ -31,6 +31,8 @@ jobs:
           docker ps -a
           ls
           curl http://127.0.0.1:8000
+      - name: show backend logs
+        run: docker logs back_end
 
       - name: wait for backend to be rdy
         run: |

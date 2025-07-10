@@ -19,12 +19,7 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:8000/health"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+    
     develop:
       watch:
         - path: app/frontend/templates

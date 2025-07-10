@@ -1,53 +1,67 @@
-name: CI test
+name: CI Pipeline
 
-on: 
+on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main, develop ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
+    
     steps:
-      - name: Checkout code 
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Set up Docker Compose
-        run: docker compose up -d --build
-
-      - name: check running containers
-        run: docker ps -a
-
-      - name: wait for backend to be rdy
-        run: |
-          echo "Waiting for backend at http://127.0.0.1:8000..."
-          for i in {1..10}; do
-            if curl -sSf http://127.0.0.1:8000/health; then
-            echo "✅ Backend is ready!"
-            break
-          else
-           echo "❌ Still waiting..."
-           sleep 5
-          fi
-          done
-     
-      - name: Install dependencies
-        run: |
-          pip install -r backend/requirements.txt
-
-      - name: Integration tests
-        run: pytest tests/
-
-      - name: Tear down containers
-        run: docker compose down
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Create logs directory
+      run: mkdir -p logs
+    
+    - name: Build and start services
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        docker-compose build
+        docker-compose up -d
+    
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for backend service..."
+        timeout 60 bash -c 'until curl -f http://localhost:8000 >/dev/null 2>&1; do sleep 2; done'
+        echo "Backend is ready!"
+        
+        echo "Waiting for frontend service..."
+        timeout 60 bash -c 'until curl -f http://localhost:5000 >/dev/null 2>&1; do sleep 2; done'
+        echo "Frontend is ready!"
+    
+    - name: Set up Python for testing
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install test dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest httpx
+    
+    - name: Run tests
+      run: |
+        pytest tests/test.py -v
+    
+    - name: Show service logs on failure
+      if: failure()
+      run: |
+        echo "=== Backend logs ==="
+        docker-compose logs backend
+        echo "=== Frontend logs ==="
+        docker-compose logs frontend
+    
+    - name: Clean up
+      if: always()
+      run: |
+        docker-compose down -v
+        docker system prune -f

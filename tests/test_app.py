@@ -1,7 +1,7 @@
 import pytest
 import httpx
 
-base_url = 'http://127.0.0.1:8000'
+base_url = 'http://localhost:8000'
 
 def test_home():
     r = httpx.get(f"{base_url}/")

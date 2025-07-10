@@ -16,6 +16,7 @@ services:
       dockerfile: Dockerfile
     image: aramk0/back_end
     container_name: back_end
+    pull_policy: never
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

@@ -31,10 +31,15 @@ jobs:
 
       - name: wait for backend to be rdy
         run: |
+          echo "Waiting for backend at http://127.0.0.1:8000..."
           for i in {1..10}; do
-            echo "checking backend health.."
-            curl -sSf http://localhost:8000 && break
-            sleep 5
+            if curl -sSf http://127.0.0.1:8000/health; then
+            echo "✅ Backend is ready!"
+            break
+          else
+           echo "❌ Still waiting..."
+           sleep 5
+          fi
           done
      
       - name: Install dependencies

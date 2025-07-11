@@ -39,12 +39,7 @@ jobs:
       - name: run containers
         run: docker compose up -d --build
 
-      - name: fix perms
-        run: |
-          mkdir logs
-          touch logs/chat_logs.txt
-          sudo chmod 777 logs
-          sudo chmod 777 logs/chat_logs.txt
+      
 
       - name: wait for backend to be ready
         run: |

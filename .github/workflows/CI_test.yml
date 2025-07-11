@@ -41,8 +41,6 @@ jobs:
 
       - name: fix perms
         run: |
-          mkdir logs
-          touch logs/chat_logs.txt
           sudo chmod 777 logs
           sudo chmod 777 logs/chat_logs.txt
 

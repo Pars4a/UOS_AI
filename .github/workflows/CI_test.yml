@@ -1,13 +1,14 @@
 name: CI test
 
-on: 
+
+on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     env:
@@ -15,50 +16,54 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
-      - name: Checkout code 
+      - name: checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: set up python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install dependencies
+      - name: install dependacies
         run: |
-          pip install -r backend/requirements-dev.txt
-         
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
-      - name: Set up Docker Compose
-        run: docker compose up -d --build
+      - name: Lintin
+        run: |
+          # will cancel the build if critical issue is found 
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          #this one wont fail it
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
-      - name: fix file perms
+      - name: run containers
+        run: docker compose up -d --build
+
+      - name: fix perms
         run: |
-          mkdir -p logs
+          mkdir logs
           touch logs/chat_logs.txt
-          sudo chmod 777 logs/
+          sudo chmod 777 logs
           sudo chmod 777 logs/chat_logs.txt
- 
-          
-      - name: Wait for backend
+
+      - name: wait for backend to be ready
         run: |
           for i in {1..10}; do
-            if curl -s http://127.0.0.1:8000; then
-              echo "Backend is up";
-             exit 0;
-            fi
-            echo "Waiting for backend...";
-            sleep 3;
-              done
-              echo "Backend failed to start";
-              docker logs back_end
-              exit 1
-   
-     
+          if curl -s http://localhost:8000; then
+            echo "backend is ready";
+            exit 0;
+          fi
+          echo 'waiting for backend...';
+          sleep 3;
+            done
+            echo "backend failed to start";
+            docker logs back_end
+            exit 1
 
-      - name: Integration tests
-        run: pytest
-
+      - name: integration test
+        run: pytest tests/
 
       - name: kill containers
-        if: always()
         run: docker compose down
+
+      

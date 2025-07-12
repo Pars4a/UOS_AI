@@ -41,6 +41,7 @@ jobs:
 
       - name: fix perms
         run: |
+          # -p flag so if the dir already exists it wont give an erro 
           mkdir -p logs
           touch logs/chat_logs.txt
           sudo chmod 777 logs/

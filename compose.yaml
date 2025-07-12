@@ -21,6 +21,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     
+    #watches for realtime changes in these frontend files
     develop:
       watch:
         - path: app/frontend/templates
@@ -29,9 +30,9 @@ services:
     ports:
       - 8000:8000
     volumes:
+    # these are bind mounts for now, change to volume mounts in prod
      - ./logs:/app/logs
      - ./frontend:/app/frontend
-     #test for ci 
      - ./backend:/app/backend
      - ./tests:/app/tests
 

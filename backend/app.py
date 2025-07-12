@@ -7,11 +7,11 @@ from claude_api import ask_claude
 from chatgpt_api import ask_openai  
 import logging
 
-
+#watch out for the log files permissions when dealing with docker, CI , uvicorn, 
 logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
-
+#need these mounted into the docker file
 templates = Jinja2Templates(directory="frontend/templates")
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
@@ -23,7 +23,7 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 class ChatMessage(BaseModel):
     message: str
 
-#dont touch these
+#dont touch these, redirects user msg to chatgpt api if claude doesnt work
 @app.post("/chat")
 async def chat_api(msg: ChatMessage):
     try:

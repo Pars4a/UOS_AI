@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from claude_api import ask_claude
 from chatgpt_api import ask_openai  
+from datetime import datetime
 import logging
 
 #watch out for the log files permissions when dealing with docker, CI , uvicorn, 
@@ -26,7 +27,7 @@ class ChatMessage(BaseModel):
 
 @app.get('/health')
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "timestamp": datetime.now()}
 
 #dont touch these, redirects user msg to chatgpt api if claude doesnt work
 @app.post("/chat")

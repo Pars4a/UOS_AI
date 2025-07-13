@@ -23,6 +23,11 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 class ChatMessage(BaseModel):
     message: str
 
+
+@app.get('/health')
+async def health_check():
+    return {"status": "healthy"}
+
 #dont touch these, redirects user msg to chatgpt api if claude doesnt work
 @app.post("/chat")
 async def chat_api(msg: ChatMessage):

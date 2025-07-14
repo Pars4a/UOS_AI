@@ -3,7 +3,7 @@
 #run this for first serup when pulled the repo
 #first run sudo chmod 744 scripts/first_setuo.sh in your terminal
 
-
+cd ~
 
 #install docker
 sudo apt update && sudo apt upgrade -y

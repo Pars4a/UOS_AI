@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#run this for first serup when pulled the repo
-#first run sudo chmod 744 scripts/first_setuo.sh in your terminal
+#This is a script for setting up the developing environment for the first time on your machine
+#first run 'sudo chmod 744 scripts/first_setup.sh' in your terminal
+#then './scripts/first_setup.sh'
 
 cd ~
 

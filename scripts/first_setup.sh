@@ -19,9 +19,10 @@ docker --version
 
 #for making .env, input your own api keys here
 echo OPENAI_API_KEY = 1234x > .env
-echo ANTHROPIC_API_KEY = 1234x > .env
+echo ANTHROPIC_API_KEY = 1234x >> .env
 
 #temp fix for the perms when running docker
+mkdir -p logs
 sudo chmod 777 logs/
 
 docker compose up --build

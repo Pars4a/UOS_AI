@@ -23,3 +23,5 @@ echo ANTHROPIC_API_KEY = 1234x > .env
 
 #temp fix for the perms when running docker
 sudo chmod 777 logs/
+
+docker compose up --build

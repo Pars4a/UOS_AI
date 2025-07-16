@@ -21,7 +21,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     
-   
+   #at 127.0.0.1:8000 instead of localhost:8000 due to wsl2
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://127.0.0.1:8000/health"]
       interval: 1m30s
@@ -38,7 +38,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-    # these are bind mounts for now, change to volume mounts in prod
+    # these are bind mounts
      - ./logs:/app/logs
      - ./frontend:/app/frontend
      - ./backend:/app/backend

@@ -43,5 +43,4 @@ services:
      - ./frontend:/app/frontend
      - ./backend:/app/backend
      - ./tests:/app/tests
-
    

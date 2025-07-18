@@ -2,7 +2,7 @@ FROM python:3.12-alpine AS builder
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 #best to use virtual env for small image size as pip wheel is bigger
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -20,7 +20,9 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 #only copy needed files to run to reduce image size
-COPY app.py claude_api.py chatgpt_api.py /app/
+#COPY app.py claude_api.py chatgpt_api.py /app/
+COPY backend/ /app/
+COPY frontend/ /app/
 
 
 RUN  chown -R usr:usr_grp .

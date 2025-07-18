@@ -12,8 +12,8 @@ services:
       - 5000:5000
   backend:
     build: 
-      context: backend/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     image: aramk0/back_end
     container_name: back_end
     pull_policy: never

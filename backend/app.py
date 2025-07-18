@@ -14,7 +14,7 @@ logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(
 app = FastAPI()
 #need these mounted into the docker file
 templates = Jinja2Templates(directory="frontend/templates")
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+app.mount("/static", StaticFiles(directory="/app/frontend/static"), name="static")
 
 
 

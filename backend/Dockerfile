@@ -23,7 +23,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 #COPY app.py claude_api.py chatgpt_api.py /app/
 COPY backend/ /app/
 COPY frontend/ /app/
-
+# this is only for testing now with k8s to have frontend files in backend
 
 RUN  chown -R usr:usr_grp .
 

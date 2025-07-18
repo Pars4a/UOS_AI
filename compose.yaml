@@ -12,6 +12,7 @@ services:
       - 5000:5000
   backend:
     build: 
+      # have the build context here so it can see frontend dir
       context: .
       dockerfile: backend/Dockerfile
     image: aramk0/back_end

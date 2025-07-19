@@ -1,33 +1,35 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: backend
+  name: haawall
 spec:
   initContainers:
-  - name: copy-frontend
+  - name: frontend-files
     image: aramk0/front_end
     command:
     - sh
     - -c
     - |
-      mkdir -p /shared/templates /shared/static
+      mkdir -p shared/templates shared/static
       cp -r /app/templates/* /shared/templates/
       cp -r /app/static/* /shared/static/
-      echo "Frontend files copied successfully!"
+      echo "front-end files copied"
     volumeMounts:
-    - name: frontend-files 
+    - name: frontend-files
       mountPath: /shared
-      
+
   containers:
   - name: backend
     image: aramk0/back_end
     env:
     - name: OPENAI_API_KEY
-      value: "fake-key"
+      value: 'FAKE-KEY24'
+    - name: ANTHROPIC_API_KEY
+      value: "FAKE-KEY42"
     ports:
     - containerPort: 8000
     volumeMounts:
-    - name: frontend-files 
+    - name: frontend-files
       mountPath: /app/frontend
     livenessProbe:
       initialDelaySeconds: 2
@@ -37,7 +39,6 @@ spec:
       httpGet:
         path: /health
         port: 8000
-        
   volumes:
-  - name: frontend-files  
+  - name: frontend-files
     emptyDir: {}

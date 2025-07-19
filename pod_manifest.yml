@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend
+spec:
+  initContainers:
+  - name: copy-frontend
+    image: aramk0/front_end
+    command:
+    - sh
+    - -c
+    - |
+      mkdir -p /shared/templates /shared/static
+      cp -r /app/templates/* /shared/templates/
+      cp -r /app/static/* /shared/static/
+      echo "Frontend files copied successfully!"
+    volumeMounts:
+    - name: frontend-files 
+      mountPath: /shared
+      
+  containers:
+  - name: backend
+    image: aramk0/back_end
+    env:
+    - name: OPENAI_API_KEY
+      value: "fake-key"
+    ports:
+    - containerPort: 8000
+    volumeMounts:
+    - name: frontend-files 
+      mountPath: /app/frontend
+    livenessProbe:
+      initialDelaySeconds: 2
+      periodSeconds: 5
+      timeoutSeconds: 1
+      failureThreshold: 3
+      httpGet:
+        path: /health
+        port: 8000
+        
+  volumes:
+  - name: frontend-files  
+    emptyDir: {}

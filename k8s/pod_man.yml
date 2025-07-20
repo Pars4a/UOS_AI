@@ -32,7 +32,7 @@ spec:
         image: aramk0/back_end
         env:
         - name: OPENAI_API_KEY
-          valueFrom: 'FAKE-KEY24'
+          value: 'FAKE-KEY24'
         - name: ANTHROPIC_API_KEY
           value: "FAKE-KEY42"
         ports:

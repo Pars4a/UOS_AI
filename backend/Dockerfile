@@ -1,4 +1,4 @@
-FROM python:3.12-alpine AS builder 
+FROM python:3.12-slim AS builder 
 
 WORKDIR /app
 
@@ -9,11 +9,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install -r requirements.txt
 
 
-FROM python:3.12-alpine AS runner
+FROM python:3.12-slim AS runner
 
 WORKDIR /app
-#-S flag makes a systerm user with no home or bin
-RUN mkdir -p /app/logs && addgroup usr_grp && adduser -S -g usr_grp usr
+#-M flag makes a systerm user with no home or bin
+RUN mkdir -p /app/logs && groupadd usr_grp && useradd -M -g usr_grp usr
 
 
 COPY --from=builder /opt/venv /opt/venv

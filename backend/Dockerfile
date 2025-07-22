@@ -1,16 +1,15 @@
-FROM python:3.12-alpine AS builder 
+FROM python:3.12-slim AS builder 
 
 WORKDIR /app
 
 COPY backend/requirements.txt .
-#best to use virtual env for small image size as pip wheel is bigger
 RUN pip install --prefix=/packages -r requirements.txt
 
-FROM python:3.12-alpine AS runner
+FROM python:3.12-slim AS runner
 
 WORKDIR /app
 #-M flag makes a systerm user with no home or bin
-RUN mkdir -p /app/logs && addgroup usr_grp && adduser -S -g usr_grp usr
+RUN mkdir -p /app/logs && groupadd usr_grp && useradd -M -g usr_grp usr
 
 COPY --from=builder /packages /usr/local/
 RUN rm -rf /packages

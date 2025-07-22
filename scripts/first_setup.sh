@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+set -e
+
 #This is a script for setting up the developing environment for the first time on your machine
 #first run 'sudo chmod 744 scripts/first_setup.sh' in your terminal
 #then './scripts/first_setup.sh'

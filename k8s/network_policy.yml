@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpol-1
+  namespace: default # target the NS of the pods you want to control with the network policy 
+spec:
+  podSelector: # {} closed curly braces means all pods in the default namespace
+    matchLabels:
+      app: hawall # applies to all pods with this label
+  policyTypes:
+  - Ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            run: client # the pods can only receive traffic from pods with run : client label 

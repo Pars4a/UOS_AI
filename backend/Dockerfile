@@ -20,7 +20,7 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 #only copy needed files to run to reduce image size
-#COPY app.py claude_api.py chatgpt_api.py /app/
+#COPY backend/app.py backend/claude_api.py backend/chatgpt_api.py /app/
 COPY backend/ /app/
 COPY frontend/ /app/
 # this is only for testing now with k8s to have frontend files in backend

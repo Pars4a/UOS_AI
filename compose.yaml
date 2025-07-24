@@ -3,8 +3,8 @@ services:
     depends_on:
       - backend
     build: 
-      context: frontend/
-      dockerfile: Dockerfile 
+      context: .
+      dockerfile: frontend/Dockerfile 
     image: aramk0/front_end
     container_name: front_end
     pull_policy: never

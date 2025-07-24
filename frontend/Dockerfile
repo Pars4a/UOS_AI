@@ -1,4 +1,4 @@
 FROM nginx:alpine
-COPY templates/ /app/templates
-COPY static/ /app/static
+COPY frontend/templates/ /app/templates
+COPY frontend/static/ /app/static
 # joint with backend cont l8r

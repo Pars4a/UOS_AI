@@ -21,7 +21,7 @@ def get_api_key():
         raise RuntimeError("API key not found")
 
 
-client = anthropic.Anthropic()
+client = anthropic.Anthropic(api_key=get_api_key())
 
 def ask_claude(prompt: str):
 

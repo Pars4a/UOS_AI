@@ -3,10 +3,11 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
+client = OpenAI()
 def get_api_key():
-	client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-	if OpenAI:
-		return OpenAI
+	api_key=os.getenv("OPENAI_API_KEY")
+	if api_key:
+		return api_key
 	
 	try:
 		with open("/etc/secrets/OPENAI_API_KEY", "r") as f:

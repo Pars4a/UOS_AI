@@ -8,12 +8,12 @@ load_dotenv()
 logging.basicConfig(filename="logs/chat_logs.txt", level=logging.INFO,format="%(asctime)s - %(levelname)s - %(message)s" )
 
 def get_api_key():
-    
+    # dev env with .env
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
     if ANTHROPIC_API_KEY:
         return ANTHROPIC_API_KEY
     
-
+    # for k8s deployment
     try:
         with open("/etc/secrets/ANTHROPIC_API_KEY", "r") as f:
            return f.read().strip()

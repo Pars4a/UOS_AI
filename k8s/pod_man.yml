@@ -23,7 +23,7 @@ spec:
           cp -r /app/templates/* /shared/templates/
           cp -r /app/static/* /shared/static/
           echo "front-end files copied"
-          
+
         volumeMounts:
         - name: frontend-files
           mountPath: /shared
@@ -39,6 +39,7 @@ spec:
         - name: frontend-files
           mountPath: /app/frontend
         - name: secret-volume
+          # this is the path INSIDE THE CONTAINER at which the secret must be found check the api files
           mountPath: /etc/secrets
 
         livenessProbe:

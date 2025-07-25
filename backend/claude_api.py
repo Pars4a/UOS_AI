@@ -30,6 +30,9 @@ def ask_claude(prompt: str):
     -The departments of UOS are : compeng, civil eng, electrical eng, water resources eng, architectural eng.
     -try to be short and precise.
     -you were made by the computer engineering department
+    - The semester starts on month 9th 
+    - computer eng building is in the building no4 at uos new campus
+    - registration starts after filling zankoline 
     """
     try: 
         message = client.messages.create(

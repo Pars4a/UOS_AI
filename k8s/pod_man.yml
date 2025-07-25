@@ -32,9 +32,16 @@ spec:
         image: aramk0/back_end
         env:
         - name: OPENAI_API_KEY
-          value: 'FAKE-KEY24'
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: OPENAI_API_KEY
+
         - name: ANTHROPIC_API_KEY
-          value: "FAKE-KEY42"
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: ANTHROPIC_API_KEY
         ports:
         - containerPort: 8000
         volumeMounts:

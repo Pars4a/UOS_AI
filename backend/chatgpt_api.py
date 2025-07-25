@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-client = OpenAI()
+
 def get_api_key():
 	api_key=os.getenv("OPENAI_API_KEY")
 	if api_key:
@@ -15,6 +15,7 @@ def get_api_key():
 	except FileNotFoundError:
 		raise RuntimeError("APi key not found")
 
+client = OpenAI(api_key=get_api_key())
 def ask_openai(prompt: str) -> str:
 
 

@@ -23,6 +23,7 @@ spec:
           cp -r /app/templates/* /shared/templates/
           cp -r /app/static/* /shared/static/
           echo "front-end files copied"
+          
         volumeMounts:
         - name: frontend-files
           mountPath: /shared
@@ -30,23 +31,16 @@ spec:
       containers:
       - name: backend
         image: aramk0/back_end
-        env:
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: my-secret
-              key: OPENAI_API_KEY
-
-        - name: ANTHROPIC_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: my-secret
-              key: ANTHROPIC_API_KEY
         ports:
         - containerPort: 8000
+
+
         volumeMounts:
         - name: frontend-files
           mountPath: /app/frontend
+        - name: secret-volume
+          mountPath: /etc/secrets
+
         livenessProbe:
           initialDelaySeconds: 2
           periodSeconds: 5
@@ -55,6 +49,11 @@ spec:
           httpGet:
             path: /health
             port: 8000
+
+
       volumes:
       - name: frontend-files
         emptyDir: {}
+      - name: secret-volume
+        secret:
+          secretName: my-secret

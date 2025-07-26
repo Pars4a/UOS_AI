@@ -1,52 +1,104 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Request, Form, HTTPException, Depends
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from claude_api import ask_claude
-from chatgpt_api import ask_openai  
+from claude_api import ask_claude, reload_university_info
+from chatgpt_api import ask_openai
 from datetime import datetime
 import logging
+import os
 
-#watch out for the log files permissions when dealing with docker, CI , uvicorn, 
-logging.basicConfig(filename='logs/chat_logs.txt',level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+#watch out for the log files permissions when dealing with docker, CI , uvicorn,  
+logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
 #need these mounted into the docker file
 templates = Jinja2Templates(directory="frontend/templates")
 app.mount("/static", StaticFiles(directory="/app/frontend/static"), name="static")
 
+# Security for admin endpoints
+security = HTTPBearer()
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "your-secret-admin-token")
 
-
-
-
+def verify_admin_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if credentials.credentials != ADMIN_TOKEN:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+    return credentials
 
 class ChatMessage(BaseModel):
     message: str
 
+class InfoUpdateResponse(BaseModel):
+    status: str
+    message: str
+    timestamp: datetime
 
 @app.get('/health')
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now()}
+
+# Admin endpoint to reload university information
+@app.post("/admin/reload-info", response_model=InfoUpdateResponse)
+async def reload_info(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    """Admin endpoint to reload university information files"""
+    try:
+        reload_university_info()
+        logging.info("University information reloaded by admin")
+        return InfoUpdateResponse(
+            status="success",
+            message="University information has been reloaded successfully",
+            timestamp=datetime.now()
+        )
+    except Exception as e:
+        logging.error(f"Error reloading university info: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to reload info: {str(e)}")
+
+# Admin endpoint to check what information is currently loaded
+@app.get("/admin/info-status")
+async def get_info_status(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    """Admin endpoint to check current university information status"""
+    try:
+        from claude_api import info_loader
+        info = info_loader.load_info_files()
+        return {
+            "status": "success",
+            "loaded_files": list(info.keys()),
+            "file_count": len(info),
+            "last_check": datetime.now(),
+            "cache_status": {
+                "cached_files": len(info_loader.info_cache),
+                "cache_keys": list(info_loader.info_cache.keys())
+            }
+        }
+    except Exception as e:
+        logging.error(f"Error getting info status: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get info status: {str(e)}")
 
 #dont touch these, redirects user msg to chatgpt api if claude doesnt work
 @app.post("/chat")
 async def chat_api(msg: ChatMessage):
     try:
         answer = ask_claude(msg.message)
-        logging.info(msg.message)
-        logging.info(answer)
-        return {"response": answer}
+        logging.info(f"User message: {msg.message}")
+        logging.info(f"Claude response: {answer}")
+        return {"response": answer, "source": "claude"}
     except Exception as e:
-        answer = ask_openai(msg.message)
-        logging.info(msg.message)
-        logging.info(answer)
-        return {"response": answer}
-
+        logging.warning(f"Claude failed, falling back to OpenAI: {e}")
+        try:
+            answer = ask_openai(msg.message)
+            logging.info(f"User message: {msg.message}")
+            logging.info(f"OpenAI response: {answer}")
+            return {"response": answer, "source": "openai"}
+        except Exception as openai_error:
+            logging.error(f"Both Claude and OpenAI failed: {openai_error}")
+            raise HTTPException(status_code=500, detail="Both AI services are currently unavailable")
 
 @app.get("/")
-async def about(request: Request):
+async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
 @app.get("/index.html")
 async def redirect_home():
     return RedirectResponse(url="/")
@@ -54,15 +106,32 @@ async def redirect_home():
 @app.get("/about")
 async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
+
 @app.get("/about.html")
 async def redirect_about():
     return RedirectResponse(url="/about")
 
-
 @app.get("/contact")
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
+
 @app.get("/contact.html")
 async def redirect_contact():
     return RedirectResponse(url="/contact")
 
+# Optional: Add a simple admin dashboard endpoint
+@app.get("/admin")
+async def admin_dashboard(request: Request, credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    """Simple admin dashboard"""
+    return templates.TemplateResponse("admin.html", {"request": request})
+
+# Startup event to load initial information
+@app.on_event("startup")
+async def startup_event():
+    """Load university information on startup"""
+    try:
+        from claude_api import info_loader
+        info_loader.load_info_files()
+        logging.info("University information loaded on startup")
+    except Exception as e:
+        logging.error(f"Failed to load university information on startup: {e}")

@@ -1,0 +1,14 @@
+{
+    "engineering_departments": [
+        "Computer Engineering",
+        "Civil Engineering", 
+        "Electrical Engineering",
+        "Water Resources Engineering",
+        "Architectural Engineering"
+    ],
+    "computer_engineering": {
+        "building": "Building No. 4",
+        "campus": "UOS New Campus",
+        "head": "Dr. Shwan Chatto"
+    }
+}

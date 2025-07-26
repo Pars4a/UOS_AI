@@ -9,6 +9,10 @@
     "computer_engineering": {
         "building": "Building No. 4",
         "campus": "UOS New Campus",
-        "head": "Dr. Shwan Chatto"
+        "head": "Dr. Shwan Chatto",
+        "Classes": {
+                "first_semester": "University Work Envicornment, English Language Level 1,2, Kurdology, Calculus1, Electrical Circuits, Compputer Fundamentals, Engineering Drawing"
+
+            }
     }
 }

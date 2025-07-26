@@ -46,6 +46,7 @@ class SmartUniversityInfoLoader:
             'architectural': ['departments', 'staff'],
             'water': ['departments', 'staff'],
             'engineering': ['departments', 'staff'],
+            "classes": ['departments', 'staff'],
             
             # Kurdish keywords for departments
             'بەش': ['departments', 'staff'],        # department
@@ -55,7 +56,8 @@ class SmartUniversityInfoLoader:
             'تەلارسازی': ['departments', 'staff'],  # architectural
             'سەرچاوەی ئاو': ['departments', 'staff'], # water resources
             'ئەندازیاری': ['departments', 'staff'], # engineering
-            'ئەندەزیاری': ['departments', 'staff'], # engineering (alt spelling)
+            'ئەندەزیاری': ['departments', 'staff'],
+             "دەرزەکان": ['departments', 'staff'], # engineering (alt spelling)
             
             # English keywords for buildings/location
             'building': ['buildings'],

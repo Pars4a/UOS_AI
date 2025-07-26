@@ -7,8 +7,11 @@ from pydantic import BaseModel
 from claude_api import ask_claude, reload_university_info, get_info_stats
 from chatgpt_api import ask_openai
 from datetime import datetime
+from pathlib import Path
 import logging
 import os
+import yaml
+from typing import List, Dict
 
 #watch out for the log files permissions when dealing with docker, CI , uvicorn,  
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -35,11 +38,17 @@ class InfoUpdateResponse(BaseModel):
     message: str
     timestamp: datetime
 
+class KeywordUpdate(BaseModel):
+    category: str
+    files: List[str]
+    keywords: Dict[str, List[str]]
+
 @app.get('/health')
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now()}
 
-# Admin endpoint to reload university information
+# ==================== ADMIN ENDPOINTS ====================
+
 @app.post("/admin/reload-info", response_model=InfoUpdateResponse)
 async def reload_info(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
     """Admin endpoint to reload university information files"""
@@ -55,7 +64,6 @@ async def reload_info(credentials: HTTPAuthorizationCredentials = Depends(verify
         logging.error(f"Error reloading university info: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to reload info: {str(e)}")
 
-# Admin endpoint to check what information is currently loaded
 @app.get("/admin/info-status")
 async def get_info_status(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
     """Admin endpoint to check current university information status"""
@@ -69,6 +77,171 @@ async def get_info_status(credentials: HTTPAuthorizationCredentials = Depends(ve
     except Exception as e:
         logging.error(f"Error getting info status: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get info status: {str(e)}")
+
+@app.get("/admin/keywords")
+async def get_keywords(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    """Get current keyword configuration"""
+    try:
+        config_file = Path("config/keywords.yaml")
+        if config_file.exists():
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+            return {"status": "success", "config": config}
+        else:
+            return {"status": "error", "message": "Keywords config file not found"}
+    except Exception as e:
+        logging.error(f"Error getting keywords: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get keywords: {str(e)}")
+
+@app.post("/admin/keywords/reload")
+async def reload_keywords(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    """Reload keyword configuration"""
+    try:
+        from claude_api import smart_info_loader
+        smart_info_loader.reload_keywords()
+        logging.info("Keywords reloaded by admin")
+        return {
+            "status": "success",
+            "message": "Keywords reloaded successfully",
+            "timestamp": datetime.now()
+        }
+    except Exception as e:
+        logging.error(f"Error reloading keywords: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to reload keywords: {str(e)}")
+
+@app.post("/admin/keywords/add-category")
+async def add_keyword_category(
+    keyword_data: KeywordUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)
+):
+    """Add a new keyword category"""
+    try:
+        config_file = Path("config/keywords.yaml")
+        
+        # Load existing config
+        if config_file.exists():
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+        else:
+            config = {}
+        
+        # Add new category
+        config[keyword_data.category] = {
+            "files": keyword_data.files,
+            "keywords": keyword_data.keywords
+        }
+        
+        # Save updated config
+        config_file.parent.mkdir(exist_ok=True)
+        with open(config_file, 'w', encoding='utf-8') as f:
+            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+        
+        # Reload keywords
+        from claude_api import smart_info_loader
+        smart_info_loader.reload_keywords()
+        
+        logging.info(f"Added keyword category: {keyword_data.category}")
+        return {
+            "status": "success",
+            "message": f"Category '{keyword_data.category}' added successfully",
+            "timestamp": datetime.now()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error adding keyword category: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to add category: {str(e)}")
+
+@app.put("/admin/keywords/update-category/{category}")
+async def update_keyword_category(
+    category: str,
+    keyword_data: KeywordUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)
+):
+    """Update an existing keyword category"""
+    try:
+        config_file = Path("config/keywords.yaml")
+        
+        if not config_file.exists():
+            raise HTTPException(status_code=404, detail="Keywords config file not found")
+        
+        # Load existing config
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        
+        if category not in config:
+            raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+        
+        # Update category
+        config[category] = {
+            "files": keyword_data.files,
+            "keywords": keyword_data.keywords
+        }
+        
+        # Save updated config
+        with open(config_file, 'w', encoding='utf-8') as f:
+            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+        
+        # Reload keywords
+        from claude_api import smart_info_loader
+        smart_info_loader.reload_keywords()
+        
+        logging.info(f"Updated keyword category: {category}")
+        return {
+            "status": "success",
+            "message": f"Category '{category}' updated successfully",
+            "timestamp": datetime.now()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating keyword category: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update category: {str(e)}")
+
+@app.delete("/admin/keywords/delete-category/{category}")
+async def delete_keyword_category(
+    category: str,
+    credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)
+):
+    """Delete a keyword category"""
+    try:
+        config_file = Path("config/keywords.yaml")
+        
+        if not config_file.exists():
+            raise HTTPException(status_code=404, detail="Keywords config file not found")
+        
+        # Load existing config
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        
+        if category not in config:
+            raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+        
+        # Delete category
+        del config[category]
+        
+        # Save updated config
+        with open(config_file, 'w', encoding='utf-8') as f:
+            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+        
+        # Reload keywords
+        from claude_api import smart_info_loader
+        smart_info_loader.reload_keywords()
+        
+        logging.info(f"Deleted keyword category: {category}")
+        return {
+            "status": "success",
+            "message": f"Category '{category}' deleted successfully",
+            "timestamp": datetime.now()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting keyword category: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete category: {str(e)}")
+
+# ==================== MAIN ENDPOINTS ====================
 
 #dont touch these, redirects user msg to chatgpt api if claude doesnt work
 @app.post("/chat")
@@ -119,12 +292,17 @@ async def admin_dashboard(request: Request, credentials: HTTPAuthorizationCreden
     """Simple admin dashboard"""
     return templates.TemplateResponse("admin.html", {"request": request})
 
-# Startup event to load initial information
+# Startup event to initialize the system
 @app.on_event("startup")
 async def startup_event():
-    """Load university information on startup"""
+    """Initialize the system on startup"""
     try:
-        # The smart loader loads files on-demand, so just log startup
-        logging.info("Smart university information loader initialized")
+        # Create necessary directories
+        Path("logs").mkdir(exist_ok=True)
+        Path("config").mkdir(exist_ok=True)
+        Path("university_info").mkdir(exist_ok=True)
+        
+        # The smart loader initializes on first use
+        logging.info("Smart university information system initialized")
     except Exception as e:
-        logging.error(f"Failed to initialize university information loader: {e}")
+        logging.error(f"Failed to initialize system: {e}")

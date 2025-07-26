@@ -110,6 +110,8 @@ async def modify_keywords(data: KeywordUpdate, new=False, category=None):
 async def chat_api(msg: ChatMessage):
     try:
         response = ask_claude(msg.message)
+        logging.info({"user": {msg.message}})
+        logging.info({"Haawall": {response}})
         return {"response": response, "source": "claude"}
     except:
         try:

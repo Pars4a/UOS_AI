@@ -47,6 +47,8 @@ class SmartUniversityInfoLoader:
             'water': ['departments', 'staff'],
             'engineering': ['departments', 'staff'],
             "classes": ['departments', 'staff'],
+            "subjects studied": ['departments', 'staff'],
+            "studied": ['departments', 'staff'],
             
             # Kurdish keywords for departments
             'بەش': ['departments', 'staff'],        # department

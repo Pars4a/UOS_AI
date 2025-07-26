@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from claude_api import ask_claude, reload_university_info
+from claude_api import ask_claude, reload_university_info, get_info_stats
 from chatgpt_api import ask_openai
 from datetime import datetime
 import logging
@@ -60,17 +60,11 @@ async def reload_info(credentials: HTTPAuthorizationCredentials = Depends(verify
 async def get_info_status(credentials: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
     """Admin endpoint to check current university information status"""
     try:
-        from claude_api import info_loader
-        info = info_loader.load_info_files()
+        stats = get_info_stats()
         return {
             "status": "success",
-            "loaded_files": list(info.keys()),
-            "file_count": len(info),
-            "last_check": datetime.now(),
-            "cache_status": {
-                "cached_files": len(info_loader.info_cache),
-                "cache_keys": list(info_loader.info_cache.keys())
-            }
+            "stats": stats,
+            "last_check": datetime.now()
         }
     except Exception as e:
         logging.error(f"Error getting info status: {e}")
@@ -130,8 +124,7 @@ async def admin_dashboard(request: Request, credentials: HTTPAuthorizationCreden
 async def startup_event():
     """Load university information on startup"""
     try:
-        from claude_api import info_loader
-        info_loader.load_info_files()
-        logging.info("University information loaded on startup")
+        # The smart loader loads files on-demand, so just log startup
+        logging.info("Smart university information loader initialized")
     except Exception as e:
-        logging.error(f"Failed to load university information on startup: {e}")
+        logging.error(f"Failed to initialize university information loader: {e}")

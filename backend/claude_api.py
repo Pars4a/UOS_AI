@@ -103,6 +103,16 @@ class SmartUniversityInfoLoader:
             'خورشید': ['staff'],      # Khwrshid (name)
             'د.': ['staff'],          # Dr. prefix
             'دکتور': ['staff'],       # Doctor
+
+
+            'student': ['numbers'],
+            'numbers': ['numbers'],
+            'how many': ['numbers'],
+
+
+            'ژمارە': ['numbers'],
+            'چەندە': ['numbers'],
+            'ژمارەی خوێندکاران': ['numbers'],
         }
     
     def _check_file_modified(self, file_path: Path) -> bool:

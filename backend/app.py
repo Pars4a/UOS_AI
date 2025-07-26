@@ -23,7 +23,7 @@ app.mount("/static", StaticFiles(directory="/app/frontend/static"), name="static
 
 # Security for admin endpoints
 security = HTTPBearer()
-ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "your-secret-admin-token")
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN",)
 
 def verify_admin_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if credentials.credentials != ADMIN_TOKEN:

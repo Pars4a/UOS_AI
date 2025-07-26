@@ -122,12 +122,19 @@ staff:
       - دکتور
       - مامۆستا
 
-scholarships:
-  files: [scholarships]
+Numbers:
+  files: 
+  - numbers
+  - numbers_kurdish
   keywords:
-    english: [scholarship, grant, funding]
-    kurdish: [بورس, یارمەتی]
-
+    english:
+    - studentnumber
+    - numbers
+    - howmany
+    kurdish:
+    - ژمارە
+    - خوێندکار
+    - چەندە
 
 
 # Example of how to add new categories:

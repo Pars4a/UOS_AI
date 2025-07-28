@@ -93,8 +93,8 @@ async def health_check():
 async def chat_api(msg: ChatMessage):
     try:
         response = ask_claude(msg.message)
-        logging.info({"user": {msg.message}})
-        logging.info({"Haawall": {response}})
+        logging.info(f"User: {msg.message}")
+        logging.info(f"Haawall: {response}")
         return {"response": response, "source": "claude"}
     except:
         try:
@@ -102,11 +102,11 @@ async def chat_api(msg: ChatMessage):
         except Exception as e:
             raise HTTPException(status_code=500, detail="Both AI services failed")
 
-#  feedback endpoint with  error handling
+# Feedback endpoint with error handling
 @app.post("/feedback")
 async def submit_feedback(request: Request, feedback: FeedbackMessage):
     try:
-        #  logging for debugging
+        # Logging for debugging
         logging.info(f"=== FEEDBACK SUBMISSION START ===")
         logging.info(f"Raw request body: {await request.body()}")
         logging.info(f"Parsed feedback data: {feedback.dict()}")

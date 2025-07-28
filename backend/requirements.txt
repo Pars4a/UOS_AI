@@ -10,3 +10,4 @@ pyyaml
 sqlalchemy 
 aiosqlite 
 psycopg2-binary
+flake8

@@ -73,7 +73,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 4	classes, subjects	classes of computer engineering, first semester	University Work Envicornment, English Language Level 1,2, Kurdology, Calculus1, Electrical Circuits, Compputer Fundamentals, Engineering Drawing
 5	classes, subjects	classes of computer engineering	second semester: Logic Design1, Calculus 2, Physical Education, English lang level 3, Physical Electronics, Professional Skills, Programming Concepts and Algorithms(in Java)
 6	Parallel Prices	parallel, price, نزخ	architectural engineering: 2,750,000 IQD computer engineering: 2,750,000 IQD civil engineering: 2,250,000 IQD electrical engineering 2,250,000 IQD water resources engineering 2,250,000 IQD
-7	staff	computer engineering assistant head	Rizgar Salih
+8	staff	computer engineering assistant head, بڕیاردەری بەش	Rizgar Salih, ڕزگار ساڵح
 \.
 
 
@@ -81,7 +81,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 -- Name: info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cloud_man
 --
 
-SELECT pg_catalog.setval('public.info_id_seq', 7, true);
+SELECT pg_catalog.setval('public.info_id_seq', 8, true);
 
 
 --

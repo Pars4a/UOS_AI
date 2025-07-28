@@ -37,7 +37,7 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: run containers
-        run: 
+        run: docker compose up -d --build
 
       - name: fix perms
         run: |
@@ -49,7 +49,6 @@ jobs:
 
       - name: wait for backend to be ready
         run: |
-          #
           docker logs back_end
           for i in {1..10}; do
           if curl -f http://127.0.0.1:8000/health 0; then

@@ -37,7 +37,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: run containers
-        run: docker compose up -d --build
+        run: |
+          docker compose up -d --build
+          docker logs back_end
 
       - name: fix perms
         run: |
@@ -46,7 +48,6 @@ jobs:
           touch logs/chat_logs.txt
           sudo chmod 777 logs/
           sudo chmod 777 logs/chat_logs.txt
-          sudo docker logs back_end
 
       - name: wait for backend to be ready
         run: |

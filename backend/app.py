@@ -1,16 +1,19 @@
-from fastapi import FastAPI, Request, Form, HTTPException, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from claude_api import ask_claude, reload_university_info, get_info_stats, smart_info_loader
-from chatgpt_api import ask_openai
 from datetime import datetime
-from pathlib import Path
-import logging, os, yaml
-from typing import List, Dict
+import os
+import logging
+from dotenv import load_dotenv
+from backend.database import SessionLocal, Info, init_db
+from backend.claude_api import ask_claude
+from chatgpt_api import ask_openai
 
+load_dotenv()
+print("ADMIN_TOKEN Loaded:", os.getenv("ADMIN_TOKEN"))
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
@@ -28,121 +31,78 @@ def verify_admin_token(credentials: HTTPAuthorizationCredentials = Depends(secur
 class ChatMessage(BaseModel):
     message: str
 
-class KeywordUpdate(BaseModel):
+class InfoCreate(BaseModel):
     category: str
-    files: List[str]
-    keywords: Dict[str, List[str]]
+    key: str
+    value: str
 
-@app.get('/health')
+@app.on_event("startup")
+async def startup():
+    init_db()
+    for folder in ["logs"]:
+        os.makedirs(folder, exist_ok=True)
+
+@app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now()}
-
-@app.post("/admin/reload-info")
-async def reload_info(_: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    try:
-        reload_university_info()
-        return {"status": "success", "message": "Info reloaded", "timestamp": datetime.now()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/admin/info-status")
-async def get_info_status(_: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    try:
-        return {"status": "success", "stats": get_info_stats(), "last_check": datetime.now()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/admin/keywords")
-async def get_keywords(_: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    try:
-        config_file = Path("config/keywords.yaml")
-        if config_file.exists():
-            with open(config_file, 'r', encoding='utf-8') as f:
-                return {"status": "success", "config": yaml.safe_load(f)}
-        return {"status": "error", "message": "File not found"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/admin/keywords/reload")
-async def reload_keywords(_: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    try:
-        smart_info_loader.reload_keywords()
-        return {"status": "success", "message": "Keywords reloaded", "timestamp": datetime.now()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/admin/keywords/add-category")
-async def add_category(data: KeywordUpdate, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    return await modify_keywords(data, new=True)
-
-@app.put("/admin/keywords/update-category/{category}")
-async def update_category(category: str, data: KeywordUpdate, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    return await modify_keywords(data, category=category)
-
-@app.delete("/admin/keywords/delete-category/{category}")
-async def delete_category(category: str, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    try:
-        config_file = Path("config/keywords.yaml")
-        if not config_file.exists(): raise HTTPException(status_code=404)
-        with open(config_file, 'r+', encoding='utf-8') as f:
-            config = yaml.safe_load(f)
-            if category not in config: raise HTTPException(status_code=404)
-            del config[category]
-            f.seek(0); f.truncate(); yaml.dump(config, f, allow_unicode=True)
-        smart_info_loader.reload_keywords()
-        return {"status": "success", "message": f"Deleted {category}", "timestamp": datetime.now()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-async def modify_keywords(data: KeywordUpdate, new=False, category=None):
-    try:
-        config_file = Path("config/keywords.yaml")
-        config = yaml.safe_load(config_file.read_text(encoding='utf-8')) if config_file.exists() else {}
-        target = data.category if new else category
-        config[target] = {"files": data.files, "keywords": data.keywords}
-        config_file.write_text(yaml.dump(config, allow_unicode=True), encoding='utf-8')
-        smart_info_loader.reload_keywords()
-        return {"status": "success", "message": f"{target} saved", "timestamp": datetime.now()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat")
 async def chat_api(msg: ChatMessage):
     try:
         response = ask_claude(msg.message)
-        logging.info({"user": {msg.message}})
-        logging.info({"Haawall": {response}})
+        logging.info(f"User: {msg.message}")
+        logging.info(f"Claude: {response}")
         return {"response": response, "source": "claude"}
-    except:
+    except Exception:
         try:
-            return {"response": ask_openai(msg.message), "source": "openai"}
-        except Exception as e:
+            response = ask_openai(msg.message)
+            logging.info(f"OpenAI: {response}")
+            return {"response": response, "source": "openai"}
+        except Exception:
             raise HTTPException(status_code=500, detail="Both AI services failed")
 
-@app.get("/")
-@app.get("/index.html")
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/about")
-@app.get("/about.html")
+@app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
 
-@app.get("/contact")
-@app.get("/contact.html")
+@app.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
 
-@app.get("/admin")
-async def admin_dashboard(request: Request, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
-    return templates.TemplateResponse("admin.html", {"request": request})
-
-@app.on_event("startup")
-async def startup_event():
+# Admin endpoints to manage info data
+@app.post("/admin/info/add")
+async def add_info(data: InfoCreate, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    db = SessionLocal()
     try:
-        for folder in ["logs", "config", "university_info"]:
-            Path(folder).mkdir(exist_ok=True)
-        logging.info("System initialized")
-    except Exception as e:
-        logging.error(f"Startup failed: {e}")
+        record = Info(category=data.category, key=data.key, value=data.value)
+        db.add(record)
+        db.commit()
+        return {"status": "success"}
+    finally:
+        db.close()
+
+@app.get("/admin/info")
+async def list_info(_: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    db = SessionLocal()
+    try:
+        results = db.query(Info).all()
+        return [{"id": r.id, "category": r.category, "key": r.key, "value": r.value} for r in results]
+    finally:
+        db.close()
+
+@app.delete("/admin/info/{info_id}")
+async def delete_info(info_id: int, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    db = SessionLocal()
+    try:
+        record = db.query(Info).filter(Info.id == info_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Record not found")
+        db.delete(record)
+        db.commit()
+        return {"status": "deleted"}
+    finally:
+        db.close()

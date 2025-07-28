@@ -11,6 +11,8 @@ services:
     ports:
       - 5000:5000
   backend:
+    depends_on:
+      - db
     build: 
       # have the build context here so it can see frontend dir
       context: .
@@ -21,6 +23,8 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - DATABASE_URL=${DATABASE_URL}
     
    #at 127.0.0.1:8000 instead of localhost:8000 due to wsl2
     healthcheck:
@@ -44,4 +48,17 @@ services:
      - ./frontend:/app/frontend
      - ./backend:/app/backend
      - ./tests:/app/tests
-   
+  db:
+    image: postgres:15
+    container_name: uos_postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+    ports:
+      - 5432:5432
+volumes:
+  pgdata:

@@ -7,3 +7,6 @@ dotenv
 httpx
 pytest
 pyyaml
+sqlalchemy 
+aiosqlite 
+psycopg2-binary

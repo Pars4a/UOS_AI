@@ -74,6 +74,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 5	classes, subjects	classes of computer engineering	second semester: Logic Design1, Calculus 2, Physical Education, English lang level 3, Physical Electronics, Professional Skills, Programming Concepts and Algorithms(in Java)
 6	Parallel Prices	parallel, price, نزخ	architectural engineering: 2,750,000 IQD computer engineering: 2,750,000 IQD civil engineering: 2,250,000 IQD electrical engineering 2,250,000 IQD water resources engineering 2,250,000 IQD
 8	staff	computer engineering assistant head, بڕیاردەری بەش	Rizgar Salih, ڕزگار ساڵح
+9	Colleges of UOS	colleges	Engineering, Medicine, science, commerce, basic education, Humanities education, College of Administration, Veterinary Medicine
 \.
 
 
@@ -81,7 +82,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 -- Name: info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cloud_man
 --
 
-SELECT pg_catalog.setval('public.info_id_seq', 8, true);
+SELECT pg_catalog.setval('public.info_id_seq', 9, true);
 
 
 --

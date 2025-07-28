@@ -13,7 +13,6 @@ from backend.claude_api import ask_claude
 from chatgpt_api import ask_openai
 
 load_dotenv()
-print("ADMIN_TOKEN Loaded:", os.getenv("ADMIN_TOKEN"))
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()

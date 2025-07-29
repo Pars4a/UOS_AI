@@ -12,15 +12,15 @@
     <div class="header">
         <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
         <nav class="main-nav left desktop-only">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="about.html" class="nav-link">About</a>
+            <a href="/" class="nav-link">Home</a>
+            <a href="about" class="nav-link">About</a>
         </nav>
         <div class="logo">
             <div class="logo-icon">Haawall</div>
         </div>
         <nav class="main-nav right desktop-only">
             <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
-            <a href="contact.html" class="nav-link active">Contact Us</a>
+            <a href="contact" class="nav-link active">Contact Us</a>
         </nav>
         <div class="mobile-controls">
             <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
@@ -140,99 +140,193 @@
     <script>
         let currentLang = 'en';
 
-        const translations = {
-            en: {
-                switchText: "کوردی",
-                contactTitle: "Get in Touch",
-                contactSubtitle: "We'd love to hear from you! Send us your feedback, questions, or suggestions and help us improve Haawall.",
-                infoTitle: "Contact Information",
-                addressLabel: "Address",
-                addressValue: "College of Engineering, University of Sulaimani<br>(New Campus), Tasluja Street 1, Zone 501<br>Sulaymaniyah, Kurdistan Region of Iraq",
-                emailLabel: "Email",
-                departmentLabel: "Department",
-                departmentValue: "Computer Engineering",
-                serviceLabel: "Service Hours",
-                serviceValue: "24/7 AI Assistant Available",
-                formTitle: "Send us your Feedback",
-                nameLabel: "Full Name",
-                emailFieldLabel: "Email Address",
-                categoryLabel: "Category",
-                selectCategory: "Select a category",
-                feedbackOption: "General Feedback",
-                suggestionOption: "Suggestion",
-                bugOption: "Bug Report",
-                featureOption: "Feature Request",
-                otherOption: "Other",
-                subjectLabel: "Subject",
-                messageLabel: "Message",
-                submitText: "Send Message",
-                messagePlaceholder: "Tell us what you think..."
+const translations = {
+    en: {
+        switchText: "کوردی",
+        contactTitle: "Get in Touch",
+        contactSubtitle: "We'd love to hear from you! Send us your feedback, questions, or suggestions and help us improve Haawall.",
+        infoTitle: "Contact Information",
+        addressLabel: "Address",
+        addressValue: "College of Engineering, University of Sulaimani<br>(New Campus), Tasluja Street 1, Zone 501<br>Sulaymaniyah, Kurdistan Region of Iraq",
+        emailLabel: "Email",
+        departmentLabel: "Department",
+        departmentValue: "Computer Engineering",
+        serviceLabel: "Service Hours",
+        serviceValue: "24/7 AI Assistant Available",
+        formTitle: "Send us your Feedback",
+        nameLabel: "Full Name",
+        emailFieldLabel: "Email Address",
+        categoryLabel: "Category",
+        selectCategory: "Select a category",
+        feedbackOption: "General Feedback",
+        suggestionOption: "Suggestion",
+        bugOption: "Bug Report",
+        featureOption: "Feature Request",
+        otherOption: "Other",
+        subjectLabel: "Subject",
+        messageLabel: "Message",
+        submitText: "Send Message",
+        messagePlaceholder: "Tell us what you think..."
+        
+        
+
+        
+    },
+    ku: {
+        switchText: "English",
+        contactTitle: "پەیوەندیمان پێوە بکە",
+        contactSubtitle: "خۆشحاڵ دەبین پەیوەنیمان پێوە بکەیت! ڕاو پێشنیار و پرسیارەکانت بنێرە بۆمان بۆ باشترکردنی هاواڵ",
+        infoTitle: "زانیاری پەیوەندی",
+        addressLabel: "ناونیشان",
+        addressValue: "کۆلێژی ئەندازیاری، زانکۆی سلێمانی<br>(کەمپی نوێ)، شەقامی تاسلوژا ژمارە ١، ناوچە ٥٠١<br>سلێمانی، هەرێمی کوردستان، عێراق",
+        emailLabel: "ئیمەیل",
+        departmentLabel: "بەش",
+        departmentValue: "ئەندازیاری کۆمپیوتەر",
+        serviceLabel: "کاتی خزمەتگوزاری",
+        serviceValue: "یارمەتیدەری ئای ئای ٢٤/٧ بەردەستە",
+        formTitle: "ڕا و پێشنیارەکانت بنێرە",
+        nameLabel: "ناوی تەواو",
+        emailFieldLabel: "ناونیشانی ئیمەیل",
+        categoryLabel: "جۆر",
+        selectCategory: "جۆرێک هەڵبژێرە",
+        feedbackOption: "ڕای گشتی",
+        suggestionOption: "پێشنیار",
+        bugOption: "گوزارشتی هەڵە",
+        featureOption: "داواکاری تایبەتمەندی",
+        otherOption: "هیتر",
+        subjectLabel: "سەردێڕ",
+        messageLabel: "پەیام",
+        submitText: "پەیام بنێرە",
+        messagePlaceholder: "ئۆزموونی خۆت بنووسە..."
+    }
+};
+
+function toggleMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('hidden');
+}
+
+function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ku' : 'en';
+    const t = translations[currentLang];
+
+    document.getElementById("langSwitchBtn").innerText = t.switchText;
+    document.getElementById("langSwitchBtnMobile").innerText = t.switchText;
+    document.getElementById("contactTitle").innerText = t.contactTitle;
+    document.getElementById("contactSubtitle").innerText = t.contactSubtitle;
+    document.getElementById("infoTitle").innerText = t.infoTitle;
+    document.getElementById("addressLabel").innerText = t.addressLabel;
+    document.getElementById("addressValue").innerHTML = t.addressValue;
+    document.getElementById("emailLabel").innerText = t.emailLabel;
+    document.getElementById("departmentLabel").innerText = t.departmentLabel;
+    document.getElementById("departmentValue").innerText = t.departmentValue;
+    document.getElementById("serviceLabel").innerText = t.serviceLabel;
+    document.getElementById("serviceValue").innerText = t.serviceValue;
+    document.getElementById("formTitle").innerText = t.formTitle;
+    document.getElementById("nameLabel").innerText = t.nameLabel;
+    document.getElementById("emailFieldLabel").innerText = t.emailFieldLabel;
+    document.getElementById("categoryLabel").innerText = t.categoryLabel;
+    document.getElementById("selectCategory").innerText = t.selectCategory;
+    document.getElementById("feedbackOption").innerText = t.feedbackOption;
+    document.getElementById("suggestionOption").innerText = t.suggestionOption;
+    document.getElementById("bugOption").innerText = t.bugOption;
+    document.getElementById("featureOption").innerText = t.featureOption;
+    document.getElementById("otherOption").innerText = t.otherOption;
+    document.getElementById("subjectLabel").innerText = t.subjectLabel;
+    document.getElementById("messageLabel").innerText = t.messageLabel;
+    document.getElementById("submitText").innerText = t.submitText;
+    document.getElementById("message").placeholder = t.messagePlaceholder;
+}
+
+// Form submission handling - FIXED VERSION
+document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const messageContainer = document.getElementById('messageContainer');
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    const loadingText = currentLang === 'ku' ? 'ناردن...' : 'Sending...';
+    submitText.innerHTML = `<span class="loading"></span> ${loadingText}`;
+    
+    // Get form data
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        category: document.getElementById('category').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value
+    };
+    
+    try {
+        console.log('Sending feedback data:', formData);
+        
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            ku: {
-                switchText: "English",
-                contactTitle: "پەیوەندیمان پێوە بکە",
-                contactSubtitle: "خۆشحاڵ دەبین پەیوەنیمان پێوە بکەیت! ڕاو پێشنیار و پرسیارەکانت بنێرە بۆمان بۆ باشترکردنی هاواڵ",
-                infoTitle: "زانیاری پەیوەندی",
-                addressLabel: "ناونیشان",
-                addressValue: "کۆلێژی ئەندازیاری، زانکۆی سلێمانی<br>(کەمپی نوێ)، شەقامی تاسلوژا ژمارە ١، ناوچە ٥٠١<br>سلێمانی، هەرێمی کوردستان، عێراق",
-                emailLabel: "ئیمەیل",
-                departmentLabel: "بەش",
-                departmentValue: "ئەندازیاری کۆمپیوتەر",
-                serviceLabel: "کاتی خزمەتگوزاری",
-                serviceValue: "یارمەتیدەری ئای ئای ٢٤/٧ بەردەستە",
-                formTitle: "ڕا و پێشنیارەکانت بنێرە",
-                nameLabel: "ناوی تەواو",
-                emailFieldLabel: "ناونیشانی ئیمەیل",
-                categoryLabel: "جۆر",
-                selectCategory: "جۆرێک هەڵبژێرە",
-                feedbackOption: "ڕای گشتی",
-                suggestionOption: "پێشنیار",
-                bugOption: "گوزارشتی هەڵە",
-                featureOption: "داواکاری تایبەتمەندی",
-                otherOption: "هیتر",
-                subjectLabel: "سەردێڕ",
-                messageLabel: "پەیام",
-                submitText: "پەیام بنێرە",
-                messagePlaceholder: "ئۆزموونی خۆت بنووسە..."
-            }
-        };
-
-        function toggleMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('hidden');
+            body: JSON.stringify(formData)
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        const result = await response.json();
+        console.log('Response data:', result);
+        
+        // Check if response is ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} - ${result.message || 'Unknown error'}`);
         }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'ku' : 'en';
-            const t = translations[currentLang];
-
-            document.getElementById("langSwitchBtn").innerText = t.switchText;
-            document.getElementById("langSwitchBtnMobile").innerText = t.switchText;
-            document.getElementById("contactTitle").innerText = t.contactTitle;
-            document.getElementById("contactSubtitle").innerText = t.contactSubtitle;
-            document.getElementById("infoTitle").innerText = t.infoTitle;
-            document.getElementById("addressLabel").innerText = t.addressLabel;
-            document.getElementById("addressValue").innerHTML = t.addressValue;
-            document.getElementById("emailLabel").innerText = t.emailLabel;
-            document.getElementById("departmentLabel").innerText = t.departmentLabel;
-            document.getElementById("departmentValue").innerText = t.departmentValue;
-            document.getElementById("serviceLabel").innerText = t.serviceLabel;
-            document.getElementById("serviceValue").innerText = t.serviceValue;
-            document.getElementById("formTitle").innerText = t.formTitle;
-            document.getElementById("nameLabel").innerText = t.nameLabel;
-            document.getElementById("emailFieldLabel").innerText = t.emailFieldLabel;
-            document.getElementById("categoryLabel").innerText = t.categoryLabel;
-            document.getElementById("selectCategory").innerText = t.selectCategory;
-            document.getElementById("feedbackOption").innerText = t.feedbackOption;
-            document.getElementById("suggestionOption").innerText = t.suggestionOption;
-            document.getElementById("bugOption").innerText = t.bugOption;
-            document.getElementById("featureOption").innerText = t.featureOption;
-            document.getElementById("otherOption").innerText = t.otherOption;
-            document.getElementById("subjectLabel").innerText = t.subjectLabel;
-            document.getElementById("messageLabel").innerText = t.messageLabel;
-            document.getElementById("submitText").innerText = t.submitText;
-            document.getElementById("message").placeholder = t.messagePlaceholder;
+        
+        if (result.success) {
+            // Show success message
+            messageContainer.innerHTML = `
+                <div class="message success" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                    ✅ ${currentLang === 'ku' ? 'سوپاس! پەیامەکەت بە سەرکەوتوویی نێردرا و ئیمەیلی پشتڕاستکردنەوەش بۆ ناردرا.' : 'Thank you! Your message has been sent successfully and a confirmation email was sent to you.'}
+                    <br><br>
+                    📧 ${currentLang === 'ku' ? 'تکایە ئیمەیلەکانت بپشکنە (لەوانەیە لە spam فۆڵدەردا بێت)' : 'Please check your email (it might be in spam folder)'}
+                </div>
+            `;
+            
+            // Also show an alert for testing
+           
+            
+            // Reset form
+            document.getElementById('feedbackForm').reset();
+        } else {
+            // Show error message  
+            const errorMsg = result.message || (currentLang === 'ku' ? 'ببورە، هەڵەیەک ڕویدا. تکایە دواتر هەوڵبدەوە.' : 'Sorry, there was an error. Please try again later.');
+            messageContainer.innerHTML = `
+                <div class="message error" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                    ❌ ${errorMsg}
+                </div>
+            `;
+            
+            // Also show an alert for testing
+        
         }
+    } catch (error) {
+        console.error('Error details:', error);
+        const errorMessage = error.message || (currentLang === 'ku' ? 'کێشەیەک لە پەیوەندیدا هەیە. تکایە دواتر هەوڵبدەوە.' : 'Connection error. Please try again later.');
+        messageContainer.innerHTML = `
+            <div class="message error" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                ❌ ${errorMessage}
+            </div>
+        `;
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText.innerText = currentLang === 'ku' ? 'پەیام بنێرە' : 'Send Message';
+        
+        // Scroll to message
+        messageContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+});
     </script>
 </body>
 </html>

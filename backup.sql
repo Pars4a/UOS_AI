@@ -76,6 +76,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 8	staff	computer engineering assistant head, بڕیاردەری بەش	Rizgar Salih, ڕزگار ساڵح
 9	Colleges of UOS	colleges	Engineering, Medicine, science, commerce, basic education, Humanities education, College of Administration, Veterinary Medicine
 10	president	name	Dr Kosar Mohammed Ali
+19	Courses	Electrical Engineering	In the first semester: Electrical Circuit 1, Physical Electronic, Linear Algebra, Information Technology, English Level 2, University Work Environment, Circuit Lab, Electronic Lab, Computer Lab. In the second semester: Electronic Circuit 2, Calculus 1, Kurdology, English Level 3, Physical Education, Professional skills, Workshop Lab, Drawing Lab. In the third semester: Digital Electronics 1, Analogue Electronics 1, DC Machine, Mechanical Engineering, Calculus 2, Computer Programming, Digital Lab, Analogue Lab, DC Machine Lab, Mechanic Lab, C++ Programming Lab. In the fourth semester: Circuit Analysis, Electromagnetic Field, Communication 1, Electrical Measure & Material, Engineering Analysis, Numerical Analysis, Communication Lab, Electrical Measurement Lab, Circuit Network {Ma} Lab, Numerical Analysis Lab. In the fifth semester: Power Engineering 1, Control Engineering 1, Communication 2, Digital Electronics 2, Antenna, Economy, Power Lab, Control Lab, Communication Lab, Digital Lab, Computer Apps {Ma} Lab. In the sixth semester: Power Engineering 2, Control Engineering 2, Digital Communication, Microprocessor & Microcontrol, Analogue Electronics 2, AC Machine, Digital Communication Lab, Microprocessor & Microcontrol Lab, Analogue Lab, AC Machine Lab, Induction Machine Lab, Computer Apps {Au} Lab.
 \.
 
 
@@ -83,7 +84,7 @@ COPY public.info (id, category, key, value) FROM stdin;
 -- Name: info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: cloud_man
 --
 
-SELECT pg_catalog.setval('public.info_id_seq', 10, true);
+SELECT pg_catalog.setval('public.info_id_seq', 19, true);
 
 
 --

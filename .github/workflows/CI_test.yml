@@ -54,7 +54,7 @@ jobs:
       - name: wait for backend to be ready
         run: |
           for i in {1..10}; do
-          if curl -f http://127.0.0.1:8000/health 0; then
+          if curl -f http://127.0.0.1:8000/health; then
             echo "backend is ready";
             exit 0;
           fi

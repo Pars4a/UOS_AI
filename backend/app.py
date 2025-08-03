@@ -18,7 +18,7 @@ from email_service import send_feedback_email
 load_dotenv()
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI()
 
 # CORS middleware - Fixed missing import and closing parenthesis
 app.add_middleware(

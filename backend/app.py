@@ -20,7 +20,7 @@ load_dotenv()
 
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
@@ -156,5 +156,22 @@ async def delete_info(info_id: int, _: HTTPAuthorizationCredentials = Depends(ve
         db.delete(record)
         db.commit()
         return {"status": "deleted"}
+    finally:
+        db.close()
+
+@app.put("/admin/info/{info_id}")
+async def update_info(info_id: int, data: InfoCreate, _: HTTPAuthorizationCredentials = Depends(verify_admin_token)):
+    db = SessionLocal()
+    try:
+        record = db.query(Info).filter(Info.id == info_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Record not found")
+        
+        record.category = data.category
+        record.key = data.key
+        record.value = data.value
+        db.commit()
+        
+        return {"status": "updated"}
     finally:
         db.close()

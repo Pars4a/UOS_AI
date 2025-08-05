@@ -16,9 +16,9 @@ anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Adaptive base prompts for different query types
-BASE_PROMPT_DETAILED = """You are a knowledgeable assistant for the University of Sulaimani. Provide comprehensive, detailed answers about university programs, admissions, facilities, faculty, student services, and campus life. Include specific examples, procedures, and helpful context. If unsure about details, say "I'm still learning about this topic." Never share security or internal data."""
+BASE_PROMPT_DETAILED = """You are a knowledgeable assistant for the University of Sulaimani. Provide comprehensive, detailed answers about university programs, admissions, facilities, faculty, student services, and campus life. Include specific examples. dont say check other sources for information, and helpful context.Never share security or internal data."""
 
-BASE_PROMPT_SIMPLE = """Assistant for University of Sulaimani. Answer university questions briefly. If unsure, say "I'm still learning about this topic." No security/internal data."""
+BASE_PROMPT_SIMPLE = """Assistant for University of Sulaimani. Answer university questions briefly. dont mention other sources for information No security/internal data. """
 
 # Simple in-memory cache for responses (use Redis in production)
 response_cache = {}
@@ -68,9 +68,9 @@ def fetch_relevant_info(user_message: str, complexity: str = "medium") -> List[s
         if complexity == "simple":
             max_records, char_limit = 1, 100
         elif complexity == "detailed":
-            max_records, char_limit = 5, 400
+            max_records, char_limit = 5, 600
         else:  # medium
-            max_records, char_limit = 3, 200
+            max_records, char_limit = 3, 400
         
         processed_query = preprocess_query(user_message)
         query_embedding = embed_text_cached(processed_query)
@@ -150,7 +150,7 @@ def create_adaptive_system_prompt(context_lines: List[str], complexity: str) -> 
     context = "\n".join(context_lines)
     
     if complexity == "detailed":
-        instruction = "\n\nUsing the information below, provide a comprehensive answer with specific details, examples, and step-by-step guidance where applicable:"
+        instruction = "\n\nUsing the information below, provide a comprehensive answer with specific details,. dont say check websites or other sources for more info. examples, and step-by-step guidance where applicable:"
     else:
         instruction = "\n\nRelevant information:"
     
@@ -180,7 +180,7 @@ def ask_claude(prompt: str) -> str:
             context_lines = fetch_relevant_info(prompt, complexity)
             system_prompt = create_adaptive_system_prompt(context_lines, complexity)
         else:  # medium
-            max_tokens = 400
+            max_tokens = 500
             temperature = 0.3
             context_lines = fetch_relevant_info(prompt, complexity)
             system_prompt = create_adaptive_system_prompt(context_lines, complexity)

@@ -118,12 +118,12 @@ def classify_query_complexity(query: str) -> str:
     
     # Complex informational queries that need detailed responses
     detailed_patterns = [
-        r'\b(how to|how do i|what are the steps|procedure|process|requirements|registration)\b',
+        r'\b(how to|how do i|what are the steps|procedure|process|requirements)\b',
         r'\b(tell me about|explain|describe|what is|what are)\b',
         r'\b(admission|program|course|degree|faculty|department)\b',
         r'\b(facilities|services|campus|library|dormitory)\b',
         r'\b(fees|tuition|scholarship|financial)\b',
-        r'\b(when|where|why|which|courses)\b.*\?',
+        r'\b(when|where|why|which)\b.*\?',
         r'\b(difference between|compare|versus|vs)\b'
     ]
     

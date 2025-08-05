@@ -15,8 +15,10 @@ logging.basicConfig(filename="logs/chat_logs.txt", level=logging.INFO, format="%
 anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Optimized base prompt - more concise
-BASE_PROMPT = """Assistant for University of Sulaimani. Answer only university-related questions concisely. If unsure, say "I'm still learning about this topic." No security/internal data."""
+# Adaptive base prompts for different query types
+BASE_PROMPT_DETAILED = """You are a knowledgeable assistant for the University of Sulaimani. Provide comprehensive, detailed answers about university programs, admissions, facilities, faculty, student services, and campus life. Include specific examples, procedures, and helpful context. If unsure about details, say "I'm still learning about this topic." Never share security or internal data."""
+
+BASE_PROMPT_SIMPLE = """Assistant for University of Sulaimani. Answer university questions briefly. If unsure, say "I'm still learning about this topic." No security/internal data."""
 
 # Simple in-memory cache for responses (use Redis in production)
 response_cache = {}
@@ -58,11 +60,18 @@ def preprocess_query(query: str) -> str:
     words = [w for w in query.split() if w not in stop_words]
     return ' '.join(words)
 
-def fetch_relevant_info(user_message: str, max_records: int = 3) -> List[str]:
-    """Fetch most relevant info with reduced token usage"""
+def fetch_relevant_info(user_message: str, complexity: str = "medium") -> List[str]:
+    """Fetch relevant info with adaptive context based on query complexity"""
     db = SessionLocal()
     try:
-        # Preprocess query for better matching
+        # Adjust parameters based on complexity
+        if complexity == "simple":
+            max_records, char_limit = 1, 100
+        elif complexity == "detailed":
+            max_records, char_limit = 5, 400
+        else:  # medium
+            max_records, char_limit = 3, 200
+        
         processed_query = preprocess_query(user_message)
         query_embedding = embed_text_cached(processed_query)
         
@@ -73,45 +82,82 @@ def fetch_relevant_info(user_message: str, max_records: int = 3) -> List[str]:
         scored = []
 
         for rec in all_entries:
-            # Create more concise text representation
             text = f"{rec.key}: {rec.value}"
             text_embedding = embed_text_cached(text)
             
             if text_embedding:
                 similarity = cosine_similarity(text_embedding, query_embedding)
-                # Only include high-confidence matches
-                if similarity > 0.3:  # Threshold to filter irrelevant content
-                    # Truncate long values to save tokens
-                    truncated_value = rec.value[:200] + "..." if len(rec.value) > 200 else rec.value
+                # Lower threshold for detailed queries to get more context
+                threshold = 0.2 if complexity == "detailed" else 0.3
+                
+                if similarity > threshold:
+                    # Adaptive truncation based on complexity
+                    if len(rec.value) > char_limit:
+                        truncated_value = rec.value[:char_limit] + "..."
+                    else:
+                        truncated_value = rec.value
+                    
                     scored.append((similarity, f"• {rec.key}: {truncated_value}"))
 
-        # Sort by relevance and return top results
         scored.sort(reverse=True, key=lambda x: x[0])
         return [entry for _, entry in scored[:max_records]]
     finally:
         db.close()
 
-def is_simple_query(query: str) -> bool:
-    """Detect if query is simple enough to answer without context"""
+def classify_query_complexity(query: str) -> str:
+    """Classify query complexity to determine appropriate response style"""
+    query_lower = query.lower()
+    
+    # Simple greetings and basic questions
     simple_patterns = [
         r'\b(hi|hello|hey|thanks|thank you)\b',
         r'\bwhat is your name\b',
         r'\bwho are you\b',
         r'\bhow are you\b'
     ]
-    return any(re.search(pattern, query.lower()) for pattern in simple_patterns)
-
-def create_optimized_system_prompt(context_lines: List[str]) -> str:
-    """Create minimal system prompt"""
-    if not context_lines:
-        return BASE_PROMPT
     
-    # Combine context more efficiently
-    context = "\n".join(context_lines[:3])  # Limit context lines
-    return f"{BASE_PROMPT}\n\nRelevant info:\n{context}"
+    # Complex informational queries that need detailed responses
+    detailed_patterns = [
+        r'\b(how to|how do i|what are the steps|procedure|process|requirements|registration)\b',
+        r'\b(tell me about|explain|describe|what is|what are)\b',
+        r'\b(admission|program|course|degree|faculty|department)\b',
+        r'\b(facilities|services|campus|library|dormitory)\b',
+        r'\b(fees|tuition|scholarship|financial)\b',
+        r'\b(when|where|why|which|courses)\b.*\?',
+        r'\b(difference between|compare|versus|vs)\b'
+    ]
+    
+    if any(re.search(pattern, query_lower) for pattern in simple_patterns):
+        return "simple"
+    elif any(re.search(pattern, query_lower) for pattern in detailed_patterns):
+        return "detailed"
+    elif len(query.split()) > 10:  # Long queries usually need detailed responses
+        return "detailed"
+    else:
+        return "medium"
+
+def create_adaptive_system_prompt(context_lines: List[str], complexity: str) -> str:
+    """Create adaptive system prompt based on query complexity"""
+    if complexity == "simple":
+        base_prompt = BASE_PROMPT_SIMPLE
+    else:
+        base_prompt = BASE_PROMPT_DETAILED
+    
+    if not context_lines:
+        return base_prompt
+    
+    # Add context with complexity-appropriate instructions
+    context = "\n".join(context_lines)
+    
+    if complexity == "detailed":
+        instruction = "\n\nUsing the information below, provide a comprehensive answer with specific details, examples, and step-by-step guidance where applicable:"
+    else:
+        instruction = "\n\nRelevant information:"
+    
+    return f"{base_prompt}{instruction}\n{context}"
 
 def ask_claude(prompt: str) -> str:
-    """Optimized Claude API call with caching and token reduction"""
+    """Adaptive Claude API call that balances token efficiency with response quality"""
     try:
         # Check cache first
         cache_key = get_cache_key(prompt)
@@ -119,19 +165,31 @@ def ask_claude(prompt: str) -> str:
             logging.info(f"Cache hit for query: {prompt[:50]}...")
             return response_cache[cache_key]
 
-        # Handle simple queries without context
-        if is_simple_query(prompt):
-            system_prompt = BASE_PROMPT
+        # Classify query complexity
+        complexity = classify_query_complexity(prompt)
+        
+        # Adjust parameters based on complexity
+        if complexity == "simple":
+            max_tokens = 150
+            temperature = 0.1
             context_lines = []
-        else:
-            context_lines = fetch_relevant_info(prompt, max_records=3)
-            system_prompt = create_optimized_system_prompt(context_lines)
+            system_prompt = BASE_PROMPT_SIMPLE
+        elif complexity == "detailed":
+            max_tokens = 800
+            temperature = 0.4
+            context_lines = fetch_relevant_info(prompt, complexity)
+            system_prompt = create_adaptive_system_prompt(context_lines, complexity)
+        else:  # medium
+            max_tokens = 400
+            temperature = 0.3
+            context_lines = fetch_relevant_info(prompt, complexity)
+            system_prompt = create_adaptive_system_prompt(context_lines, complexity)
 
-        # Use more efficient model and reduced max_tokens
+        # API call with adaptive parameters
         response = anthropic_client.messages.create(
-            model="claude-3-5-haiku-20241022",  # Haiku is more token-efficient
-            max_tokens=500,  # Reduced from 1000
-            temperature=0.3,  # Lower temperature for more focused responses
+            model="claude-3-5-haiku-20241022",
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=system_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -141,10 +199,10 @@ def ask_claude(prompt: str) -> str:
         # Cache the response
         response_cache[cache_key] = answer
         
-        # Log token usage info
+        # Enhanced logging with complexity info
         input_tokens = response.usage.input_tokens if hasattr(response, 'usage') else 0
         output_tokens = response.usage.output_tokens if hasattr(response, 'usage') else 0
-        logging.info(f"Tokens used - Input: {input_tokens}, Output: {output_tokens}")
+        logging.info(f"Query complexity: {complexity}, Tokens - Input: {input_tokens}, Output: {output_tokens}")
         
         return answer
         

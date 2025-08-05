@@ -21,7 +21,7 @@ load_dotenv()
 
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
@@ -83,8 +83,8 @@ class ChatMessage(BaseModel):
         v = v.strip()
         if not v:
             raise ValueError("Message cannot be empty")
-        if len(v) > 500:  # Limit message length to reduce token usage
-            raise ValueError("Message too long (max 500 characters)")
+        if len(v) > 1000:  # Increased limit for detailed queries
+            raise ValueError("Message too long (max 1000 characters)")
         return v
 
 class InfoCreate(BaseModel):

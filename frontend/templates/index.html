@@ -278,7 +278,7 @@ function updateInputState() {
     }
 }
 
-// FIXED: Free scrolling during AI response - no forced scrolling
+//Free scrolling during AI response ->>. no forced scrolling
 function typeWriter(element, text, speed = 20, showCursor = true) {
     element.innerHTML = '';
     let i = 0;
@@ -287,7 +287,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
     let userHasScrolled = false;
     let isAtBottomBeforeTyping = isScrolledToBottom();
     
-    // FIXED: Only apply RTL if the actual message content contains Kurdish text
+    //only apply RTL if the actual message content contains Kurdish text
     const isKurdishContent = detectKurdishText(text);
     if (isKurdishContent) {
       element.classList.add('rtl-text');
@@ -425,7 +425,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
     typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە    ' : 'Haawall is responding...';
     inputArea.appendChild(typingStatus);
     
-    // FIXED: Track user scrolling without interfering
+    //Track user scrolling without interfering
     const messagesContainer = document.getElementById('messages');
     let scrollTimeout;
     
@@ -433,7 +433,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
         userHasScrolled = true;
         clearTimeout(scrollTimeout);
         
-        // Reset scroll tracking after user stops scrolling
+        // reset scroll tracking after user stops scrolling
         scrollTimeout = setTimeout(() => {
             if (isScrolledToBottom()) {
                 userHasScrolled = false;
@@ -441,7 +441,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
         }, 1000);
     };
     
-    // Use passive listener for better performance
+    // 
     messagesContainer.addEventListener('scroll', handleScroll, { passive: true });
     
     function type() {
@@ -478,7 +478,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
             
             setTimeout(type, currentSpeed);
             
-            // FIXED: Only auto-scroll if user was at bottom when typing started AND hasn't scrolled away
+            //only auto-scroll if user was at bottom when typing started AND hasn't scrolled away
             if (isAtBottomBeforeTyping && !userHasScrolled) {
                 scrollToBottom();
             }
@@ -541,7 +541,7 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
     });
 }
 
-// Helper function to check if user is at bottom of scroll
+//function to check if user is at bottom of scroll
 function isScrolledToBottom() {
     const messagesContainer = document.getElementById('messages');
     if (!messagesContainer) return true;

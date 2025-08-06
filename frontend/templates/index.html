@@ -2,27 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- prevent zooming on mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Haawall - University Assistant</title>
     <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/style.css">
     <style>
-        
     </style>
 </head>
 <body>
+    <!-- main header -->
     <div class="header">
+        <!-- hamburger menu for mobile -->
         <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
       
+        <!-- left nav links -->
         <nav class="main-nav left desktop-only">
           <a href="/" class="nav-link active">Home</a>
           <a href="about" class="nav-link">About</a>
         </nav>
       
-        <div class="logo"> <div class="logo-icon">
-          </div>
+        <!-- university logo -->
+        <div class="logo"> 
+            <div class="logo-icon"></div>
         </div>
       
+        <!-- right side controls -->
         <nav class="main-nav right desktop-only">
           <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">
             کوردی
@@ -30,36 +35,37 @@
           <a href="contact" class="nav-link contact-btn">Contact Us</a>
         </nav>
         
-        <!-- FAQ Button - Keep only this one -->
+        <!-- help button with question mark -->
         <button class="faq-button" onclick="toggleFAQ()" id="faqButton">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
           </svg>
         </button>
         
-        <!-- FAQ Dropdown - Keep only this one -->
+        <!-- FAQ dropdown menu -->
         <div class="faq-dropdown" id="faqDropdown">
           <div class="faq-header">Frequently Asked Questions</div>
           <div class="faq-list" id="faqList">
-            <!-- FAQ items will be populated here -->
+            <!-- FAQ items added by javascript -->
           </div>
         </div>
 
-        <!-- Mobile controls - always visible on mobile -->
+        <!-- mobile language switcher -->
         <div class="mobile-controls">
           <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">
             کوردی
           </button>
         </div>
-      <!-- Mobile controls - mobile menu -->
+
+        <!-- mobile dropdown menu -->
         <div class="mobile-menu hidden" id="mobileMenu">
           <a href="/" class="nav-link active">Home</a>
           <a href="/about" class="nav-link">About</a>
           <a href="/contact" class="nav-link contact-btn">Contact Us</a>
         </div>
-      </div>
+    </div>
       
-    <!-- Quick Actions Bar - Horizontal prompts -scrollable on mobile -->
+    <!-- quick action buttons -->
     <div class="quick-actions">
         <div class="quick-actions-container">
             <div class="quick-action-btn" onclick="sendExamplePrompt(0)">
@@ -81,23 +87,24 @@
         </div>
     </div>
 
+    <!-- chat area -->
     <div class="chat-container">
 
-        <!-- Welcome Screen AKA welcome-tab -->
+        <!-- welcome screen -->
         <div class="welcome-screen" id="welcomeScreen">
-            <div class="welcome-logo"> <img src="static/images/uoswelcomelogo.png" alt="Logo"> </div>
+            <div class="welcome-logo"> 
+                <img src="static/images/uoswelcomelogo.png" alt="Logo"> 
+            </div>
             <h1 class="welcome-title">How can I help you today?</h1>
             <p class="welcome-subtitle">I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.</p>
         </div>
 
-        <!-- Chat Messages -->
-         <!-- these are messages that are shown through out the chat -->
-        <div class="messages" id="messages">  </div>
+        <!-- chat messages go here -->
+        <div class="messages" id="messages"></div>
         
-        <!-- Typing Indicator -->
+        <!-- typing dots animation -->
         <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-avatar">  
-          </div>
+            <div class="typing-avatar"></div>
             <div class="typing-dots">
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
@@ -106,9 +113,10 @@
         </div>
     </div>
 
-    <!-- Input Area -->
+    <!-- message input at bottom -->
     <div class="input-area" id="inputArea">
         <div class="input-container">
+            <!-- text input box -->
             <textarea 
                 class="message-input" 
                 id="messageInput" 
@@ -119,6 +127,7 @@
                 onfocus="handleInputFocus()"
                 onblur="handleInputBlur()"
             ></textarea>
+            <!-- send button -->
             <button class="send-button" id="sendButton" onclick="sendMessage()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
@@ -128,11 +137,13 @@
     </div>
 
 <script>
-// Replace your existing JavaScript with these fixes:
-
+// global variables
 let currentLang = 'en';
 let faqOpen = false;
+let isAIResponding = false;
+let isTypingComplete = false;
 
+// FAQ questions in both languages
 const faqQuestions = {
   en: [
     "Engineering College Foundation Building?",
@@ -159,7 +170,8 @@ const faqQuestions = {
     "کافتریای ناوەند لەکوێیە؟ "
   ]
 };
-// hey parsa
+
+// UI text translations
 const translations = {
   en: {
     switchText: "کوردی",
@@ -189,7 +201,318 @@ const translations = {
   }
 };
 
-// FAQ functionality
+// format text with basic HTML
+function formatMessage(message) {
+  // line breaks to HTML
+  message = message.replace(/\n/g, '<br>');
+  
+  // make numbered lists bold
+  message = message.replace(/^(\d+\.\s)/gm, '<strong>$1</strong>');
+  
+  // bullet points
+  message = message.replace(/^[-•]\s/gm, '• ');
+  
+  // bold text between **
+  message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // make specific phrases bold
+  message = message.replace(/^(To get the most accurate.*?):/gm, '<strong>$1:</strong>');
+  message = message.replace(/^(For the most current.*?):/gm, '<strong>$1:</strong>');
+  
+  return message;
+}
+
+// check if text is kurdish
+function detectKurdishText(text) {
+  const kurdishPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  return kurdishPattern.test(text);
+}
+
+// check if UI is in kurdish
+function isCurrentLanguageKurdish() {
+  return currentLang === 'ku';
+}
+
+// enable/disable input based on AI status
+function updateInputState() {
+    const input = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const inputContainer = document.querySelector('.input-container');
+    
+    if (isAIResponding) {
+        // disable while AI responds
+        input.disabled = true;
+        sendButton.disabled = true;
+        inputContainer.classList.add('disabled');
+        
+        // update placeholder
+        const originalPlaceholder = input.placeholder;
+        input.setAttribute('data-original-placeholder', originalPlaceholder);
+        input.placeholder = currentLang === 'ku' 
+            ? 'چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە...' 
+            : 'Please wait for Haawall to finish responding...';
+    } else {
+        // re-enable input
+        input.disabled = false;
+        sendButton.disabled = false;
+        inputContainer.classList.remove('disabled');
+        
+        // restore placeholder
+        const originalPlaceholder = input.getAttribute('data-original-placeholder');
+        if (originalPlaceholder) {
+            input.placeholder = originalPlaceholder;
+        } else {
+            input.placeholder = translations[currentLang].inputPlaceholder;
+        }
+        
+        // focus for better UX
+        input.focus();
+    }
+}
+
+// typewriter effect with RTL support
+function typeWriter(element, text, speed = 20, showCursor = true) {
+    element.innerHTML = '';
+    let i = 0;
+    let isScrollingEnabled = true;
+    
+    // check for kurdish text and apply RTL
+    if (detectKurdishText(text) || isCurrentLanguageKurdish()) {
+      element.classList.add('rtl-text');
+      element.parentElement.classList.add('rtl-message');
+    }
+    
+    // set AI responding state
+    isAIResponding = true;
+    isTypingComplete = false;
+    updateInputState();
+    
+    // add cursor styles if not there
+    if (!document.querySelector('#cursor-style')) {
+        const style = document.createElement('style');
+        style.id = 'cursor-style';
+        style.textContent = `
+            .typing-cursor {
+                display: inline-block;
+                background-color: #333;
+                width: 2px;
+                height: 1.2em;
+                margin-left: 2px;
+                animation: blink 1s infinite;
+            }
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+            
+            .ai-response-header {
+                font-weight: bold;
+                font-size: 1.1em;
+                margin-bottom: 8px;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 5px;
+                display: inline-block;
+            }
+            
+            .message.assistant .message-content {
+                line-height: 1.6;
+            }
+            
+            /* disabled input styles */
+            .input-container.disabled {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+            
+            .message-input:disabled {
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+            }
+            
+            .send-button:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+            
+            /* typing status */
+            .typing-status {
+                position: absolute;
+                top: -25px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(52, 152, 219, 0.1);
+                color: #3498db;
+                padding: 5px 15px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 100;
+            }
+            
+            /* RTL text */
+            .rtl-text {
+                direction: rtl;
+                text-align: right;
+                font-family: 'Segoe UI', 'Tahoma', 'Arial Unicode MS', sans-serif;
+                line-height: 1.6;
+            }
+            
+            /* RTL message container */
+            .rtl-message {
+                direction: rtl;
+            }
+            
+            /* avatar position for RTL */
+            .rtl-message .message-avatar {
+                order: 2;
+                margin-left: 12px;
+                margin-right: 0;
+            }
+            
+            .rtl-message .message-content {
+                order: 1;
+            }
+            
+            /* fix lists for RTL */
+            .rtl-text ul, .rtl-text ol {
+                text-align: right;
+                direction: rtl;
+            }
+            
+            .rtl-text li {
+                text-align: right;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // add typing status
+    const inputArea = document.getElementById('inputArea');
+    const typingStatus = document.createElement('div');
+    typingStatus.className = 'typing-status';
+    typingStatus.id = 'typingStatus';
+    typingStatus.textContent = currentLang === 'ku' ? 'هاوەڵ وەڵام دەداتەوە...' : 'Haawall is responding...';
+    inputArea.appendChild(typingStatus);
+    
+    // detect user scroll to pause auto-scroll
+    const messagesContainer = document.getElementById('messages');
+    let userScrollTimeout;
+    
+    const handleScroll = () => {
+        const container = messagesContainer;
+        const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+        
+        if (!isAtBottom) {
+            isScrollingEnabled = false;
+            clearTimeout(userScrollTimeout);
+            userScrollTimeout = setTimeout(() => {
+                isScrollingEnabled = true;
+            }, 2000); 
+        } else {
+            isScrollingEnabled = true;
+        }
+    };
+    
+    messagesContainer.addEventListener('scroll', handleScroll, { passive: true });
+    
+    function type() {
+        if (i < text.length) {
+            const char = text.charAt(i);
+            let formattedText = formatMessage(text.substring(0, i + 1));
+            
+            // add header styling
+            if (i === 0 || (i > 0 && text.substring(0, i).includes('\n') && text.substring(i).trim().length > 0)) {
+                const lines = formattedText.split('<br>');
+                if (lines.length > 0 && lines[0].trim().length > 0) {
+                    lines[0] = `<div class="ai-response-header">${lines[0]}</div>`;
+                    formattedText = lines.join('<br>');
+                }
+            }
+            
+            element.innerHTML = formattedText;
+            
+            if (showCursor) {
+                element.innerHTML += '<span class="typing-cursor"></span>';
+            }
+            
+            i++;
+            
+            // variable typing speed
+            let currentSpeed = speed;
+            if (char === '.' || char === '!' || char === '?') {
+                currentSpeed = speed * 4; 
+            } else if (char === ',' || char === ';' || char === ':') {
+                currentSpeed = speed * 2; 
+            } else if (char === ' ') {
+                currentSpeed = speed * 0.3; 
+            }
+            
+            setTimeout(type, currentSpeed);
+            
+            // auto-scroll if user didn't scroll up
+            if (isScrollingEnabled) {
+                scrollToBottom();
+            }
+        } else {
+            // typing done
+            isTypingComplete = true;
+            
+            // clean up
+            messagesContainer.removeEventListener('scroll', handleScroll);
+            
+            // remove typing status
+            const statusElement = document.getElementById('typingStatus');
+            if (statusElement) {
+                statusElement.remove();
+            }
+            
+            if (showCursor) {
+                setTimeout(() => {
+                    let finalText = formatMessage(text);
+                    // apply header styling
+                    const lines = finalText.split('<br>');
+                    if (lines.length > 0 && lines[0].trim().length > 0) {
+                        lines[0] = `<div class="ai-response-header">${lines[0]}</div>`;
+                        finalText = lines.join('<br>');
+                    }
+                    element.innerHTML = finalText;
+                    if (isScrollingEnabled) {
+                        scrollToBottom();
+                    }
+                    
+                    // re-enable input
+                    isAIResponding = false;
+                    updateInputState();
+                }, 500); 
+            } else {
+                // re-enable input immediately
+                isAIResponding = false;
+                updateInputState();
+            }
+        }
+    }
+    
+    type();
+    
+    return new Promise(resolve => {
+        const checkComplete = () => {
+            if (i >= text.length) {
+                setTimeout(() => {
+                    isAIResponding = false;
+                    updateInputState();
+                    resolve();
+                }, showCursor ? 500 : 0);
+            } else {
+                setTimeout(checkComplete, 100);
+            }
+        };
+        checkComplete();
+    });
+}
+
+// toggle FAQ dropdown
 function toggleFAQ() {
   const dropdown = document.getElementById('faqDropdown');
   const button = document.getElementById('faqButton');
@@ -206,6 +529,7 @@ function toggleFAQ() {
   }
 }
 
+// fill FAQ list with questions
 function populateFAQList() {
   const faqList = document.getElementById('faqList');
   faqList.innerHTML = '';
@@ -224,40 +548,53 @@ function populateFAQList() {
   });
 }
 
+// send FAQ question
 function sendFAQQuestion(question) {
+  if (isAIResponding) {
+    return;
+  }
   document.getElementById('messageInput').value = question;
   sendMessage(question);
 }
 
+// toggle mobile menu
 function toggleMenu() {
   const menu = document.getElementById('mobileMenu');
   menu.classList.toggle('hidden');
 }
 
+// handle enter key
 function handleKeyDown(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
-    sendMessage();
+    
+    // only send if not responding
+    if (!isAIResponding) {
+      sendMessage();
+    }
   }
 }
 
-// FIXED: Better textarea height adjustment with proper scroll compensation
+// auto-resize textarea
 function adjustTextareaHeight() {
   const textarea = document.getElementById('messageInput');
   
-  // Reset height to get proper scrollHeight
+  // don't adjust if disabled
+  if (textarea.disabled) return;
+  
+  // reset height to calculate new height
   textarea.style.height = 'auto';
   
-  // Set new height with limits
+  // set new height with max limit
   const newHeight = Math.min(textarea.scrollHeight, 120);
   textarea.style.height = newHeight + 'px';
   
-  // Immediately update scroll position when textarea changes size
+  // update scroll after resize
   requestAnimationFrame(() => {
     scrollToBottom();
   });
   
-  // Additional scroll for mobile after textarea adjustment
+  // extra scroll for mobile
   if (window.innerWidth <= 768) {
     setTimeout(() => {
       scrollToBottom();
@@ -265,62 +602,71 @@ function adjustTextareaHeight() {
   }
 }
 
-// FIXED: Enhanced input focus handling with proper scroll management
+// handle mobile keyboard opening
 function handleInputFocus() {
   const inputArea = document.getElementById('inputArea');
   
   if (window.innerWidth <= 768) {
     inputArea.classList.add('keyboard-open');
     
-    // Multiple scroll attempts for keyboard opening with longer delays
-    setTimeout(() => {
-      scrollToBottom();
-    }, 100);
-    
-    setTimeout(() => {
-      scrollToBottom();
-    }, 300);
-    
-    setTimeout(() => {
-      scrollToBottom();
-    }, 500);
-    
-    setTimeout(() => {
-      scrollToBottom();
-    }, 800);
+    // multiple scroll attempts
+    setTimeout(() => scrollToBottom(), 100);
+    setTimeout(() => scrollToBottom(), 300);
+    setTimeout(() => scrollToBottom(), 500);
+    setTimeout(() => scrollToBottom(), 800);
   }
 }
 
-// FIXED: Better input blur handling
+// handle mobile keyboard closing
 function handleInputBlur() {
   const inputArea = document.getElementById('inputArea');
   
   if (window.innerWidth <= 768) {
     inputArea.classList.remove('keyboard-open');
     
-    // Longer delay to prevent flickering and ensure proper scroll
+    // longer delay to prevent flicker
     setTimeout(() => {
       scrollToBottom();
     }, 400);
   }
 }
 
+// send example prompt
 function sendExamplePrompt(promptIndex) {
+  if (isAIResponding) {
+    return;
+  }
+  
   const prompt = translations[currentLang].prompts[promptIndex].text;
   document.getElementById('messageInput').value = prompt;
   sendMessage(prompt);
 }
 
+// main send message function
 function sendMessage(customMessage = null) {
   const input = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
   const message = customMessage ?? input.value.trim();
 
+  // prevent sending if AI is responding
+  if (isAIResponding) {
+    // show warning
+    const warningMsg = currentLang === 'ku' 
+      ? 'تکایە چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە'
+      : 'Please wait for Haawall to finish responding';
+    
+    console.log(warningMsg);
+    return;
+  }
+
   if (message === '') return;
 
+  // hide welcome screen
   document.getElementById('welcomeScreen').classList.add('hidden');
-  input.disabled = true;
-  sendButton.disabled = true;
+  
+  // set AI responding state
+  isAIResponding = true;
+  updateInputState();
 
   addMessage(message, 'user');
   input.value = '';
@@ -333,7 +679,10 @@ function sendMessage(customMessage = null) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ message: message })
+    body: JSON.stringify({ 
+      message: message,
+      instruction: "Please answer only the single question asked. Do not provide additional information or answer multiple questions at once."
+    })
   })
     .then(response => {
       if (!response.ok) {
@@ -343,36 +692,44 @@ function sendMessage(customMessage = null) {
     })
     .then(data => {
       hideTypingIndicator();
-      if (data.response) {
-        addMessage(data.response, 'assistant');
-      } else if (data.error) {
-        const errorMsg = currentLang === 'ku'
-          ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
-          : 'I apologize, but I encountered an error: ' + data.error;
-        addMessage(errorMsg, 'assistant', true);
-      } else {
-        const unexpectedMsg = currentLang === 'ku'
-          ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
-          : 'I received an unexpected response. Please try again.';
-        addMessage(unexpectedMsg, 'assistant', true);
-      }
+      
+      // small delay for better UX
+      setTimeout(() => {
+        if (data.response) {
+          addMessage(data.response, 'assistant');
+        } else if (data.error) {
+          const errorMsg = currentLang === 'ku'
+            ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
+            : 'I apologize, but I encountered an error: ' + data.error;
+          addMessage(errorMsg, 'assistant', true);
+        } else {
+          const unexpectedMsg = currentLang === 'ku'
+            ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
+            : 'I received an unexpected response. Please try again.';
+          addMessage(unexpectedMsg, 'assistant', true);
+        }
+      }, 300);
     })
     .catch(error => {
       hideTypingIndicator();
       console.error('Error:', error);
-      const connectionErrorMsg = currentLang === 'ku'
-        ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
-        : 'I\'m having trouble connecting right now. Please check your connection and try again.';
-      addMessage(connectionErrorMsg, 'assistant', true);
+      
+      setTimeout(() => {
+        const connectionErrorMsg = currentLang === 'ku'
+          ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
+          : 'I\'m having trouble connecting right now. Please check your connection and try again.';
+        addMessage(connectionErrorMsg, 'assistant', true);
+      }, 300);
     })
     .finally(() => {
-      input.disabled = false;
-      sendButton.disabled = false;
-      input.focus();
+      // ensure input is re-enabled
+      if (!isAIResponding) {
+        updateInputState();
+      }
     });
 }
 
-// FIXED: Improved message adding with better scrolling
+// add message to chat with RTL support
 function addMessage(message, sender, isError = false) {
   const messagesContainer = document.getElementById('messages');
   const messageDiv = document.createElement('div');
@@ -380,56 +737,56 @@ function addMessage(message, sender, isError = false) {
 
   const avatar = document.createElement('div');
   avatar.className = 'message-avatar';
-  avatar.textContent = sender === 'user' ? 'U' : 'H';
+  avatar.textContent = sender === 'user' ? 'U' : '';
 
   const content = document.createElement('div');
   content.className = isError ? 'error-message' : 'message-content';
-  content.textContent = message;
-
+  
+  // add RTL class for kurdish
+  if (sender === 'assistant' && (detectKurdishText(message) || isCurrentLanguageKurdish())) {
+    content.classList.add('rtl-text');
+    messageDiv.classList.add('rtl-message');
+  }
+  
   messageDiv.appendChild(avatar);
   messageDiv.appendChild(content);
   messagesContainer.appendChild(messageDiv);
 
-  // Force multiple scroll attempts to ensure proper positioning
-  requestAnimationFrame(() => {
+  // show user messages immediately
+  if (sender === 'user') {
+    content.innerHTML = formatMessage(message);
     scrollToBottom();
-  });
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 10);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 100);
-  
-  // Final scroll attempt for stubborn cases
-  setTimeout(() => {
-    scrollToBottom();
-  }, 300);
+  } else {
+    // use typewriter for AI responses
+    typeWriter(content, message, 20, true).then(() => {
+      // final scroll after typing
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    });
+  }
 }
 
-// FIXED: Improved scroll to bottom function with proper input area compensation
+// scroll chat to bottom
 function scrollToBottom() {
   const messagesContainer = document.getElementById('messages');
   const inputArea = document.getElementById('inputArea');
   
   if (messagesContainer && inputArea) {
-    // Get the actual input area height including any dynamic changes
+    // get actual input area height
     const inputAreaHeight = inputArea.getBoundingClientRect().height;
     
-    // Add substantial padding to ensure messages don't get cut off
+    // add extra padding
     const extraPadding = 30;
     
-    // Set bottom padding dynamically based on actual input area height
+    // set dynamic padding
     messagesContainer.style.paddingBottom = `${inputAreaHeight + extraPadding}px`;
     
-    // Force immediate scroll to bottom
+    // force scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Additional scroll attempts for mobile devices
+    // multiple scroll attempts for mobile
     if (window.innerWidth <= 768) {
-      // Multiple attempts with increasing delays for mobile
       setTimeout(() => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }, 50);
@@ -445,72 +802,73 @@ function scrollToBottom() {
   }
 }
 
-// FIXED: Enhanced typing indicator with better scroll management
+// show typing indicator
 function showTypingIndicator() {
   const indicator = document.getElementById('typingIndicator');
-  indicator.style.display = 'flex';
-  
-  // Multiple scroll attempts to show typing indicator properly
-  setTimeout(() => {
-    scrollToBottom();
-  }, 50);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 150);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 300);
+  if (indicator) {
+    indicator.style.display = 'flex';
+    
+    // scroll to show indicator
+    setTimeout(() => scrollToBottom(), 50);
+    setTimeout(() => scrollToBottom(), 150);
+  }
 }
 
+// hide typing indicator
 function hideTypingIndicator() {
-  document.getElementById('typingIndicator').style.display = 'none';
+  const indicator = document.getElementById('typingIndicator');
+  if (indicator) {
+    indicator.style.display = 'none';
+  }
   
-  // Ensure proper scroll after hiding typing indicator
-  setTimeout(() => {
-    scrollToBottom();
-  }, 50);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 150);
+  // scroll after hiding
+  setTimeout(() => scrollToBottom(), 50);
 }
 
+// switch between languages
 function toggleLanguage() {
   currentLang = currentLang === 'en' ? 'ku' : 'en';
   const t = translations[currentLang];
 
-  // Update for both desktop and mobile language buttons
+  // update language buttons
   document.getElementById('langSwitchBtn').innerText = t.switchText;
   document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
   
+  // update welcome screen
   document.querySelector('.welcome-title').innerText = t.welcomeTitle;
   document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
-  document.getElementById('messageInput').placeholder = t.inputPlaceholder;
+  
+  // update input placeholder
+  updateInputState();
 
-  // Update FAQ header
+  // update FAQ header
   const faqHeader = document.querySelector('.faq-header');
   if (faqHeader) {
     faqHeader.textContent = t.faqHeader;
   }
 
-  // Update FAQ questions if dropdown is open
+  // refresh FAQ list if open
   if (faqOpen) {
     populateFAQList();
   }
 
-  // Update for quick action buttons
+  // update quick action buttons
   const quickActionBtns = document.querySelectorAll('.quick-action-btn');
   quickActionBtns.forEach((btn, i) => {
     btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
     btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
   });
+  
+  // update typing status if it exists
+  const typingStatus = document.getElementById('typingStatus');
+  if (typingStatus) {
+    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە' : 'Haawall is responding...';
+  }
 }
 
-// FIXED: Better mobile viewport handling with dynamic padding updates
+// mobile viewport fixes
 function initializeMobileFixes() {
-  // More reliable viewport height calculation
+  // better viewport height for mobile browsers
   function setViewportHeight() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -518,7 +876,7 @@ function initializeMobileFixes() {
   
   setViewportHeight();
   
-  // Handle resize with debouncing and scroll adjustment
+  // handle resize with debouncing
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -528,15 +886,15 @@ function initializeMobileFixes() {
     }, 100);
   });
   
-  // Handle orientation change with longer delay
+  // handle orientation change
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
       setViewportHeight();
       scrollToBottom();
-    }, 700); // Increased delay for orientation change
+    }, 700); 
   });
   
-  // Better keyboard detection with scroll management
+  // detect keyboard open/close
   let initialViewportHeight = window.innerHeight;
   let keyboardOpen = false;
   
@@ -545,63 +903,47 @@ function initializeMobileFixes() {
     const heightDifference = initialViewportHeight - currentHeight;
     
     if (heightDifference > 150 && !keyboardOpen) {
-      // Keyboard opened
+      // keyboard opened
       keyboardOpen = true;
       document.body.classList.add('keyboard-open');
-      setTimeout(() => {
-        scrollToBottom();
-      }, 300);
-      setTimeout(() => {
-        scrollToBottom();
-      }, 600);
+      setTimeout(() => scrollToBottom(), 300);
+      setTimeout(() => scrollToBottom(), 600);
     } else if (heightDifference < 150 && keyboardOpen) {
-      // Keyboard closed
+      // keyboard closed
       keyboardOpen = false;
       document.body.classList.remove('keyboard-open');
-      setTimeout(() => {
-        scrollToBottom();
-      }, 300);
-      setTimeout(() => {
-        scrollToBottom();
-      }, 600);
+      setTimeout(() => scrollToBottom(), 300);
+      setTimeout(() => scrollToBottom(), 600);
     }
   });
 }
 
-// FIXED: iOS Safari specific fixes
+// iOS safari fixes
 function initializeIOSFixes() {
-  // Prevent zoom on input focus
+  // prevent zoom on input focus
   const viewportMeta = document.querySelector('meta[name="viewport"]');
   if (viewportMeta) {
     viewportMeta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0';
   }
   
-  // Better focus handling for iOS
+  // better focus handling for iOS
   document.addEventListener('focusin', function(e) {
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
-      setTimeout(() => {
-        scrollToBottom();
-      }, 400);
-      setTimeout(() => {
-        scrollToBottom();
-      }, 700);
+      setTimeout(() => scrollToBottom(), 100);
+      setTimeout(() => scrollToBottom(), 400);
+      setTimeout(() => scrollToBottom(), 700);
     }
   });
   
-  // Handle iOS keyboard hiding
+  // handle iOS keyboard hiding
   document.addEventListener('focusout', function(e) {
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      setTimeout(() => {
-        scrollToBottom();
-      }, 300);
+      setTimeout(() => scrollToBottom(), 300);
     }
   });
 }
 
-// FIXED: Android specific fixes
+// android fixes
 function initializeAndroidFixes() {
   let originalHeight = window.innerHeight;
   
@@ -610,22 +952,18 @@ function initializeAndroidFixes() {
     const diff = originalHeight - currentHeight;
     
     if (diff > 150) {
-      // Keyboard is open
+      // keyboard is open
       document.body.style.paddingBottom = '0px';
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
+      setTimeout(() => scrollToBottom(), 100);
     } else {
-      // Keyboard is closed
+      // keyboard is closed
       document.body.style.paddingBottom = '';
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
+      setTimeout(() => scrollToBottom(), 100);
     }
   });
 }
 
-// Event listeners for FAQ dropdown
+// close FAQ when clicking outside
 document.addEventListener('click', function(event) {
   const dropdown = document.getElementById('faqDropdown');
   const button = document.getElementById('faqButton');
@@ -635,15 +973,19 @@ document.addEventListener('click', function(event) {
   }
 });
 
-// Initialize everything when DOM is loaded with proper scroll setup
+// initialize when page loads
 document.addEventListener('DOMContentLoaded', function () {
+  // ensure input starts correctly
+  isAIResponding = false;
+  updateInputState();
+  
   document.getElementById('messageInput').focus();
   
-  // Add improved styling to prevent message cutoff
+  // add styling to prevent message cutoff
   const style = document.createElement('style');
   style.textContent = `
     .messages {
-      padding-bottom: 140px !important; /* Increased initial padding */
+      padding-bottom: 140px !important;
       scroll-behavior: smooth;
     }
     
@@ -653,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     .message:last-child {
-      margin-bottom: 20px !important; /* More space for last message */
+      margin-bottom: 20px !important;
     }
     
     .input-area {
@@ -669,11 +1011,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
     @media (max-width: 768px) {
       .messages {
-        padding-bottom: 160px !important; /* Even more padding on mobile */
+        padding-bottom: 160px !important;
       }
       
       .keyboard-open .messages {
-        padding-bottom: 200px !important; /* Maximum padding when keyboard is open */
+        padding-bottom: 200px !important;
       }
       
       .input-area {
@@ -683,33 +1025,25 @@ document.addEventListener('DOMContentLoaded', function () {
   `;
   document.head.appendChild(style);
   
-  // Initialize mobile fixes based on device
+  // mobile fixes
   if (window.innerWidth <= 768) {
     initializeMobileFixes();
   }
   
-  // iOS specific fixes
+  // iOS fixes
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
     initializeIOSFixes();
   }
   
-  // Android specific fixes
+  // android fixes
   if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
     initializeAndroidFixes();
   }
   
-  // Initial scroll setup with multiple attempts
-  setTimeout(() => {
-    scrollToBottom();
-  }, 100);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 300);
-  
-  setTimeout(() => {
-    scrollToBottom();
-  }, 500);
+  //scroll setup
+  setTimeout(() => scrollToBottom(), 100);
+  setTimeout(() => scrollToBottom(), 300);
+  setTimeout(() => scrollToBottom(), 500);
 });
 </script>
 </body>

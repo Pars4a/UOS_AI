@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/style.css">
     <style>
+       
     </style>
 </head>
 <body>
@@ -222,15 +223,22 @@ function formatMessage(message) {
   return message;
 }
 
-// check if text is kurdish
+// improved kurdish text detection - only checks the actual content
 function detectKurdishText(text) {
+  // remove HTML tags first
+  const cleanText = text.replace(/<[^>]*>/g, '');
+  
+  // kurdish unicode ranges
   const kurdishPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
-  return kurdishPattern.test(text);
-}
-
-// check if UI is in kurdish
-function isCurrentLanguageKurdish() {
-  return currentLang === 'ku';
+  
+  // count kurdish vs latin characters
+  const kurdishChars = (cleanText.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g) || []).length;
+  const latinChars = (cleanText.match(/[a-zA-Z]/g) || []).length;
+  const totalChars = kurdishChars + latinChars;
+  
+  // only apply RTL if kurdish characters make up more than 30% of the text
+  if (totalChars === 0) return false;
+  return (kurdishChars / totalChars) > 0.3;
 }
 
 // enable/disable input based on AI status
@@ -249,7 +257,7 @@ function updateInputState() {
         const originalPlaceholder = input.placeholder;
         input.setAttribute('data-original-placeholder', originalPlaceholder);
         input.placeholder = currentLang === 'ku' 
-            ? 'چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە...' 
+            ? '...چاوەڕێ بکە تا هاوەڵ وەڵامت دەداتەوە'
             : 'Please wait for Haawall to finish responding...';
     } else {
         // re-enable input
@@ -270,16 +278,24 @@ function updateInputState() {
     }
 }
 
-// typewriter effect with RTL support
+// FIXED: Free scrolling during AI response - no forced scrolling
 function typeWriter(element, text, speed = 20, showCursor = true) {
     element.innerHTML = '';
     let i = 0;
-    let isScrollingEnabled = true;
     
-    // check for kurdish text and apply RTL
-    if (detectKurdishText(text) || isCurrentLanguageKurdish()) {
+    // User can now scroll freely during AI response
+    let userHasScrolled = false;
+    let isAtBottomBeforeTyping = isScrolledToBottom();
+    
+    // FIXED: Only apply RTL if the actual message content contains Kurdish text
+    const isKurdishContent = detectKurdishText(text);
+    if (isKurdishContent) {
       element.classList.add('rtl-text');
       element.parentElement.classList.add('rtl-message');
+    } else {
+      // Make sure to remove RTL classes for English content
+      element.classList.remove('rtl-text');
+      element.parentElement.classList.remove('rtl-message');
     }
     
     // set AI responding state
@@ -351,7 +367,14 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
                 z-index: 100;
             }
             
-            /* RTL text */
+            /* Scroll to bottom indicator - REMOVED */
+            
+            /* Mobile adjustments */
+            @media (max-width: 768px) {
+                /* Mobile styles */
+            }
+            
+            /* RTL text - ONLY apply when content is actually Kurdish */
             .rtl-text {
                 direction: rtl;
                 text-align: right;
@@ -384,6 +407,12 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
             .rtl-text li {
                 text-align: right;
             }
+            
+            /* Default LTR styling for English content */
+            .message.assistant .message-content:not(.rtl-text) {
+                direction: ltr;
+                text-align: left;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -393,28 +422,26 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
     const typingStatus = document.createElement('div');
     typingStatus.className = 'typing-status';
     typingStatus.id = 'typingStatus';
-    typingStatus.textContent = currentLang === 'ku' ? 'هاوەڵ وەڵام دەداتەوە...' : 'Haawall is responding...';
+    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە    ' : 'Haawall is responding...';
     inputArea.appendChild(typingStatus);
     
-    // detect user scroll to pause auto-scroll
+    // FIXED: Track user scrolling without interfering
     const messagesContainer = document.getElementById('messages');
-    let userScrollTimeout;
+    let scrollTimeout;
     
     const handleScroll = () => {
-        const container = messagesContainer;
-        const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+        userHasScrolled = true;
+        clearTimeout(scrollTimeout);
         
-        if (!isAtBottom) {
-            isScrollingEnabled = false;
-            clearTimeout(userScrollTimeout);
-            userScrollTimeout = setTimeout(() => {
-                isScrollingEnabled = true;
-            }, 2000); 
-        } else {
-            isScrollingEnabled = true;
-        }
+        // Reset scroll tracking after user stops scrolling
+        scrollTimeout = setTimeout(() => {
+            if (isScrolledToBottom()) {
+                userHasScrolled = false;
+            }
+        }, 1000);
     };
     
+    // Use passive listener for better performance
     messagesContainer.addEventListener('scroll', handleScroll, { passive: true });
     
     function type() {
@@ -451,8 +478,8 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
             
             setTimeout(type, currentSpeed);
             
-            // auto-scroll if user didn't scroll up
-            if (isScrollingEnabled) {
+            // FIXED: Only auto-scroll if user was at bottom when typing started AND hasn't scrolled away
+            if (isAtBottomBeforeTyping && !userHasScrolled) {
                 scrollToBottom();
             }
         } else {
@@ -478,7 +505,9 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
                         finalText = lines.join('<br>');
                     }
                     element.innerHTML = finalText;
-                    if (isScrollingEnabled) {
+                    
+                    // Only scroll if user was at bottom and hasn't scrolled
+                    if (isAtBottomBeforeTyping && !userHasScrolled) {
                         scrollToBottom();
                     }
                     
@@ -510,6 +539,15 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
         };
         checkComplete();
     });
+}
+
+// Helper function to check if user is at bottom of scroll
+function isScrolledToBottom() {
+    const messagesContainer = document.getElementById('messages');
+    if (!messagesContainer) return true;
+    
+    const threshold = 50; // pixels from bottom
+    return messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + threshold;
 }
 
 // toggle FAQ dropdown
@@ -589,16 +627,11 @@ function adjustTextareaHeight() {
   const newHeight = Math.min(textarea.scrollHeight, 120);
   textarea.style.height = newHeight + 'px';
   
-  // update scroll after resize
-  requestAnimationFrame(() => {
-    scrollToBottom();
-  });
-  
-  // extra scroll for mobile
-  if (window.innerWidth <= 768) {
-    setTimeout(() => {
-      scrollToBottom();
-    }, 100);
+  // update scroll after resize - only if user was at bottom
+  if (isScrolledToBottom()) {
+    requestAnimationFrame(() => {
+        scrollToBottom();
+    });
   }
 }
 
@@ -609,11 +642,12 @@ function handleInputFocus() {
   if (window.innerWidth <= 768) {
     inputArea.classList.add('keyboard-open');
     
-    // multiple scroll attempts
-    setTimeout(() => scrollToBottom(), 100);
-    setTimeout(() => scrollToBottom(), 300);
-    setTimeout(() => scrollToBottom(), 500);
-    setTimeout(() => scrollToBottom(), 800);
+    // Only scroll if user was at bottom
+    if (isScrolledToBottom()) {
+        setTimeout(() => scrollToBottom(), 100);
+        setTimeout(() => scrollToBottom(), 300);
+        setTimeout(() => scrollToBottom(), 500);
+    }
   }
 }
 
@@ -624,10 +658,12 @@ function handleInputBlur() {
   if (window.innerWidth <= 768) {
     inputArea.classList.remove('keyboard-open');
     
-    // longer delay to prevent flicker
-    setTimeout(() => {
-      scrollToBottom();
-    }, 400);
+    // Only scroll if user was at bottom
+    if (isScrolledToBottom()) {
+        setTimeout(() => {
+            scrollToBottom();
+        }, 400);
+    }
   }
 }
 
@@ -729,7 +765,7 @@ function sendMessage(customMessage = null) {
     });
 }
 
-// add message to chat with RTL support
+// add message to chat with CORRECTED RTL support
 function addMessage(message, sender, isError = false) {
   const messagesContainer = document.getElementById('messages');
   const messageDiv = document.createElement('div');
@@ -742,10 +778,15 @@ function addMessage(message, sender, isError = false) {
   const content = document.createElement('div');
   content.className = isError ? 'error-message' : 'message-content';
   
-  // add RTL class for kurdish
-  if (sender === 'assistant' && (detectKurdishText(message) || isCurrentLanguageKurdish())) {
+  //only apply RTL if the message actually contains Kurdish text
+  // Don't base it on UI language, base it on the actual content
+  if (sender === 'assistant' && detectKurdishText(message)) {
     content.classList.add('rtl-text');
     messageDiv.classList.add('rtl-message');
+  } else {
+    // Explicitly ensure LTR for non-Kurdish content
+    content.classList.remove('rtl-text');
+    messageDiv.classList.remove('rtl-message');
   }
   
   messageDiv.appendChild(avatar);
@@ -755,16 +796,31 @@ function addMessage(message, sender, isError = false) {
   // show user messages immediately
   if (sender === 'user') {
     content.innerHTML = formatMessage(message);
-    scrollToBottom();
+    // Only auto-scroll for user messages if they were at bottom
+    if (isScrolledToBottom()) {
+        scrollToBottom();
+    }
   } else {
     // use typewriter for AI responses
     typeWriter(content, message, 20, true).then(() => {
-      // final scroll after typing
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
+      // final scroll after typing - only if user didn't scroll away
+      if (isScrolledToBottom()) {
+          setTimeout(() => {
+              scrollToBottom();
+          }, 100);
+      }
     });
   }
+}
+
+// show scroll to bottom indicator - REMOVED
+function showScrollToBottomIndicator() {
+  // Removed - no longer showing scroll indicator
+}
+
+// hide scroll to bottom indicator - REMOVED  
+function hideScrollToBottomIndicator() {
+  // Removed - no longer showing scroll indicator
 }
 
 // scroll chat to bottom
@@ -785,19 +841,13 @@ function scrollToBottom() {
     // force scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // multiple scroll attempts for mobile
+    // Additional scroll for mobile - but only if needed
     if (window.innerWidth <= 768) {
       setTimeout(() => {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        if (isScrolledToBottom()) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
       }, 50);
-      
-      setTimeout(() => {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }, 150);
-      
-      setTimeout(() => {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }, 300);
     }
   }
 }
@@ -808,9 +858,11 @@ function showTypingIndicator() {
   if (indicator) {
     indicator.style.display = 'flex';
     
-    // scroll to show indicator
-    setTimeout(() => scrollToBottom(), 50);
-    setTimeout(() => scrollToBottom(), 150);
+    // Only scroll if user was at bottom
+    if (isScrolledToBottom()) {
+        setTimeout(() => scrollToBottom(), 50);
+        setTimeout(() => scrollToBottom(), 150);
+    }
   }
 }
 
@@ -821,8 +873,10 @@ function hideTypingIndicator() {
     indicator.style.display = 'none';
   }
   
-  // scroll after hiding
-  setTimeout(() => scrollToBottom(), 50);
+  // Only scroll if user is at bottom
+  if (isScrolledToBottom()) {
+      setTimeout(() => scrollToBottom(), 50);
+  }
 }
 
 // switch between languages
@@ -862,7 +916,7 @@ function toggleLanguage() {
   // update typing status if it exists
   const typingStatus = document.getElementById('typingStatus');
   if (typingStatus) {
-    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە' : 'Haawall is responding...';
+    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵامت دەداتەوە' : 'Haawall is responding...';
   }
 }
 
@@ -882,7 +936,10 @@ function initializeMobileFixes() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       setViewportHeight();
-      scrollToBottom();
+      // Only scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          scrollToBottom();
+      }
     }, 100);
   });
   
@@ -890,7 +947,10 @@ function initializeMobileFixes() {
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
       setViewportHeight();
-      scrollToBottom();
+      // Only scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          scrollToBottom();
+      }
     }, 700); 
   });
   
@@ -906,14 +966,20 @@ function initializeMobileFixes() {
       // keyboard opened
       keyboardOpen = true;
       document.body.classList.add('keyboard-open');
-      setTimeout(() => scrollToBottom(), 300);
-      setTimeout(() => scrollToBottom(), 600);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 300);
+          setTimeout(() => scrollToBottom(), 600);
+      }
     } else if (heightDifference < 150 && keyboardOpen) {
       // keyboard closed
       keyboardOpen = false;
       document.body.classList.remove('keyboard-open');
-      setTimeout(() => scrollToBottom(), 300);
-      setTimeout(() => scrollToBottom(), 600);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 300);
+          setTimeout(() => scrollToBottom(), 600);
+      }
     }
   });
 }
@@ -929,16 +995,22 @@ function initializeIOSFixes() {
   // better focus handling for iOS
   document.addEventListener('focusin', function(e) {
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      setTimeout(() => scrollToBottom(), 100);
-      setTimeout(() => scrollToBottom(), 400);
-      setTimeout(() => scrollToBottom(), 700);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 100);
+          setTimeout(() => scrollToBottom(), 400);
+          setTimeout(() => scrollToBottom(), 700);
+      }
     }
   });
   
   // handle iOS keyboard hiding
   document.addEventListener('focusout', function(e) {
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      setTimeout(() => scrollToBottom(), 300);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 300);
+      }
     }
   });
 }
@@ -954,11 +1026,17 @@ function initializeAndroidFixes() {
     if (diff > 150) {
       // keyboard is open
       document.body.style.paddingBottom = '0px';
-      setTimeout(() => scrollToBottom(), 100);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 100);
+      }
     } else {
       // keyboard is closed
       document.body.style.paddingBottom = '';
-      setTimeout(() => scrollToBottom(), 100);
+      // Only auto-scroll if user was at bottom
+      if (isScrolledToBottom()) {
+          setTimeout(() => scrollToBottom(), 100);
+      }
     }
   });
 }
@@ -1040,10 +1118,12 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeAndroidFixes();
   }
   
-  //scroll setup
-  setTimeout(() => scrollToBottom(), 100);
-  setTimeout(() => scrollToBottom(), 300);
-  setTimeout(() => scrollToBottom(), 500);
+  // Initial scroll setup - only if at bottom
+  if (isScrolledToBottom()) {
+      setTimeout(() => scrollToBottom(), 100);
+      setTimeout(() => scrollToBottom(), 300);
+      setTimeout(() => scrollToBottom(), 500);
+  }
 });
 </script>
 </body>

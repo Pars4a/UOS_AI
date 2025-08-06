@@ -58,8 +58,8 @@ def get_adaptive_token_limits(language: str, complexity: str) -> dict:
     """Get token limits adapted for language and complexity"""
     base_limits = {
         "simple": {"en": 150, "ku": 200},
-        "medium": {"en": 400, "ku": 600}, 
-        "detailed": {"en": 700, "ku": 900}
+        "medium": {"en": 1000, "ku": 1000}, 
+        "detailed": {"en": 1100, "ku": 1100}
     }
     
     return {
@@ -119,9 +119,9 @@ def fetch_relevant_info(user_message: str, language: str, complexity: str = "med
         if complexity == "simple":
             max_records, char_limit = 1, 60 if language == "ku" else 100
         elif complexity == "detailed":
-            max_records, char_limit = 4, 250 if language == "ku" else 500
+            max_records, char_limit = 4, 700 if language == "ku" else 500
         else:  # medium
-            max_records, char_limit = 2, 150 if language == "ku" else 300
+            max_records, char_limit = 2, 500 if language == "ku" else 500
         
         processed_query = preprocess_query(user_message, language)
         query_embedding = embed_text_cached(processed_query)

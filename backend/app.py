@@ -21,7 +21,7 @@ load_dotenv()
 
 logging.basicConfig(filename='logs/chat_logs.txt', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,7 +47,7 @@ def get_client_ip(request: Request) -> str:
         return x_forwarded_for.split(",")[0].strip()
     return request.client.host
 
-def check_rate_limit(client_ip: str, limit: int = 30, window: int = 3600) -> bool:
+def check_rate_limit(client_ip: str, limit: int = 50, window: int = 3600) -> bool:
     """Check if client has exceeded rate limit (30 requests per hour)"""
     now = datetime.now()
     

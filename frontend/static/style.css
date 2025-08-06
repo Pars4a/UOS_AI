@@ -824,7 +824,7 @@ html, body {
     right: 24px;
     width: 56px;
     height: 56px;
-    background: rgba(26, 27, 32, 0.1);
+    background: rgba(26, 27, 32, 0.3);
     backdrop-filter: blur(0.1px);
     border: 1px solid rgba(134, 192, 226, 0.2);
     border-radius: 50%;
@@ -847,7 +847,7 @@ html, body {
 .faq-button:hover {
     transform: scale(1.1);
     background: rgba(26, 27, 32, 0.2);
-    box-shadow: 0 6px 20px rgba(26, 27, 32, 0.3);
+    box-shadow: 0 6px 20px rgba(26, 27, 32, 0.6);
 }
 
 .faq-button svg {
@@ -911,7 +911,7 @@ html, body {
 }
 
 .faq-item:hover {
-    background: #f8fafc;
+    background: linear-gradient(135deg, #82848d 0%, #48556d 100%);
     color: #1a1b20;
     transform: translateX(4px);
 }

@@ -16,9 +16,9 @@ anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Adaptive base prompts for different query types
-BASE_PROMPT_DETAILED = """You are a knowledgeable assistant for the University of Sulaimani. Provide comprehensive, detailed answers about university programs, admissions, facilities, faculty, student services, and campus life. Include specific examples. dont say check other sources for information, and helpful context.Never share security or internal data."""
+BASE_PROMPT_DETAILED = """You are a knowledgeable assistant for the University of Sulaimani. You were made by the computer engineering department. Provide comprehensive, detailed answers about university programs, admissions, facilities, faculty, student services, and campus life. Include specific examples. dont say check other sources for information, and helpful context.Never share security or internal data."""
 
-BASE_PROMPT_SIMPLE = """Assistant for University of Sulaimani. Answer university questions briefly. dont mention other sources for information No security/internal data. """
+BASE_PROMPT_SIMPLE = """Assistant for University of Sulaimani. You were made by the computer engineering department . Answer university questions briefly. dont mention other sources for information No security/internal data. """
 
 # Simple in-memory cache for responses (use Redis in production)
 response_cache = {}
@@ -70,7 +70,7 @@ def fetch_relevant_info(user_message: str, complexity: str = "medium") -> List[s
         elif complexity == "detailed":
             max_records, char_limit = 5, 600
         else:  # medium
-            max_records, char_limit = 3, 400
+            max_records, char_limit = 4, 500
         
         processed_query = preprocess_query(user_message)
         query_embedding = embed_text_cached(processed_query)

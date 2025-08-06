@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
+# CUREENTLY USING CLAUDE SETUP CHATGPT AS BACKUP LATER
+
 load_dotenv()
 
 def get_api_key():

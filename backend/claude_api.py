@@ -171,9 +171,9 @@ def classify_query_complexity(query: str, language: str) -> str:
         # Kurdish complexity patterns
         simple_patterns = [
             r'\b(سڵاو|بەخێربێی|سوپاس|زۆر سوپاس)\b',  # greetings, thanks
-            r'\bناوت چییە\b',  # what is your name
-            r'\bتۆ کێیت\b',   # who are you
-            r'\bچۆنی\b'       # how are you
+            r'\bناوت چییە\b',  # w
+            r'\bتۆ کێیت\b',   #
+            r'\bچۆنی\b'       
         ]
         
         detailed_patterns = [
@@ -308,14 +308,12 @@ def ask_claude(prompt: str) -> str:
 
 def clear_cache():
     """Clear response cache - useful for production management"""
-    global response_cache
     response_cache.clear()
     embed_text_cached.cache_clear()
     logging.info("Caches cleared")
 
 def cleanup_cache():
     """Remove old cache entries to prevent memory bloat"""
-    global response_cache
     if len(response_cache) > 1000:  # Keep only 1000 most recent
         keys_to_remove = list(response_cache.keys())[:-500]
         for key in keys_to_remove:

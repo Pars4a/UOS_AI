@@ -168,9 +168,7 @@ const translations = {
         submitText: "Send Message",
         messagePlaceholder: "Tell us what you think..."
         
-        
 
-        
     },
     ku: {
         switchText: "English",
@@ -248,8 +246,10 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
     
     // Show loading state
     submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.6';
+    submitBtn.style.cursor = 'not-allowed';
     const loadingText = currentLang === 'ku' ? 'ناردن...' : 'Sending...';
-    submitText.innerHTML = `<span class="loading"></span> ${loadingText}`;
+    submitText.innerHTML = `<div class="loading" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-left: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px;"></div> ${loadingText}`;
     
     // Get form data
     const formData = {
@@ -321,6 +321,8 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
     } finally {
         // Reset button state
         submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
         submitText.innerText = currentLang === 'ku' ? 'پەیام بنێرە' : 'Send Message';
         
         // Scroll to message

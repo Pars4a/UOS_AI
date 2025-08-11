@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/style.css">
     <style>
-       
+        
     </style>
 </head>
 <body>
@@ -30,9 +30,31 @@
       
         <!-- right side controls -->
         <nav class="main-nav right desktop-only">
-          <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">
-            کوردی
-          </button>
+          <!-- Desktop Language Dropdown -->
+          <div class="language-dropdown" id="languageDropdown">
+              <button class="lang-toggle" id="langToggleBtn" onclick="toggleLanguageMenu()">
+                  <span class="current-lang">English</span>
+                  <span class="arrow">▼</span>
+              </button>
+              
+              <div class="language-menu" id="languageMenu">
+                  <div class="language-option active" onclick="selectLanguage('en')">
+                      <span class="language-flag">EN</span>
+                      <span class="language-name">English</span>
+                      <span class="language-check">✓</span>
+                  </div>
+                  <div class="language-option" onclick="selectLanguage('ku')">
+                      <span class="language-flag">KU</span>
+                      <span class="language-name">کوردی</span>
+                      <span class="language-check">✓</span>
+                  </div>
+                  <div class="language-option" onclick="selectLanguage('ar')">
+                      <span class="language-flag">AR</span>
+                      <span class="language-name">العربية</span>
+                      <span class="language-check">✓</span>
+                  </div>
+              </div>
+          </div>
           <a href="contact" class="nav-link contact-btn">Contact Us</a>
         </nav>
         
@@ -51,11 +73,32 @@
           </div>
         </div>
 
-        <!-- mobile language switcher -->
+        <!-- Mobile Language Dropdown -->
         <div class="mobile-controls">
-          <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">
-            کوردی
-          </button>
+          <div class="language-dropdown" id="languageDropdownMobile">
+              <button class="lang-toggle" id="langToggleBtnMobile" onclick="toggleLanguageMenuMobile()">
+                  <span class="current-lang">English</span>
+                  <span class="arrow">▼</span>
+              </button>
+              
+              <div class="language-menu" id="languageMenuMobile">
+                  <div class="language-option active" onclick="selectLanguageMobile('en')">
+                      <span class="language-flag">EN</span>
+                      <span class="language-name">English</span>
+                      <span class="language-check">✓</span>
+                  </div>
+                  <div class="language-option" onclick="selectLanguageMobile('ku')">
+                      <span class="language-flag">KU</span>
+                      <span class="language-name">کوردی</span>
+                      <span class="language-check">✓</span>
+                  </div>
+                  <div class="language-option" onclick="selectLanguageMobile('ar')">
+                      <span class="language-flag">AR</span>
+                      <span class="language-name">العربية</span>
+                      <span class="language-check">✓</span>
+                  </div>
+              </div>
+          </div>
         </div>
 
         <!-- mobile dropdown menu -->
@@ -137,14 +180,27 @@
         </div>
     </div>
 
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
 <script>
 // global variables
 let currentLang = 'en';
 let faqOpen = false;
 let isAIResponding = false;
 let isTypingComplete = false;
+let languageMenuOpen = false;
+let languageMenuMobileOpen = false;
 
-// FAQ questions in both languages
+// Languages object
+const languages = {
+    en: { name: 'English', flag: '🇺🇸' },
+    ku: { name: 'کوردی', flag: 'ku' },
+    ar: { name: 'العربية', flag: '🇸🇦' }
+};
+
+// FAQ questions in all languages
 const faqQuestions = {
   en: [
     "Engineering College Foundation Building?",
@@ -169,13 +225,24 @@ const faqQuestions = {
     "تۆمار لەکوێیە؟ ",
     "کرێی پاراڵێلی بەشەکان چەندە؟",
     "کافتریای ناوەند لەکوێیە؟ "
+  ],
+  ar: [
+    "مبنى كلية الهندسة؟",
+    "أين موظفو الإحصاء؟",
+    "أين مجلس رؤساء الأقسام؟",
+    "متى يبدأ الفصل الدراسي؟",
+    "متى جلسات الموظفين؟",
+    "ما هي ساعات المكتبة؟",
+    "ما هي أقسام كلية الهندسة؟",
+    "أين التسجيل؟",
+    "أسعار البرنامج المتوازي",
+    "أين الكافتيريا المركزية؟"
   ]
 };
 
 // UI text translations
 const translations = {
   en: {
-    switchText: "کوردی",
     welcomeTitle: "How can I help you today?",
     welcomeSubtitle: "I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.",
     prompts: [
@@ -188,7 +255,6 @@ const translations = {
     faqHeader: "Frequently Asked Questions"
   },
   ku: {
-    switchText: "English",
     welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
     welcomeSubtitle: "من هاوەڵم، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
     prompts: [
@@ -199,8 +265,138 @@ const translations = {
     ],
     inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ",
     faqHeader: "پرسیارە دووبارەکان"
+  },
+  ar: {
+    welcomeTitle: "كيف يمكنني مساعدتك اليوم؟",
+    welcomeSubtitle: "أنا هاوال، مساعدك في جامعة السليمانية. اسألني عن الدورات والجداول ومعلومات الحرم الجامعي والمزيد.",
+    prompts: [
+      { title: "معلومات الدورة", text: "ما هي الدورات المتاحة في هندسة الحاسوب؟" },
+      { title: "خدمات الحرم الجامعي", text: "متى يبدأ الفصل الدراسي القادم؟" },
+      { title: "مساعدة التسجيل", text: "كيف أسجل في الدورات؟" },
+      { title: "التنقل في الحرم الجامعي", text: "أين يقع مبنى هندسة الحاسوب؟" },
+    ],
+    inputPlaceholder: "أرسل رسالة إلى هاوال...",
+    faqHeader: "الأسئلة الشائعة"
   }
 };
+
+// Language dropdown functions
+function toggleLanguageMenu() {
+    const menu = document.getElementById('languageMenu');
+    const button = document.getElementById('langToggleBtn');
+    
+    languageMenuOpen = !languageMenuOpen;
+    
+    if (languageMenuOpen) {
+        menu.classList.add('show');
+        button.classList.add('active');
+    } else {
+        menu.classList.remove('show');
+        button.classList.remove('active');
+    }
+}
+
+function toggleLanguageMenuMobile() {
+    const menu = document.getElementById('languageMenuMobile');
+    const button = document.getElementById('langToggleBtnMobile');
+    
+    languageMenuMobileOpen = !languageMenuMobileOpen;
+    
+    if (languageMenuMobileOpen) {
+        menu.classList.add('show');
+        button.classList.add('active');
+    } else {
+        menu.classList.remove('show');
+        button.classList.remove('active');
+    }
+}
+
+function selectLanguage(langCode) {
+    // Desktop dropdown
+    document.querySelectorAll('#languageMenu .language-option').forEach(option => {
+        option.classList.remove('active');
+    });
+    document.querySelector(`#languageMenu [onclick="selectLanguage('${langCode}')"]`).classList.add('active');
+    
+    currentLang = langCode;
+    document.getElementById('langToggleBtn').querySelector('.current-lang').textContent = languages[langCode].name;
+    
+    //  mobile dropdown
+    syncMobileLanguage(langCode);
+    
+    toggleLanguageMenu();
+    updateUILanguage();
+}
+
+function selectLanguageMobile(langCode) {
+    // Mobile dropdown  
+    document.querySelectorAll('#languageMenuMobile .language-option').forEach(option => {
+        option.classList.remove('active');
+    });
+    document.querySelector(`#languageMenuMobile [onclick="selectLanguageMobile('${langCode}')"]`).classList.add('active');
+    
+    currentLang = langCode;
+    document.getElementById('langToggleBtnMobile').querySelector('.current-lang').textContent = languages[langCode].name;
+    
+    //desktop dropdown
+    syncDesktopLanguage(langCode);
+    
+    toggleLanguageMenuMobile();
+    updateUILanguage();
+}
+
+function syncMobileLanguage(langCode) {
+    document.querySelectorAll('#languageMenuMobile .language-option').forEach(option => {
+        option.classList.remove('active');
+    });
+    document.querySelector(`#languageMenuMobile [onclick="selectLanguageMobile('${langCode}')"]`).classList.add('active');
+    document.getElementById('langToggleBtnMobile').querySelector('.current-lang').textContent = languages[langCode].name;
+}
+
+function syncDesktopLanguage(langCode) {
+    document.querySelectorAll('#languageMenu .language-option').forEach(option => {
+        option.classList.remove('active');
+    });
+    document.querySelector(`#languageMenu [onclick="selectLanguage('${langCode}')"]`).classList.add('active');
+    document.getElementById('langToggleBtn').querySelector('.current-lang').textContent = languages[langCode].name;
+}
+
+function updateUILanguage() {
+    const t = translations[currentLang];
+
+    // welcome screen
+    document.querySelector('.welcome-title').innerText = t.welcomeTitle;
+    document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
+    
+    // input placeholder
+    updateInputState();
+
+    // FAQ header
+    const faqHeader = document.querySelector('.faq-header');
+    if (faqHeader) {
+        faqHeader.textContent = t.faqHeader;
+    }
+
+    // Refresh FAQ list if open
+    if (faqOpen) {
+        populateFAQList();
+    }
+
+    // Update quick action buttons
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    quickActionBtns.forEach((btn, i) => {
+        btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
+        btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
+    });
+    
+    // typing status if it exists
+    const typingStatus = document.getElementById('typingStatus');
+    if (typingStatus) {
+        typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵامت دەداتەوە' 
+                                 : currentLang === 'ar' ? '...هاوال يجيب'
+                                 : 'Haawall is responding...';
+    }
+}
 
 // format text with basic HTML
 function formatMessage(message) {
@@ -245,25 +441,38 @@ function detectKurdishText(text) {
 function updateInputState() {
     const input = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
-    const inputContainer = document.querySelector('.input-container');
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
     
     if (isAIResponding) {
         // disable while AI responds
         input.disabled = true;
+        input.classList.add('loading');
         sendButton.disabled = true;
-        inputContainer.classList.add('disabled');
+        sendButton.classList.add('loading');
+        
+        // disable quick action buttons
+        quickActionBtns.forEach(btn => {
+            btn.classList.add('loading');
+        });
         
         // update placeholder
         const originalPlaceholder = input.placeholder;
         input.setAttribute('data-original-placeholder', originalPlaceholder);
         input.placeholder = currentLang === 'ku' 
             ? '...چاوەڕێ بکە تا هاوەڵ وەڵامت دەداتەوە'
+            : currentLang === 'ar' ? '...انتظر حتى يجيب هاوال'
             : 'Please wait for Haawall to finish responding...';
     } else {
         // re-enable input
         input.disabled = false;
+        input.classList.remove('loading');
         sendButton.disabled = false;
-        inputContainer.classList.remove('disabled');
+        sendButton.classList.remove('loading');
+        
+        // re-enable quick action buttons
+        quickActionBtns.forEach(btn => {
+            btn.classList.remove('loading');
+        });
         
         // restore placeholder
         const originalPlaceholder = input.getAttribute('data-original-placeholder');
@@ -278,6 +487,43 @@ function updateInputState() {
     }
 }
 
+// show loading overlay
+function showLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.add('show');
+    }
+}
+
+// hide loading overlay
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+}
+
+// message skeleton while loading
+function addMessageSkeleton() {
+    const messagesContainer = document.getElementById('messages');
+    const skeletonDiv = document.createElement('div');
+    skeletonDiv.className = 'message-skeleton';
+    skeletonDiv.id = 'messageSkeleton';
+    
+    skeletonDiv.innerHTML = `
+        <div class="skeleton-avatar">
+            <img src="static/images/uoswelcomelogo.png" alt="Haawall">
+        </div>
+        <div class="skeleton-content">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(skeletonDiv);
+    scrollToBottom();
+}
 //Free scrolling during AI response ->>. no forced scrolling
 function typeWriter(element, text, speed = 20, showCursor = true) {
     element.innerHTML = '';
@@ -367,8 +613,6 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
                 z-index: 100;
             }
             
-            /* Scroll to bottom indicator - REMOVED */
-            
             /* Mobile adjustments */
             @media (max-width: 768px) {
                 /* Mobile styles */
@@ -422,7 +666,9 @@ function typeWriter(element, text, speed = 20, showCursor = true) {
     const typingStatus = document.createElement('div');
     typingStatus.className = 'typing-status';
     typingStatus.id = 'typingStatus';
-    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە    ' : 'Haawall is responding...';
+    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە    ' 
+                             : currentLang === 'ar' ? '...هاوال يجيب'
+                             : 'Haawall is responding...';
     inputArea.appendChild(typingStatus);
     
     //Track user scrolling without interfering
@@ -670,6 +916,14 @@ function handleInputBlur() {
 // send example prompt
 function sendExamplePrompt(promptIndex) {
   if (isAIResponding) {
+    // show user feedback
+    const warningMsg = currentLang === 'ku' 
+      ? 'تکایە چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە'
+      : currentLang === 'ar' ? 'يرجى الانتظار حتى ينهي هاوال الإجابة'
+      : 'Please wait for Haawall to finish responding';
+    
+    // could add a toast notification here
+    console.log(warningMsg);
     return;
   }
   
@@ -689,6 +943,7 @@ function sendMessage(customMessage = null) {
     // show warning
     const warningMsg = currentLang === 'ku' 
       ? 'تکایە چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە'
+      : currentLang === 'ar' ? 'يرجى الانتظار حتى ينهي هاوال الإجابة'
       : 'Please wait for Haawall to finish responding';
     
     console.log(warningMsg);
@@ -708,7 +963,9 @@ function sendMessage(customMessage = null) {
   input.value = '';
   input.style.height = 'auto';
 
+  // show enhanced loading states
   showTypingIndicator();
+  addMessageSkeleton();
 
   fetch('/chat', {
     method: 'POST',
@@ -721,6 +978,12 @@ function sendMessage(customMessage = null) {
     })
   })
     .then(response => {
+      // remove skeleton on response
+      const skeleton = document.getElementById('messageSkeleton');
+      if (skeleton) {
+        skeleton.remove();
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -736,23 +999,32 @@ function sendMessage(customMessage = null) {
         } else if (data.error) {
           const errorMsg = currentLang === 'ku'
             ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
+            : currentLang === 'ar' ? 'أعتذر، حدث خطأ: ' + data.error
             : 'I apologize, but I encountered an error: ' + data.error;
           addMessage(errorMsg, 'assistant', true);
         } else {
           const unexpectedMsg = currentLang === 'ku'
             ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
+            : currentLang === 'ar' ? 'تم استلام رد غير متوقع. يرجى المحاولة مرة أخرى.'
             : 'I received an unexpected response. Please try again.';
           addMessage(unexpectedMsg, 'assistant', true);
         }
       }, 300);
     })
     .catch(error => {
+      // remove skeleton on error
+      const skeleton = document.getElementById('messageSkeleton');
+      if (skeleton) {
+        skeleton.remove();
+      }
+      
       hideTypingIndicator();
       console.error('Error:', error);
       
       setTimeout(() => {
         const connectionErrorMsg = currentLang === 'ku'
           ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
+          : currentLang === 'ar' ? 'أواجه مشكلة في الاتصال الآن. يرجى التحقق من اتصالك والمحاولة مرة أخرى.'
           : 'I\'m having trouble connecting right now. Please check your connection and try again.';
         addMessage(connectionErrorMsg, 'assistant', true);
       }, 300);
@@ -813,16 +1085,6 @@ function addMessage(message, sender, isError = false) {
   }
 }
 
-// show scroll to bottom indicator - REMOVED
-function showScrollToBottomIndicator() {
-  // Removed - no longer showing scroll indicator
-}
-
-// hide scroll to bottom indicator - REMOVED  
-function hideScrollToBottomIndicator() {
-  // Removed - no longer showing scroll indicator
-}
-
 // scroll chat to bottom
 function scrollToBottom() {
   const messagesContainer = document.getElementById('messages');
@@ -876,47 +1138,6 @@ function hideTypingIndicator() {
   // Only scroll if user is at bottom
   if (isScrolledToBottom()) {
       setTimeout(() => scrollToBottom(), 50);
-  }
-}
-
-// switch between languages
-function toggleLanguage() {
-  currentLang = currentLang === 'en' ? 'ku' : 'en';
-  const t = translations[currentLang];
-
-  // update language buttons
-  document.getElementById('langSwitchBtn').innerText = t.switchText;
-  document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
-  
-  // update welcome screen
-  document.querySelector('.welcome-title').innerText = t.welcomeTitle;
-  document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
-  
-  // update input placeholder
-  updateInputState();
-
-  // update FAQ header
-  const faqHeader = document.querySelector('.faq-header');
-  if (faqHeader) {
-    faqHeader.textContent = t.faqHeader;
-  }
-
-  // refresh FAQ list if open
-  if (faqOpen) {
-    populateFAQList();
-  }
-
-  // update quick action buttons
-  const quickActionBtns = document.querySelectorAll('.quick-action-btn');
-  quickActionBtns.forEach((btn, i) => {
-    btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
-    btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
-  });
-  
-  // update typing status if it exists
-  const typingStatus = document.getElementById('typingStatus');
-  if (typingStatus) {
-    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵامت دەداتەوە' : 'Haawall is responding...';
   }
 }
 
@@ -1041,12 +1262,24 @@ function initializeAndroidFixes() {
   });
 }
 
-// close FAQ when clicking outside
+// Close language dropdowns and FAQ when clicking outside
 document.addEventListener('click', function(event) {
-  const dropdown = document.getElementById('faqDropdown');
-  const button = document.getElementById('faqButton');
+  const dropdown = document.getElementById('languageDropdown');
+  const dropdownMobile = document.getElementById('languageDropdownMobile');
+  const faqDropdown = document.getElementById('faqDropdown');
+  const faqButton = document.getElementById('faqButton');
   
-  if (faqOpen && !dropdown.contains(event.target) && !button.contains(event.target)) {
+  // Close language dropdowns
+  if (languageMenuOpen && dropdown && !dropdown.contains(event.target)) {
+    toggleLanguageMenu();
+  }
+  
+  if (languageMenuMobileOpen && dropdownMobile && !dropdownMobile.contains(event.target)) {
+    toggleLanguageMenuMobile();
+  }
+  
+  // Close FAQ dropdown
+  if (faqOpen && !faqDropdown.contains(event.target) && !faqButton.contains(event.target)) {
     toggleFAQ();
   }
 });
@@ -1059,7 +1292,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   document.getElementById('messageInput').focus();
   
-  // add styling to prevent message cutoff
+  //  styling to prevent message cutoff
   const style = document.createElement('style');
   style.textContent = `
     .messages {

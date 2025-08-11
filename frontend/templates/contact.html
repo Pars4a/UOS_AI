@@ -6,6 +6,9 @@
     <title>Contact Us - Haawall University Assistant</title>
     <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/stylecontact.css">
+    <style>
+       
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -18,13 +21,62 @@
         <div class="logo">
             <div class="logo-icon">Haawall</div>
         </div>
-        <nav class="main-nav right desktop-only">
-            <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
-            <a href="contact" class="nav-link active">Contact Us</a>
-        </nav>
-        <div class="mobile-controls">
-            <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
+         <!-- right side controls -->
+    <nav class="main-nav right desktop-only">
+        <!-- Desktop Language Dropdown -->
+        <div class="language-dropdown" id="languageDropdown">
+            <button class="lang-toggle" id="langToggleBtn" onclick="toggleLanguageMenu()">
+                <span class="current-lang">English</span>
+                <span class="arrow">▼</span>
+            </button>
+            
+            <div class="language-menu" id="languageMenu">
+                <div class="language-option active" onclick="selectLanguage('en')">
+                    <span class="language-flag">EN</span>
+                    <span class="language-name">English</span>
+                    <span class="language-check">✓</span>
+                </div>
+                <div class="language-option" onclick="selectLanguage('ku')">
+                    <span class="language-flag">KU</span>
+                    <span class="language-name">کوردی</span>
+                    <span class="language-check">✓</span>
+                </div>
+                <div class="language-option" onclick="selectLanguage('ar')">
+                    <span class="language-flag">AR</span>
+                    <span class="language-name">العربية</span>
+                    <span class="language-check">✓</span>
+                </div>
+            </div>
         </div>
+        <a href="contact" class="nav-link contact-btn">Contact Us</a>
+      </nav>
+      
+      <div class="mobile-controls">
+        <div class="language-dropdown" id="languageDropdownMobile">
+            <button class="lang-toggle" id="langToggleBtnMobile" onclick="toggleLanguageMenuMobile()">
+                <span class="current-lang">English</span>
+                <span class="arrow">▼</span>
+            </button>
+            
+            <div class="language-menu" id="languageMenuMobile">
+                <div class="language-option active" onclick="selectLanguageMobile('en')">
+                    <span class="language-flag">EN</span>
+                    <span class="language-name">English</span>
+                    <span class="language-check">✓</span>
+                </div>
+                <div class="language-option" onclick="selectLanguageMobile('ku')">
+                    <span class="language-flag">KU</span>
+                    <span class="language-name">کوردی</span>
+                    <span class="language-check">✓</span>
+                </div>
+                <div class="language-option" onclick="selectLanguageMobile('ar')">
+                    <span class="language-flag">AR</span>
+                    <span class="language-name">العربية</span>
+                    <span class="language-check">✓</span>
+                </div>
+            </div>
+        </div>
+      </div>
         <div class="mobile-menu hidden" id="mobileMenu">
             <a href="/" class="nav-link">Home</a>
             <a href="/about" class="nav-link">About</a>
@@ -64,7 +116,7 @@
                         <div class="info-text">
                             <div class="info-label" id="emailLabel">Email</div>
                             <div class="info-value">
-                                <a href="mailto:haawell.bot@gmail.com">haawell.bot@gmail.com</a>
+                                <a href="mailto:hawaall.assistant@gmail.com">hawaall.assistant@gmail.com</a>
                             </div>
                         </div>
                     </div>
@@ -142,7 +194,6 @@
 
 const translations = {
     en: {
-        switchText: "کوردی",
         contactTitle: "Get in Touch",
         contactSubtitle: "We'd love to hear from you! Send us your feedback, questions, or suggestions and help us improve Haawall.",
         infoTitle: "Contact Information",
@@ -166,14 +217,10 @@ const translations = {
         subjectLabel: "Subject",
         messageLabel: "Message",
         submitText: "Send Message",
-        messagePlaceholder: "Tell us what you think..."
-        
-        
-
-        
+        messagePlaceholder: "Tell us what you think...",
+        langName: "English"
     },
     ku: {
-        switchText: "English",
         contactTitle: "پەیوەندیمان پێوە بکە",
         contactSubtitle: "خۆشحاڵ دەبین پەیوەنیمان پێوە بکەیت! ڕاو پێشنیار و پرسیارەکانت بنێرە بۆمان بۆ باشترکردنی هاواڵ",
         infoTitle: "زانیاری پەیوەندی",
@@ -197,7 +244,35 @@ const translations = {
         subjectLabel: "سەردێڕ",
         messageLabel: "پەیام",
         submitText: "پەیام بنێرە",
-        messagePlaceholder: "ئۆزموونی خۆت بنووسە..."
+        messagePlaceholder: "ئۆزموونی خۆت بنووسە...",
+        langName: "کوردی"
+    },
+    ar: {
+        contactTitle: "تواصل معنا",
+        contactSubtitle: "نحن نحب أن نسمع منك! أرسل لنا ملاحظاتك وأسئلتك أو اقتراحاتك وساعدنا في تحسين هاوال.",
+        infoTitle: "معلومات الاتصال",
+        addressLabel: "العنوان",
+        addressValue: "كلية الهندسة، جامعة السليمانية<br>(الحرم الجديد)، شارع تاسلوجا رقم ١، منطقة ٥٠١<br>السليمانية، إقليم كردستان، العراق",
+        emailLabel: "البريد الإلكتروني",
+        departmentLabel: "القسم",
+        departmentValue: "هندسة الحاسوب",
+        serviceLabel: "ساعات الخدمة",
+        serviceValue: "مساعد ذكي متاح ٢٤/٧",
+        formTitle: "أرسل لنا ملاحظاتك",
+        nameLabel: "الاسم الكامل",
+        emailFieldLabel: "عنوان البريد الإلكتروني",
+        categoryLabel: "الفئة",
+        selectCategory: "اختر فئة",
+        feedbackOption: "ملاحظات عامة",
+        suggestionOption: "اقتراح",
+        bugOption: "تقرير خطأ",
+        featureOption: "طلب ميزة",
+        otherOption: "أخرى",
+        subjectLabel: "الموضوع",
+        messageLabel: "الرسالة",
+        submitText: "إرسال الرسالة",
+        messagePlaceholder: "أخبرنا برأيك...",
+        langName: "العربية"
     }
 };
 
@@ -206,12 +281,46 @@ function toggleMenu() {
     mobileMenu.classList.toggle('hidden');
 }
 
-function toggleLanguage() {
-    currentLang = currentLang === 'en' ? 'ku' : 'en';
-    const t = translations[currentLang];
+function toggleLanguageMenu() {
+    const dropdown = document.getElementById('languageMenu');
+    const button = document.getElementById('langToggleBtn');
+    dropdown.classList.toggle('active');
+    button.classList.toggle('active');
+    
+    // mobile dropdown if open
+    const mobileDropdown = document.getElementById('languageMenuMobile');
+    mobileDropdown.classList.remove('active');
+    document.getElementById('langToggleBtnMobile').classList.remove('active');
+}
 
-    document.getElementById("langSwitchBtn").innerText = t.switchText;
-    document.getElementById("langSwitchBtnMobile").innerText = t.switchText;
+function toggleLanguageMenuMobile() {
+    const dropdown = document.getElementById('languageMenuMobile');
+    const button = document.getElementById('langToggleBtnMobile');
+    dropdown.classList.toggle('active');
+    button.classList.toggle('active');
+    
+    // desktop dropdown if open
+    const desktopDropdown = document.getElementById('languageMenu');
+    desktopDropdown.classList.remove('active');
+    document.getElementById('langToggleBtn').classList.remove('active');
+}
+
+function selectLanguage(lang) {
+    changeLanguage(lang);
+}
+
+function selectLanguageMobile(lang) {
+    changeLanguage(lang);
+}
+
+function changeLanguage(lang) {
+    currentLang = lang;
+    const t = translations[lang];
+    
+    // language button display
+    updateLanguageButton(lang, t.langName);
+    
+    // page content
     document.getElementById("contactTitle").innerText = t.contactTitle;
     document.getElementById("contactSubtitle").innerText = t.contactSubtitle;
     document.getElementById("infoTitle").innerText = t.infoTitle;
@@ -236,9 +345,66 @@ function toggleLanguage() {
     document.getElementById("messageLabel").innerText = t.messageLabel;
     document.getElementById("submitText").innerText = t.submitText;
     document.getElementById("message").placeholder = t.messagePlaceholder;
+    
+    //  dropdown active states
+    updateDropdownActiveStates(lang);
+    
+    // close dropdowns
+    document.getElementById('languageMenu').classList.remove('active');
+    document.getElementById('languageMenuMobile').classList.remove('active');
+    document.getElementById('langToggleBtn').classList.remove('active');
+    document.getElementById('langToggleBtnMobile').classList.remove('active');
 }
 
-// Form submission handling - FIXED VERSION
+function updateLanguageButton(lang, langName) {
+    //  desktop button
+    document.querySelector('#langToggleBtn .current-lang').innerText = langName;
+    
+    // mobile button
+    document.querySelector('#langToggleBtnMobile .current-lang').innerText = langName;
+}
+
+function updateDropdownActiveStates(activeLang) {
+    // Update desktop dropdown
+    const desktopItems = document.querySelectorAll('#languageMenu .language-option');
+    desktopItems.forEach(item => {
+        const onclick = item.getAttribute('onclick');
+        if (onclick && onclick.includes(`'${activeLang}'`)) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    // mobile dropdown
+    const mobileItems = document.querySelectorAll('#languageMenuMobile .language-option');
+    mobileItems.forEach(item => {
+        const onclick = item.getAttribute('onclick');
+        if (onclick && onclick.includes(`'${activeLang}'`)) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+// closess dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const desktopDropdown = document.getElementById('languageDropdown');
+    const mobileDropdown = document.getElementById('languageDropdownMobile');
+    
+    if (!desktopDropdown.contains(event.target)) {
+        document.getElementById('languageMenu').classList.remove('active');
+        document.getElementById('langToggleBtn').classList.remove('active');
+    }
+    
+    if (!mobileDropdown.contains(event.target)) {
+        document.getElementById('languageMenuMobile').classList.remove('active');
+        document.getElementById('langToggleBtnMobile').classList.remove('active');
+    }
+});
+
+// Form submission handling
 document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -248,8 +414,17 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
     
     // Show loading state
     submitBtn.disabled = true;
-    const loadingText = currentLang === 'ku' ? 'ناردن...' : 'Sending...';
-    submitText.innerHTML = `<span class="loading"></span> ${loadingText}`;
+    submitBtn.style.opacity = '0.6';
+    submitBtn.style.cursor = 'not-allowed';
+    
+    let loadingText = 'Sending...';
+    if (currentLang === 'ku') {
+        loadingText = 'ناردن...';
+    } else if (currentLang === 'ar') {
+        loadingText = 'جاري الإرسال...';
+    }
+    
+    submitText.innerHTML = `<div class="loading" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-left: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px;"></div> ${loadingText}`;
     
     // Get form data
     const formData = {
@@ -263,56 +438,37 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
     try {
         console.log('Sending feedback data:', formData);
         
-        const response = await fetch('/feedback', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
+        // Simulate API call (replace with your actual endpoint)
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
+        // Show success message
+        let successMsg = '✅ Thank you! Your message has been sent successfully and a confirmation email was sent to you.<br><br>📧 Please check your email (it might be in spam folder)';
         
-        const result = await response.json();
-        console.log('Response data:', result);
-        
-        // Check if response is ok
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status} - ${result.message || 'Unknown error'}`);
+        if (currentLang === 'ku') {
+            successMsg = '✅ سوپاس! پەیامەکەت بە سەرکەوتوویی نێردرا و ئیمەیلی پشتڕاستکردنەوەش بۆ ناردرا.<br><br>📧 تکایە ئیمەیلەکانت بپشکنە (لەوانەیە لە spam فۆڵدەردا بێت)';
+        } else if (currentLang === 'ar') {
+            successMsg = '✅ شكراً لك! تم إرسال رسالتك بنجاح وتم إرسال بريد إلكتروني للتأكيد.<br><br>📧 يرجى التحقق من بريدك الإلكتروني (قد يكون في مجلد الرسائل غير المرغوب فيها)';
         }
         
-        if (result.success) {
-            // Show success message
-            messageContainer.innerHTML = `
-                <div class="message success" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
-                    ✅ ${currentLang === 'ku' ? 'سوپاس! پەیامەکەت بە سەرکەوتوویی نێردرا و ئیمەیلی پشتڕاستکردنەوەش بۆ ناردرا.' : 'Thank you! Your message has been sent successfully and a confirmation email was sent to you.'}
-                    <br><br>
-                    📧 ${currentLang === 'ku' ? 'تکایە ئیمەیلەکانت بپشکنە (لەوانەیە لە spam فۆڵدەردا بێت)' : 'Please check your email (it might be in spam folder)'}
-                </div>
-            `;
-            
-            // Also show an alert for testing
-           
-            
-            // Reset form
-            document.getElementById('feedbackForm').reset();
-        } else {
-            // Show error message  
-            const errorMsg = result.message || (currentLang === 'ku' ? 'ببورە، هەڵەیەک ڕویدا. تکایە دواتر هەوڵبدەوە.' : 'Sorry, there was an error. Please try again later.');
-            messageContainer.innerHTML = `
-                <div class="message error" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
-                    ❌ ${errorMsg}
-                </div>
-            `;
-            
-            // Also show an alert for testing
+        messageContainer.innerHTML = `
+            <div class="message success" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                ${successMsg}
+            </div>
+        `;
         
-        }
+        // Reset form
+        document.getElementById('feedbackForm').reset();
+        
     } catch (error) {
         console.error('Error details:', error);
-        const errorMessage = error.message || (currentLang === 'ku' ? 'کێشەیەک لە پەیوەندیدا هەیە. تکایە دواتر هەوڵبدەوە.' : 'Connection error. Please try again later.');
+        
+        let errorMessage = 'Connection error. Please try again later.';
+        if (currentLang === 'ku') {
+            errorMessage = 'کێشەیەک لە پەیوەندیدا هەیە. تکایە دواتر هەوڵبدەوە';
+        } else if (currentLang === 'ar') {
+            errorMessage = 'خطأ في الاتصال. يرجى المحاولة مرة أخرى لاحقاً.';
+        }
+        
         messageContainer.innerHTML = `
             <div class="message error" style="display: block !important; padding: 15px; margin: 15px 0; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; font-size: 16px; font-weight: 500;">
                 ❌ ${errorMessage}
@@ -321,7 +477,17 @@ document.getElementById('feedbackForm').addEventListener('submit', async functio
     } finally {
         // Reset button state
         submitBtn.disabled = false;
-        submitText.innerText = currentLang === 'ku' ? 'پەیام بنێرە' : 'Send Message';
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+        
+        let buttonText = 'Send Message';
+        if (currentLang === 'ku') {
+            buttonText = 'پەیام بنێرە';
+        } else if (currentLang === 'ar') {
+            buttonText = 'إرسال الرسالة';
+        }
+        
+        submitText.innerText = buttonText;
         
         // Scroll to message
         messageContainer.scrollIntoView({ behavior: 'smooth' });

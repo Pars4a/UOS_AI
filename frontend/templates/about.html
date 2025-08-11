@@ -254,13 +254,13 @@
       }
     };
 
-    // Toggle hamburger menu
+    // hamburger menu
     function toggleMenu() {
       const menu = document.getElementById('mobileMenu');
       menu.classList.toggle('hidden');
     }
 
-    // Desktop language dropdown functions
+    // desktop language dropdown functions
     function toggleLanguageMenu() {
       const menu = document.getElementById('languageMenu');
       const toggle = document.getElementById('langToggleBtn');
@@ -310,15 +310,15 @@
       updateActiveLanguageOptionMobile();
     }
 
-    // Update language content
+    // language content
     function updateLanguage() {
       const t = translations[currentLang];
       
-      // Update current language text in dropdowns
+      //  current language text in dropdowns
       document.querySelector('#langToggleBtn .current-lang').innerText = t.currentLangText;
       document.querySelector('#langToggleBtnMobile .current-lang').innerText = t.currentLangText;
 
-      // Update all text content
+      // U all text content
       Object.keys(t).forEach(id => {
         if (id !== 'currentLangText') {
           const el = document.getElementById(id);
@@ -326,7 +326,7 @@
         }
       });
 
-      // Update document direction for RTL languages
+      // document direction for RTL languages
       if (currentLang === 'ar' || currentLang === 'ku') {
         document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif';
       } else {
@@ -334,7 +334,7 @@
       }
     }
 
-    // Update active language option styling for desktop
+    //  active language option styling for desktop
     function updateActiveLanguageOption() {
       const options = document.querySelectorAll('#languageMenu .language-option');
       options.forEach((option, index) => {
@@ -360,7 +360,7 @@
       });
     }
 
-    // Close dropdown when clicking outside
+    // closes dropdown when clicking outside
     document.addEventListener('click', function(event) {
       const dropdown = document.getElementById('languageDropdown');
       const dropdownMobile = document.getElementById('languageDropdownMobile');

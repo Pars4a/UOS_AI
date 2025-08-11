@@ -287,7 +287,7 @@ function toggleLanguageMenu() {
     dropdown.classList.toggle('active');
     button.classList.toggle('active');
     
-    // Close mobile dropdown if open
+    // mobile dropdown if open
     const mobileDropdown = document.getElementById('languageMenuMobile');
     mobileDropdown.classList.remove('active');
     document.getElementById('langToggleBtnMobile').classList.remove('active');
@@ -299,7 +299,7 @@ function toggleLanguageMenuMobile() {
     dropdown.classList.toggle('active');
     button.classList.toggle('active');
     
-    // Close desktop dropdown if open
+    // desktop dropdown if open
     const desktopDropdown = document.getElementById('languageMenu');
     desktopDropdown.classList.remove('active');
     document.getElementById('langToggleBtn').classList.remove('active');
@@ -317,10 +317,10 @@ function changeLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
     
-    // Update language button display
+    // language button display
     updateLanguageButton(lang, t.langName);
     
-    // Update page content
+    // page content
     document.getElementById("contactTitle").innerText = t.contactTitle;
     document.getElementById("contactSubtitle").innerText = t.contactSubtitle;
     document.getElementById("infoTitle").innerText = t.infoTitle;
@@ -346,10 +346,10 @@ function changeLanguage(lang) {
     document.getElementById("submitText").innerText = t.submitText;
     document.getElementById("message").placeholder = t.messagePlaceholder;
     
-    // Update dropdown active states
+    //  dropdown active states
     updateDropdownActiveStates(lang);
     
-    // Close dropdowns
+    // close dropdowns
     document.getElementById('languageMenu').classList.remove('active');
     document.getElementById('languageMenuMobile').classList.remove('active');
     document.getElementById('langToggleBtn').classList.remove('active');
@@ -357,10 +357,10 @@ function changeLanguage(lang) {
 }
 
 function updateLanguageButton(lang, langName) {
-    // Update desktop button
+    //  desktop button
     document.querySelector('#langToggleBtn .current-lang').innerText = langName;
     
-    // Update mobile button
+    // mobile button
     document.querySelector('#langToggleBtnMobile .current-lang').innerText = langName;
 }
 
@@ -376,7 +376,7 @@ function updateDropdownActiveStates(activeLang) {
         }
     });
     
-    // Update mobile dropdown
+    // mobile dropdown
     const mobileItems = document.querySelectorAll('#languageMenuMobile .language-option');
     mobileItems.forEach(item => {
         const onclick = item.getAttribute('onclick');
@@ -388,7 +388,7 @@ function updateDropdownActiveStates(activeLang) {
     });
 }
 
-// Close dropdowns when clicking outside
+// closess dropdowns when clicking outside
 document.addEventListener('click', function(event) {
     const desktopDropdown = document.getElementById('languageDropdown');
     const mobileDropdown = document.getElementById('languageDropdownMobile');

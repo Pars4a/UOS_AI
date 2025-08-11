@@ -321,7 +321,7 @@ function selectLanguage(langCode) {
     currentLang = langCode;
     document.getElementById('langToggleBtn').querySelector('.current-lang').textContent = languages[langCode].name;
     
-    // Sync mobile dropdown
+    //  mobile dropdown
     syncMobileLanguage(langCode);
     
     toggleLanguageMenu();
@@ -338,7 +338,7 @@ function selectLanguageMobile(langCode) {
     currentLang = langCode;
     document.getElementById('langToggleBtnMobile').querySelector('.current-lang').textContent = languages[langCode].name;
     
-    // Sync desktop dropdown
+    //desktop dropdown
     syncDesktopLanguage(langCode);
     
     toggleLanguageMenuMobile();
@@ -364,14 +364,14 @@ function syncDesktopLanguage(langCode) {
 function updateUILanguage() {
     const t = translations[currentLang];
 
-    // Update welcome screen
+    // welcome screen
     document.querySelector('.welcome-title').innerText = t.welcomeTitle;
     document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
     
-    // Update input placeholder
+    // input placeholder
     updateInputState();
 
-    // Update FAQ header
+    // FAQ header
     const faqHeader = document.querySelector('.faq-header');
     if (faqHeader) {
         faqHeader.textContent = t.faqHeader;
@@ -389,7 +389,7 @@ function updateUILanguage() {
         btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
     });
     
-    // Update typing status if it exists
+    // typing status if it exists
     const typingStatus = document.getElementById('typingStatus');
     if (typingStatus) {
         typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵامت دەداتەوە' 

@@ -6,11 +6,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, validator
 from datetime import datetime, timedelta
-from typing import Literal, Dict, Optional
+from typing import Literal, Dict, Optional, List
 import logging
 import os
 import hashlib
 import uuid
+from fastapi import status
 
 from dotenv import load_dotenv
 from backend.database import (
@@ -21,10 +22,10 @@ from backend.claude_api import ask_claude, clear_cache, cleanup_cache
 from backend.auth import (
     authenticate_user, create_access_token, get_password_hash, 
     get_current_user, get_current_admin_user, create_guest_token,
-    UserCreate, UserLogin, Token
+    UserCreate, UserLogin, Token, UserUpdate
 )
-from chatgpt_api import ask_openai
-from email_service import send_feedback_email
+from backend.chatgpt_api import ask_openai
+from backend.email_service import send_feedback_email
 
 load_dotenv()
 
@@ -98,6 +99,17 @@ class ChatMessage(BaseModel):
 
 class GuestLogin(BaseModel):
     session_id: Optional[str] = None
+
+class UserProfileUpdate(BaseModel):
+    full_name: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+    
+    @validator('new_password')
+    def validate_new_password(cls, v, values):
+        if v and len(v) < 6:
+            raise ValueError("New password must be at least 6 characters long")
+        return v
 
 class InfoCreate(BaseModel):
     category: str
@@ -288,6 +300,136 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     if not current_user:
         return {"user_type": "anonymous"}
     return current_user
+
+# User profile and chat history endpoints
+@app.get("/user/profile")
+async def get_user_profile(current_user: dict = Depends(get_current_user)):
+    if not current_user or current_user.get("user_type") == "guest":
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == current_user["user_id"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "user_type": user.user_type,
+            "created_at": user.created_at.isoformat()
+        }
+    finally:
+        db.close()
+
+@app.put("/user/profile")
+async def update_user_profile(profile_data: UserProfileUpdate, current_user: dict = Depends(get_current_user)):
+    if not current_user or current_user.get("user_type") == "guest":
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == current_user["user_id"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Update full name if provided
+        if profile_data.full_name:
+            user.full_name = profile_data.full_name
+        
+        # Update password if provided
+        if profile_data.new_password and profile_data.current_password:
+            from backend.auth import verify_password
+            if not verify_password(profile_data.current_password, user.hashed_password):
+                raise HTTPException(status_code=400, detail="Current password is incorrect")
+            user.hashed_password = get_password_hash(profile_data.new_password)
+        
+        db.commit()
+        return {"message": "Profile updated successfully"}
+    finally:
+        db.close()
+
+@app.get("/user/chat-history")
+async def get_user_chat_history(
+    page: int = 1, 
+    limit: int = 10,
+    current_user: dict = Depends(get_current_user)
+):
+    if not current_user or current_user.get("user_type") == "guest":
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    db = SessionLocal()
+    try:
+        offset = (page - 1) * limit
+        
+        # Get user's chat sessions
+        sessions = db.query(ChatSession).filter(
+            ChatSession.user_id == current_user["user_id"]
+        ).order_by(ChatSession.created_at.desc()).offset(offset).limit(limit).all()
+        
+        result = []
+        for session in sessions:
+            messages = db.query(ChatMessage).filter(
+                ChatMessage.session_id == session.id
+            ).order_by(ChatMessage.created_at.asc()).all()
+            
+            session_data = {
+                "session_id": session.id,
+                "created_at": session.created_at.isoformat(),
+                "messages": [
+                    {
+                        "id": msg.id,
+                        "message": msg.message,
+                        "response": msg.response,
+                        "created_at": msg.created_at.isoformat()
+                    }
+                    for msg in messages
+                ]
+            }
+            result.append(session_data)
+        
+        # Get total count
+        total_sessions = db.query(ChatSession).filter(
+            ChatSession.user_id == current_user["user_id"]
+        ).count()
+        
+        return {
+            "sessions": result,
+            "total": total_sessions,
+            "page": page,
+            "limit": limit,
+            "total_pages": (total_sessions + limit - 1) // limit
+        }
+    finally:
+        db.close()
+
+@app.delete("/user/chat-session/{session_id}")
+async def delete_user_chat_session(session_id: int, current_user: dict = Depends(get_current_user)):
+    if not current_user or current_user.get("user_type") == "guest":
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    db = SessionLocal()
+    try:
+        # Verify session belongs to user
+        session = db.query(ChatSession).filter(
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user["user_id"]
+        ).first()
+        
+        if not session:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        # Delete messages first
+        db.query(ChatMessage).filter(ChatMessage.session_id == session_id).delete()
+        
+        # Delete session
+        db.delete(session)
+        db.commit()
+        
+        return {"message": "Chat session deleted successfully"}
+    finally:
+        db.close()
 
 @app.post("/auth/logout")
 async def logout():

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Haawall University Assistant</title>
+    <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        .profile-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f7f7f8 0%, #e5e7eb 100%);
+            padding: 20px;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #1a1b20 0%, #2d3748 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .profile-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #718096;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            color: #1a1b20;
+            border-bottom-color: #1a1b20;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1a1b20;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 27, 32, 0.1);
+        }
+        
+        .form-input:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .profile-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1a1b20, #2d3748);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+        
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 27, 32, 0.3);
+        }
+        
+        .profile-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .profile-btn.danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+        
+        .profile-btn.danger:hover {
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .message.error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .chat-history-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .chat-sessions {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .chat-session {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px;
+            transition: background 0.2s ease;
+        }
+        
+        .chat-session:hover {
+            background: #f8fafc;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .session-date {
+            font-weight: 600;
+            color: #1a1b20;
+        }
+        
+        .session-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .expand-btn {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .expand-btn:hover {
+            background: #d1d5db;
+        }
+        
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+        
+        .session-messages {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .session-messages.show {
+            display: block;
+        }
+        
+        .message-pair {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .message-user {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .message-assistant {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 16px;
+            }
+            
+            .profile-content {
+                margin: 0;
+            }
+            
+            .profile-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .profile-card {
+                padding: 20px;
+            }
+            
+            .session-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-nav">
+                <h1 class="profile-title">My Profile</h1>
+                <a href="/" class="back-btn">← Back to Chat</a>
+            </div>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-tabs">
+                <button class="tab-button active" onclick="switchTab('profile-info')">Profile</button>
+                <button class="tab-button" onclick="switchTab('chat-history')">Chat History</button>
+                <button class="tab-button" onclick="switchTab('settings')">Settings</button>
+            </div>
+            
+            <!-- Profile Info Tab -->
+            <div id="profile-info" class="tab-content active">
+                <div class="profile-card">
+                    <div id="profileMessage" class="message"></div>
+                    
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" class="form-input" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" id="fullName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="userType" class="form-label">Account Type</label>
+                            <input type="text" id="userType" class="form-input" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="createdAt" class="form-label">Member Since</label>
+                            <input type="text" id="createdAt" class="form-input" disabled>
+                        </div>
+                        
+                        <button type="submit" class="profile-btn" id="updateProfileBtn">
+                            Update Profile
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Change Password Section -->
+                <div class="profile-card">
+                    <h3 style="margin-bottom: 20px; color: #1a1b20;">Change Password</h3>
+                    <div id="passwordMessage" class="message"></div>
+                    
+                    <form id="passwordForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" id="newPassword" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-input" required>
+                        </div>
+                        
+                        <button type="submit" class="profile-btn" id="changePasswordBtn">
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Chat History Tab -->
+            <div id="chat-history" class="tab-content">
+                <div class="chat-history-container">
+                    <div id="chatHistoryContent" class="chat-sessions">
+                        <div class="loading">Loading chat history...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="profile-card">
+                    <h3 style="margin-bottom: 20px; color: #1a1b20;">Account Settings</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <button class="profile-btn danger" onclick="confirmDeleteAccount()">
+                            Delete Account
+                        </button>
+                        <p style="color: #718096; font-size: 14px; margin-top: 8px;">
+                            This action cannot be undone. All your data will be permanently deleted.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadProfile();
+        });
+        
+        function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            const userType = localStorage.getItem('user_type');
+            
+            if (!token || userType === 'guest') {
+                window.location.href = '/';
+                return;
+            }
+            
+            // Set authorization header for all requests
+            window.authHeaders = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'chat-history') {
+                loadChatHistory();
+            }
+        }
+        
+        async function loadProfile() {
+            try {
+                const response = await fetch('/user/profile', {
+                    headers: window.authHeaders
+                });
+                
+                if (response.ok) {
+                    currentUser = await response.json();
+                    populateProfile(currentUser);
+                } else {
+                    showMessage('profileMessage', 'Failed to load profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('profileMessage', 'Error loading profile', 'error');
+            }
+        }
+        
+        function populateProfile(user) {
+            document.getElementById('email').value = user.email;
+            document.getElementById('fullName').value = user.full_name;
+            document.getElementById('userType').value = user.user_type.charAt(0).toUpperCase() + user.user_type.slice(1);
+            document.getElementById('createdAt').value = new Date(user.created_at).toLocaleDateString();
+        }
+        
+        // Profile form handler
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const updateBtn = document.getElementById('updateProfileBtn');
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            
+            const formData = {
+                full_name: document.getElementById('fullName').value
+            };
+            
+            try {
+                const response = await fetch('/user/profile', {
+                    method: 'PUT',
+                    headers: window.authHeaders,
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showMessage('profileMessage', 'Profile updated successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showMessage('profileMessage', error.detail || 'Failed to update profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showMessage('profileMessage', 'Connection error. Please try again.', 'error');
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update Profile';
+            }
+        });
+        
+        // Password form handler
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('passwordMessage', 'New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showMessage('passwordMessage', 'New password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            const changeBtn = document.getElementById('changePasswordBtn');
+            changeBtn.disabled = true;
+            changeBtn.textContent = 'Changing...';
+            
+            const formData = {
+                current_password: currentPassword,
+                new_password: newPassword
+            };
+            
+            try {
+                const response = await fetch('/user/profile', {
+                    method: 'PUT',
+                    headers: window.authHeaders,
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showMessage('passwordMessage', 'Password changed successfully!', 'success');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    const error = await response.json();
+                    showMessage('passwordMessage', error.detail || 'Failed to change password', 'error');
+                }
+            } catch (error) {
+                console.error('Error changing password:', error);
+                showMessage('passwordMessage', 'Connection error. Please try again.', 'error');
+            } finally {
+                changeBtn.disabled = false;
+                changeBtn.textContent = 'Change Password';
+            }
+        });
+        
+        async function loadChatHistory() {
+            const content = document.getElementById('chatHistoryContent');
+            content.innerHTML = '<div class="loading">Loading chat history...</div>';
+            
+            try {
+                const response = await fetch('/user/chat-history?page=1&limit=20', {
+                    headers: window.authHeaders
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayChatHistory(data);
+                } else {
+                    content.innerHTML = '<div class="empty-state">Failed to load chat history</div>';
+                }
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+                content.innerHTML = '<div class="empty-state">Error loading chat history</div>';
+            }
+        }
+        
+        function displayChatHistory(data) {
+            const content = document.getElementById('chatHistoryContent');
+            
+            if (data.sessions.length === 0) {
+                content.innerHTML = '<div class="empty-state">No chat sessions found</div>';
+                return;
+            }
+            
+            const sessionsHtml = data.sessions.map(session => `
+                <div class="chat-session">
+                    <div class="session-header">
+                        <div class="session-date">${new Date(session.created_at).toLocaleString()}</div>
+                        <div class="session-actions">
+                            <button class="action-btn expand-btn" onclick="toggleMessages(${session.session_id})">
+                                View Messages
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteSession(${session.session_id})">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-messages" id="messages-${session.session_id}">
+                        ${session.messages.map(msg => `
+                            <div class="message-pair">
+                                <div class="message-user"><strong>You:</strong> ${msg.message}</div>
+                                <div class="message-assistant"><strong>Haawall:</strong> ${msg.response}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = sessionsHtml;
+        }
+        
+        function toggleMessages(sessionId) {
+            const messagesDiv = document.getElementById(`messages-${sessionId}`);
+            messagesDiv.classList.toggle('show');
+        }
+        
+        async function deleteSession(sessionId) {
+            if (!confirm('Are you sure you want to delete this chat session?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/user/chat-session/${sessionId}`, {
+                    method: 'DELETE',
+                    headers: window.authHeaders
+                });
+                
+                if (response.ok) {
+                    loadChatHistory(); // Reload the list
+                } else {
+                    alert('Failed to delete session');
+                }
+            } catch (error) {
+                console.error('Error deleting session:', error);
+                alert('Error deleting session');
+            }
+        }
+        
+        function confirmDeleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                if (confirm('This will permanently delete all your data. Are you absolutely sure?')) {
+                    // TODO: Implement account deletion
+                    alert('Account deletion feature will be implemented soon.');
+                }
+            }
+        }
+        
+        function showMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.textContent = message;
+            container.className = `message ${type}`;
+            container.style.display = 'block';
+            
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

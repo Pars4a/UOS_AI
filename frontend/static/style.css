@@ -1251,8 +1251,55 @@ body {
     height: 36px;
   }
 }
+/* Authentication Overlay Styles */
+.auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.5s ease-out;
+}
 
+.auth-overlay.hidden {
+  display: none;
+}
 
+.auth-overlay-content {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.6s ease-out;
+}
 
+.auth-welcome {
+  margin-bottom: 40px;
+}
 
+.auth-logo {
+  margin-bottom: 20px;
+}
 
+.auth-logo img {
+  width: 80px;
+  height: 60px;
+  border-radius: 12px;
+}
+
+.auth-welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1b20;
+  margin-bottom: 8px;
+}

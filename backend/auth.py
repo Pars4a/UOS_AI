@@ -36,6 +36,10 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 

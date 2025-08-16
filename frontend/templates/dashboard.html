@@ -427,7 +427,10 @@
             const token = localStorage.getItem('access_token');
             const userType = localStorage.getItem('user_type');
             
+            console.log('Checking auth - Token:', token ? 'Present' : 'Missing', 'Type:', userType);
+            
             if (!token || userType !== 'admin') {
+                alert('Admin access required. Please log in with admin credentials.');
                 window.location.href = '/login';
                 return;
             }
@@ -437,6 +440,26 @@
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             };
+            
+            // Verify with server
+            fetch('/auth/me', {
+                headers: window.authHeaders
+            })
+            .then(response => response.json())
+            .then(user => {
+                if (user.user_type !== 'admin') {
+                    alert('Admin access required');
+                    window.location.href = '/';
+                    return;
+                }
+                document.getElementById('adminName').textContent = user.full_name || 'Admin';
+            })
+            .catch(error => {
+                console.error('Auth verification failed:', error);
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user_type');
+                window.location.href = '/';
+            });
         }
         
         function switchTab(tabName) {

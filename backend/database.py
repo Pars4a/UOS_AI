@@ -66,6 +66,28 @@ def create_user(db, email: str, hashed_password: str, full_name: str, user_type:
     db.refresh(db_user)
     return db_user
 
+def create_admin_user_if_not_exists(db):
+    """Create default admin user if it doesn't exist"""
+    admin_email = "admin@uos.edu.krd"
+    existing_admin = get_user_by_email(db, admin_email)
+    
+    if not existing_admin:
+        from backend.auth import get_password_hash
+        hashed_password = get_password_hash("UOS_Admin_2024!")
+        admin_user = create_user(
+            db,
+            email=admin_email,
+            hashed_password=hashed_password,
+            full_name="System Administrator",
+            user_type="admin"
+        )
+        return admin_user
+    elif existing_admin.user_type != "admin":
+        existing_admin.user_type = "admin"
+        db.commit()
+        return existing_admin
+    return existing_admin
+
 def create_chat_session(db, user_id: int = None, session_id: str = None):
     db_session = ChatSession(user_id=user_id, session_id=session_id)
     db.add(db_session)

@@ -640,13 +640,32 @@
         });
         
         function checkAuth() {
-            // Mock data for demo purposes
-            currentUser = {
-                email: 'user@example.com',
-                full_name: 'John Doe',
-                user_type: 'student',
-                created_at: '2024-01-15T10:30:00Z'
-            };
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+            
+            // Get user info from API
+            fetch('/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(user => {
+                if (user.user_type === 'guest') {
+                    alert('Please create an account to access profile features.');
+                    window.location.href = '/';
+                    return;
+                }
+                currentUser = user;
+                loadProfile();
+            })
+            .catch(error => {
+                console.error('Auth check failed:', error);
+                window.location.href = '/';
+            });
         }
         
         function switchTab(tabName) {
@@ -686,15 +705,50 @@
         // Profile form handler
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            showMessage('profileMessage', 'Profile updated successfully! (Demo mode)', 'success');
+            
+            const token = localStorage.getItem('access_token');
+            const fullName = document.getElementById('fullName').value;
+            
+            if (!token) {
+                showMessage('profileMessage', 'Please log in to update profile', 'error');
+                return;
+            }
+            
+            fetch('/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ full_name: fullName })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    showMessage('profileMessage', result.message, 'success');
+                } else {
+                    showMessage('profileMessage', 'Profile updated successfully!', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Profile update failed:', error);
+                showMessage('profileMessage', 'Failed to update profile', 'error');
+            });
         });
         
         // Password form handler
         document.getElementById('passwordForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            const token = localStorage.getItem('access_token');
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            
+            if (!token) {
+                showMessage('passwordMessage', 'Please log in to change password', 'error');
+                return;
+            }
             
             if (newPassword !== confirmPassword) {
                 showMessage('passwordMessage', 'New passwords do not match', 'error');
@@ -706,45 +760,55 @@
                 return;
             }
             
-            showMessage('passwordMessage', 'Password changed successfully! (Demo mode)', 'success');
-            document.getElementById('passwordForm').reset();
+            fetch('/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    current_password: currentPassword,
+                    new_password: newPassword 
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    showMessage('passwordMessage', result.message, 'success');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    showMessage('passwordMessage', 'Password changed successfully!', 'success');
+                    document.getElementById('passwordForm').reset();
+                }
+            })
+            .catch(error => {
+                console.error('Password change failed:', error);
+                showMessage('passwordMessage', 'Failed to change password', 'error');
+            });
         });
         
         function loadChatHistory() {
             const content = document.getElementById('chatHistoryContent');
+            const token = localStorage.getItem('access_token');
             
-            // Mock data for demo
-            setTimeout(() => {
-                const mockData = {
-                    sessions: [
-                        {
-                            session_id: 1,
-                            created_at: '2024-01-20T14:30:00Z',
-                            messages: [
-                                {
-                                    message: 'What is machine learning?',
-                                    response: 'Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed.'
-                                },
-                                {
-                                    message: 'Can you explain neural networks?',
-                                    response: 'Neural networks are computing systems inspired by biological neural networks. They consist of interconnected nodes (neurons) that process information through weighted connections.'
-                                }
-                            ]
-                        },
-                        {
-                            session_id: 2,
-                            created_at: '2024-01-19T09:15:00Z',
-                            messages: [
-                                {
-                                    message: 'Help me with calculus derivatives',
-                                    response: 'I\'d be happy to help with derivatives! The derivative represents the rate of change of a function. For basic functions, we have rules like d/dx(x^n) = nx^(n-1).'
-                                }
-                            ]
-                        }
-                    ]
-                };
-                displayChatHistory(mockData);
-            }, 1000);
+            if (!token) {
+                content.innerHTML = '<div class="empty-state">Please log in to view chat history</div>';
+                return;
+            }
+            
+            fetch('/user/chat-history', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayChatHistory(data);
+            })
+            .catch(error => {
+                console.error('Failed to load chat history:', error);
+                content.innerHTML = '<div class="empty-state">Failed to load chat history</div>';
+            });
         }
         
         function displayChatHistory(data) {
@@ -791,8 +855,29 @@
             if (!confirm('Are you sure you want to delete this chat session?')) {
                 return;
             }
-            alert('Session deleted! (Demo mode)');
-            loadChatHistory(); // Reload the list
+            
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Please log in to delete sessions');
+                return;
+            }
+            
+            fetch(`/user/chat-session/${sessionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    loadChatHistory(); // Reload the list
+                }
+            })
+            .catch(error => {
+                console.error('Failed to delete session:', error);
+                alert('Failed to delete session');
+            });
         }
         
         function confirmDeleteAccount() {

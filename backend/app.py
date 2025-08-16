@@ -168,6 +168,15 @@ class FeedbackMessage(BaseModel):
 @app.on_event("startup")
 async def startup():
     init_db()
+    # Create default admin user
+    db = SessionLocal()
+    try:
+        from backend.database import create_admin_user_if_not_exists
+        admin_user = create_admin_user_if_not_exists(db)
+        logging.info(f"Admin user ready: {admin_user.email}")
+    finally:
+        db.close()
+    
     os.makedirs("logs", exist_ok=True)
     logging.info("=== SYSTEM STARTUP COMPLETE ===")
 

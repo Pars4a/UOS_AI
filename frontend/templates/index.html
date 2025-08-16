@@ -57,9 +57,15 @@
         <div class="form-group">
           <input type="email" id="loginEmail" placeholder="Email" required>
         </div>
+          <label class="form-label">Email</label>
         <div class="form-group">
           <input type="password" id="loginPassword" placeholder="Password" required>
+      
+          <label class="form-label">Password</label>
+      <div id="loginMessage" class="auth-message"></div>
+      
         </div>
+          <span id="loginBtnText">Sign In</span>
         <button type="submit" class="auth-submit-btn">Sign In</button>
         <div class="auth-form-links">
           <a href="#" onclick="showRegister()">Don't have an account? Sign up</a>
@@ -79,10 +85,18 @@
         </div>
         <div class="form-group">
           <input type="email" id="registerEmail" placeholder="Email" required>
+      
+      <div id="registerMessage" class="auth-message"></div>
+          <label class="form-label">Email</label>
+      
         </div>
         <div class="form-group">
+          <label class="form-label">Password</label>
+          <label class="form-label">Full Name</label>
+          <div class="password-hint">Password must be at least 6 characters long</div>
           <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
         </div>
+          <span id="registerBtnText">Create Account</span>
         <button type="submit" class="auth-submit-btn">Create Account</button>
         <div class="auth-form-links">
           <a href="#" onclick="showLogin()">Already have an account? Sign in</a>
@@ -411,8 +425,17 @@
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const loginBtn = document.querySelector('#loginForm .auth-submit-btn');
+      const loginBtnText = document.getElementById('loginBtnText');
+      const loginMessage = document.getElementById('loginMessage');
+      
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+      
+      // Show loading state
+      loginBtn.disabled = true;
+      loginBtnText.innerHTML = '<div class="loading"></div>Signing in...';
+      loginMessage.style.display = 'none';
       
       try {
         const response = await fetch('/auth/login', {
@@ -426,22 +449,41 @@
         if (response.ok) {
           const result = await response.json();
           localStorage.setItem('access_token', result.access_token);
+          localStorage.setItem('user_type', result.user_type);
+          localStorage.setItem('user_id', result.user_id);
+          
           currentUser = {
             user_type: result.user_type,
             user_id: result.user_id,
-            email: email
+            email: email,
+            full_name: result.full_name || email.split('@')[0]
           };
           isAuthenticated = true;
+          
+          // Show success message
+          loginMessage.textContent = 'Login successful! Welcome back.';
+          loginMessage.className = 'auth-message success';
+          loginMessage.style.display = 'block';
+          
+          setTimeout(() => {
           hideAuthForms();
           hideAuthOverlay();
           updateUserMenu();
+          }, 1000);
         } else {
           const error = await response.json();
-          alert(error.detail || 'Login failed');
+          loginMessage.textContent = error.detail || 'Login failed. Please check your credentials.';
+          loginMessage.className = 'auth-message error';
+          loginMessage.style.display = 'block';
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert('Connection error. Please try again.');
+        loginMessage.textContent = 'Connection error. Please try again.';
+        loginMessage.className = 'auth-message error';
+        loginMessage.style.display = 'block';
+      } finally {
+        loginBtn.disabled = false;
+        loginBtnText.textContent = 'Sign In';
       }
     });
 
@@ -449,14 +491,25 @@
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const registerBtn = document.querySelector('#registerForm .auth-submit-btn');
+      const registerBtnText = document.getElementById('registerBtnText');
+      const registerMessage = document.getElementById('registerMessage');
+      
       const full_name = document.getElementById('registerName').value;
       const email = document.getElementById('registerEmail').value;
       const password = document.getElementById('registerPassword').value;
       
       if (password.length < 6) {
-        alert('Password must be at least 6 characters long');
+        registerMessage.textContent = 'Password must be at least 6 characters long';
+        registerMessage.className = 'auth-message error';
+        registerMessage.style.display = 'block';
         return;
       }
+      
+      // Show loading state
+      registerBtn.disabled = true;
+      registerBtnText.innerHTML = '<div class="loading"></div>Creating account...';
+      registerMessage.style.display = 'none';
       
       try {
         const response = await fetch('/auth/register', {
@@ -470,6 +523,9 @@
         if (response.ok) {
           const result = await response.json();
           localStorage.setItem('access_token', result.access_token);
+          localStorage.setItem('user_type', result.user_type);
+          localStorage.setItem('user_id', result.user_id);
+          
           currentUser = {
             user_type: result.user_type,
             user_id: result.user_id,
@@ -477,16 +533,31 @@
             full_name: full_name
           };
           isAuthenticated = true;
+          
+          // Show success message
+          registerMessage.textContent = 'Account created successfully! Welcome to Haawall.';
+          registerMessage.className = 'auth-message success';
+          registerMessage.style.display = 'block';
+          
+          setTimeout(() => {
           hideAuthForms();
           hideAuthOverlay();
           updateUserMenu();
+          }, 1000);
         } else {
           const error = await response.json();
-          alert(error.detail || 'Registration failed');
+          registerMessage.textContent = error.detail || 'Registration failed. Please try again.';
+          registerMessage.className = 'auth-message error';
+          registerMessage.style.display = 'block';
         }
       } catch (error) {
         console.error('Registration error:', error);
-        alert('Connection error. Please try again.');
+        registerMessage.textContent = 'Connection error. Please try again.';
+        registerMessage.className = 'auth-message error';
+        registerMessage.style.display = 'block';
+      } finally {
+        registerBtn.disabled = false;
+        registerBtnText.textContent = 'Create Account';
       }
     });
 

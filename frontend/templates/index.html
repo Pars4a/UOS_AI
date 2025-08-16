@@ -1,1363 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- prevent zooming on mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Haawall - University Assistant</title>
-    <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="static/style.css">
-    <style>
-        
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Haawall - University of Sulaimani Assistant</title>
+  <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="static/style.css">
 </head>
+
 <body>
-    <!-- main header -->
-    <div class="header">
-        <!-- hamburger menu for mobile -->
-        <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
-      
-        <!-- left nav links -->
-        <nav class="main-nav left desktop-only">
-          <a href="/" class="nav-link active">Home</a>
-          <a href="about" class="nav-link">About</a>
-        </nav>
-      
-        <!-- university logo -->
-        <div class="logo"> 
-            <div class="logo-icon"></div>
+  <!-- Authentication Overlay -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-overlay-content">
+      <div class="auth-welcome">
+        <div class="auth-logo">
+          <img src="static/images/uoswelcomelogo.png" alt="Haawall Logo">
         </div>
+        <h1 class="auth-welcome-title">Welcome to Haawall</h1>
+        <p class="auth-welcome-subtitle">Your University of Sulaimani AI Assistant</p>
+      </div>
       
-        <!-- right side controls -->
-        <nav class="main-nav right desktop-only">
-          <!-- Desktop Language Dropdown -->
-          <div class="language-dropdown" id="languageDropdown">
-              <button class="lang-toggle" id="langToggleBtn" onclick="toggleLanguageMenu()">
-                  <span class="current-lang">English</span>
-                  <span class="arrow">▼</span>
-              </button>
-              
-              <div class="language-menu" id="languageMenu">
-                  <div class="language-option active" onclick="selectLanguage('en')">
-                      <span class="language-flag">EN</span>
-                      <span class="language-name">English</span>
-                      <span class="language-check">✓</span>
-                  </div>
-                  <div class="language-option" onclick="selectLanguage('ku')">
-                      <span class="language-flag">KU</span>
-                      <span class="language-name">کوردی</span>
-                      <span class="language-check">✓</span>
-                  </div>
-                  <div class="language-option" onclick="selectLanguage('ar')">
-                      <span class="language-flag">AR</span>
-                      <span class="language-name">العربية</span>
-                      <span class="language-check">✓</span>
-                  </div>
-              </div>
+      <div class="auth-options">
+        <button class="auth-option-btn primary" onclick="showLogin()">
+          <div class="auth-option-icon">👤</div>
+          <div class="auth-option-content">
+            <div class="auth-option-title">Sign In</div>
+            <div class="auth-option-desc">Access your account and chat history</div>
           </div>
-          <a href="contact" class="nav-link contact-btn">Contact Us</a>
-        </nav>
-        
-        <!-- help button with question mark -->
-        <button class="faq-button" onclick="toggleFAQ()" id="faqButton">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-          </svg>
         </button>
         
-        <!-- FAQ dropdown menu -->
-        <div class="faq-dropdown" id="faqDropdown">
-          <div class="faq-header">Frequently Asked Questions</div>
-          <div class="faq-list" id="faqList">
-            <!-- FAQ items added by javascript -->
+        <button class="auth-option-btn" onclick="showRegister()">
+          <div class="auth-option-icon">✨</div>
+          <div class="auth-option-content">
+            <div class="auth-option-title">Create Account</div>
+            <div class="auth-option-desc">Join Haawall and save your conversations</div>
           </div>
-        </div>
-
-        <!-- Mobile Language Dropdown -->
-        <div class="mobile-controls">
-          <div class="language-dropdown" id="languageDropdownMobile">
-              <button class="lang-toggle" id="langToggleBtnMobile" onclick="toggleLanguageMenuMobile()">
-                  <span class="current-lang">English</span>
-                  <span class="arrow">▼</span>
-              </button>
-              
-              <div class="language-menu" id="languageMenuMobile">
-                  <div class="language-option active" onclick="selectLanguageMobile('en')">
-                      <span class="language-flag">EN</span>
-                      <span class="language-name">English</span>
-                      <span class="language-check">✓</span>
-                  </div>
-                  <div class="language-option" onclick="selectLanguageMobile('ku')">
-                      <span class="language-flag">KU</span>
-                      <span class="language-name">کوردی</span>
-                      <span class="language-check">✓</span>
-                  </div>
-                  <div class="language-option" onclick="selectLanguageMobile('ar')">
-                      <span class="language-flag">AR</span>
-                      <span class="language-name">العربية</span>
-                      <span class="language-check">✓</span>
-                  </div>
-              </div>
+        </button>
+        
+        <button class="auth-option-btn guest" onclick="continueAsGuest()">
+          <div class="auth-option-icon">🚀</div>
+          <div class="auth-option-content">
+            <div class="auth-option-title">Continue as Guest</div>
+            <div class="auth-option-desc">Start chatting without an account</div>
           </div>
-        </div>
-
-        <!-- mobile dropdown menu -->
-        <div class="mobile-menu hidden" id="mobileMenu">
-          <a href="/" class="nav-link active">Home</a>
-          <a href="/about" class="nav-link">About</a>
-          <a href="/contact" class="nav-link contact-btn">Contact Us</a>
-        </div>
+        </button>
+      </div>
     </div>
+  </div>
+
+  <!-- Login Form Overlay -->
+  <div class="auth-form-overlay hidden" id="loginOverlay">
+    <div class="auth-form-content">
+      <button class="auth-close-btn" onclick="hideAuthForms()">×</button>
+      <h2 class="auth-form-title">Sign In</h2>
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <input type="email" id="loginEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Password" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">Sign In</button>
+        <div class="auth-form-links">
+          <a href="#" onclick="showRegister()">Don't have an account? Sign up</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Form Overlay -->
+  <div class="auth-form-overlay hidden" id="registerOverlay">
+    <div class="auth-form-content">
+      <button class="auth-close-btn" onclick="hideAuthForms()">×</button>
+      <h2 class="auth-form-title">Create Account</h2>
+      <form id="registerForm" class="auth-form">
+        <div class="form-group">
+          <input type="text" id="registerName" placeholder="Full Name" required>
+        </div>
+        <div class="form-group">
+          <input type="email" id="registerEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">Create Account</button>
+        <div class="auth-form-links">
+          <a href="#" onclick="showLogin()">Already have an account? Sign in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-container" id="appContainer">
+    <!-- Header -->
+    <div class="header">
+      <div class="mobile-menu-icon" onclick="toggleMenu()">☰</div>
       
-    <!-- quick action buttons -->
+      <nav class="main-nav left desktop-only">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="about" class="nav-link">About</a>
+        <div class="admin-dashboard-container" id="adminDashboardContainer" style="display: none;">
+          <a href="/dashboard" class="nav-link dashboard-btn">Dashboard</a>
+        </div>
+      </nav>
+      
+      <div class="logo"> 
+        <div class="logo-icon">
+          <img src="static/images/uoswelcomelogo.png" alt="Haawall Logo">
+        </div>
+        Haawall
+      </div>
+      
+      <nav class="main-nav right desktop-only">
+        <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
+        <div class="user-menu" id="userMenu">
+          <!-- Will be populated by JavaScript -->
+        </div>
+        <a href="contact" class="nav-link contact-btn">Contact Us</a>
+      </nav>
+
+      <div class="mobile-controls">
+        <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
+        <div class="user-menu-mobile" id="userMenuMobile">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <div class="mobile-menu hidden" id="mobileMenu">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="about" class="nav-link">About</a>
+        <div class="admin-dashboard-mobile" id="adminDashboardMobile" style="display: none;">
+          <a href="/dashboard" class="nav-link dashboard-btn">Dashboard</a>
+        </div>
+        <a href="contact" class="nav-link contact-btn">Contact Us</a>
+        <div class="mobile-user-menu" id="mobileUserMenu">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
     <div class="quick-actions">
-        <div class="quick-actions-container">
-            <div class="quick-action-btn" onclick="sendExamplePrompt(0)">
-                <div class="quick-action-title">Course Information</div>
-                <div class="quick-action-text">What courses are available in Computer Engineering?</div>
-            </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt(1)">
-                <div class="quick-action-title">Campus Services</div>
-                <div class="quick-action-text">When The Next Semester Starts?</div>
-            </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt(2)">
-                <div class="quick-action-title">Registration Help</div>
-                <div class="quick-action-text">How do I register for courses?</div>
-            </div>
-            <div class="quick-action-btn" onclick="sendExamplePrompt(3)">
-                <div class="quick-action-title">Campus Navigation</div>
-                <div class="quick-action-text">Where is the Computer Engineering building?</div>
-            </div>
-        </div>
+      <div class="quick-actions-container">
+        <button class="quick-action-btn" onclick="sendQuickMessage('What programs does the University of Sulaimani offer?')">
+          <div class="quick-action-title" id="quickAction1Title">Academic Programs</div>
+          <div class="quick-action-text" id="quickAction1Text">Explore available degrees and courses</div>
+        </button>
+        <button class="quick-action-btn" onclick="sendQuickMessage('How do I apply for admission to the University of Sulaimani?')">
+          <div class="quick-action-title" id="quickAction2Title">Admissions</div>
+          <div class="quick-action-text" id="quickAction2Text">Learn about the application process</div>
+        </button>
+        <button class="quick-action-btn" onclick="sendQuickMessage('What facilities are available on campus?')">
+          <div class="quick-action-title" id="quickAction3Title">Campus Life</div>
+          <div class="quick-action-text" id="quickAction3Text">Discover campus facilities and services</div>
+        </button>
+        <button class="quick-action-btn" onclick="sendQuickMessage('Tell me about scholarships and financial aid.')">
+          <div class="quick-action-title" id="quickAction4Title">Financial Aid</div>
+          <div class="quick-action-text" id="quickAction4Text">Information about scholarships and support</div>
+        </button>
+      </div>
     </div>
 
-    <!-- chatt area -->
+    <!-- Chat Container -->
     <div class="chat-container">
+      <!-- Welcome Screen -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-logo">
+          <img src="static/images/uoswelcomelogo.png" alt="Haawall Logo">
+        </div>
+        <h1 class="welcome-title" id="welcomeTitle">Welcome to Haawall</h1>
+        <p class="welcome-subtitle" id="welcomeSubtitle">
+          Your intelligent University of Sulaimani assistant. Ask me anything about programs, admissions, campus life, and more!
+        </p>
+      </div>
 
-        <!-- welcome screen -->
-        <div class="welcome-screen" id="welcomeScreen">
-            <div class="welcome-logo"> 
-                <img src="static/images/uoswelcomelogo.png" alt="Logo"> 
+      <!-- Messages -->
+      <div class="messages" id="messages"></div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-container">
+        <textarea 
+          class="message-input" 
+          id="messageInput" 
+          placeholder="Ask me anything about University of Sulaimani..."
+          rows="1"
+        ></textarea>
+        <button class="send-button" id="sendButton" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- FAQ Button -->
+    <button class="faq-button" onclick="toggleFAQ()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+      </svg>
+    </button>
+
+    <!-- FAQ Dropdown -->
+    <div class="faq-dropdown" id="faqDropdown">
+      <div class="faq-header" id="faqHeader">Frequently Asked Questions</div>
+      <div class="faq-list">
+        <div class="faq-item" onclick="sendQuickMessage('What are the admission requirements?')" id="faq1">What are the admission requirements?</div>
+        <div class="faq-item" onclick="sendQuickMessage('How much are the tuition fees?')" id="faq2">How much are the tuition fees?</div>
+        <div class="faq-item" onclick="sendQuickMessage('What programs are available in English?')" id="faq3">What programs are available in English?</div>
+        <div class="faq-item" onclick="sendQuickMessage('How do I contact the admissions office?')" id="faq4">How do I contact the admissions office?</div>
+        <div class="faq-item" onclick="sendQuickMessage('What is campus life like?')" id="faq5">What is campus life like?</div>
+        <div class="faq-item" onclick="sendQuickMessage('Are there dormitories available?')" id="faq6">Are there dormitories available?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <script>
+    let currentLang = 'en';
+    let currentUser = null;
+    let isAuthenticated = false;
+
+    // Translations
+    const translations = {
+      en: {
+        switchText: "کوردی",
+        welcomeTitle: "Welcome to Haawall",
+        welcomeSubtitle: "Your intelligent University of Sulaimani assistant. Ask me anything about programs, admissions, campus life, and more!",
+        quickAction1Title: "Academic Programs",
+        quickAction1Text: "Explore available degrees and courses",
+        quickAction2Title: "Admissions", 
+        quickAction2Text: "Learn about the application process",
+        quickAction3Title: "Campus Life",
+        quickAction3Text: "Discover campus facilities and services",
+        quickAction4Title: "Financial Aid",
+        quickAction4Text: "Information about scholarships and support",
+        faqHeader: "Frequently Asked Questions",
+        faq1: "What are the admission requirements?",
+        faq2: "How much are the tuition fees?",
+        faq3: "What programs are available in English?",
+        faq4: "How do I contact the admissions office?",
+        faq5: "What is campus life like?",
+        faq6: "Are there dormitories available?"
+      },
+      ku: {
+        switchText: "English",
+        welcomeTitle: "بەخێربێیت بۆ هاواڵ",
+        welcomeSubtitle: "یاریدەدەری زیرەکی زانکۆی سلێمانی. هەر پرسیارێکت هەبێت دەربارەی بەرنامەکان، وەرگرتن، ژیانی کەمپەس و زیاتر!",
+        quickAction1Title: "بەرنامە ئەکادیمییەکان",
+        quickAction1Text: "بەرنامە و کۆرسە بەردەستەکان بناسە",
+        quickAction2Title: "وەرگرتن",
+        quickAction2Text: "دەربارەی پرۆسەی داخوازینامە زانیاری وەربگرە",
+        quickAction3Title: "ژیانی کەمپەس",
+        quickAction3Text: "ئامرازەکان و خزمەتگوزارییەکانی کەمپەس بدۆزەرەوە",
+        quickAction4Title: "یارمەتی دارایی",
+        quickAction4Text: "زانیاری دەربارەی بورس و پشتگیری",
+        faqHeader: "پرسیارە دووبارەبووەکان",
+        faq1: "مەرجەکانی وەرگرتن چین؟",
+        faq2: "کرێی خوێندن چەندە؟",
+        faq3: "چ بەرنامەیەک بە ئینگلیزی هەیە؟",
+        faq4: "چۆن پەیوەندی بە ئۆفیسی وەرگرتنەوە بکەم؟",
+        faq5: "ژیانی کەمپەس چۆنە؟",
+        faq6: "نیشتەجێبوون بەردەستە؟"
+      }
+    };
+
+    // Authentication functions
+    async function checkAuthStatus() {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        showAuthOverlay();
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          currentUser = await response.json();
+          isAuthenticated = true;
+          hideAuthOverlay();
+          updateUserMenu();
+        } else {
+          localStorage.removeItem('access_token');
+          showAuthOverlay();
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        showAuthOverlay();
+      }
+    }
+
+    function showAuthOverlay() {
+      document.getElementById('authOverlay').classList.remove('hidden');
+      document.getElementById('appContainer').style.filter = 'blur(5px)';
+    }
+
+    function hideAuthOverlay() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('appContainer').style.filter = 'none';
+    }
+
+    function showLogin() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('loginOverlay').classList.remove('hidden');
+    }
+
+    function showRegister() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('registerOverlay').classList.remove('hidden');
+    }
+
+    function hideAuthForms() {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('registerOverlay').classList.add('hidden');
+      showAuthOverlay();
+    }
+
+    async function continueAsGuest() {
+      try {
+        const response = await fetch('/auth/guest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('access_token', result.access_token);
+          currentUser = { user_type: 'guest' };
+          isAuthenticated = true;
+          hideAuthOverlay();
+          updateUserMenu();
+        }
+      } catch (error) {
+        console.error('Guest login failed:', error);
+      }
+    }
+
+    function updateUserMenu() {
+      const userMenu = document.getElementById('userMenu');
+      const userMenuMobile = document.getElementById('userMenuMobile');
+      const mobileUserMenu = document.getElementById('mobileUserMenu');
+      const adminDashboardContainer = document.getElementById('adminDashboardContainer');
+      const adminDashboardMobile = document.getElementById('adminDashboardMobile');
+
+      let menuHTML = '';
+      
+      // Show/hide admin dashboard button
+      if (currentUser && currentUser.user_type === 'admin') {
+        adminDashboardContainer.style.display = 'block';
+        adminDashboardMobile.style.display = 'block';
+      } else {
+        adminDashboardContainer.style.display = 'none';
+        adminDashboardMobile.style.display = 'none';
+      }
+      
+      if (currentUser) {
+        if (currentUser.user_type === 'admin') {
+          menuHTML = `
+            <div class="user-dropdown">
+              <button class="user-btn" onclick="toggleUserDropdown()">
+                ${currentUser.full_name || 'Admin'} ▼
+              </button>
+              <div class="user-dropdown-menu" id="userDropdownMenu">
+                <a href="#" onclick="showProfile()">Profile</a>
+                <a href="#" onclick="showChatHistory()">Chat History</a>
+                <a href="#" onclick="logout()">Logout</a>
+              </div>
             </div>
-            <h1 class="welcome-title">How can I help you today?</h1>
-            <p class="welcome-subtitle">I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.</p>
-        </div>
-
-        <!-- chat messages go here -->
-        <div class="messages" id="messages"></div>
-        
-        <!-- typing dots animation -->
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-avatar"></div>
-            <div class="typing-dots">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
+          `;
+        } else if (currentUser.user_type === 'user') {
+          menuHTML = `
+            <div class="user-dropdown">
+              <button class="user-btn" onclick="toggleUserDropdown()">
+                ${currentUser.full_name || 'User'} ▼
+              </button>
+              <div class="user-dropdown-menu" id="userDropdownMenu">
+                <a href="#" onclick="showProfile()">Profile</a>
+                <a href="#" onclick="showChatHistory()">Chat History</a>
+                <a href="#" onclick="logout()">Logout</a>
+              </div>
             </div>
-        </div>
-    </div>
+          `;
+        } else {
+          menuHTML = `
+            <button class="nav-link" onclick="logout()">Exit Guest Mode</button>
+          `;
+        }
+      }
 
-    <!-- message input at bottom -->
-    <div class="input-area" id="inputArea">
-        <div class="input-container">
-            <!-- text input box -->
-            <textarea 
-                class="message-input" 
-                id="messageInput" 
-                placeholder="Message Haawall..."
-                rows="1"
-                onkeydown="handleKeyDown(event)"
-                oninput="adjustTextareaHeight()"
-                onfocus="handleInputFocus()"
-                onblur="handleInputBlur()"
-            ></textarea>
-            <!-- send button -->
-            <button class="send-button" id="sendButton" onclick="sendMessage()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <!-- Loading overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-<script>
-// global variables
-let currentLang = 'en';
-let faqOpen = false;
-let isAIResponding = false;
-let isTypingComplete = false;
-let languageMenuOpen = false;
-let languageMenuMobileOpen = false;
-
-// Languages object
-const languages = {
-    en: { name: 'English', flag: '🇺🇸' },
-    ku: { name: 'کوردی', flag: 'ku' },
-    ar: { name: 'العربية', flag: '🇸🇦' }
-};
-
-// FAQ questions in all languages
-const faqQuestions = {
-  en: [
-    "Engineering College Foundation Building?",
-    "Where are the statistic staffs?", 
-    "Where is the board of department heads?",
-    "When does the semester start?",
-    "When is the employees' sessions?",
-    "What are the library hours?",
-    "What departments does the engineering college have?",
-    "Where is the registration?",
-    "Parallel Program Prices",
-    "Where is the central cafeteria?"
-  ],
-  ku: [
-    "بینای کۆلێژی ئەندازیاری",
-    "ژمێریاری لە کوێیە؟",
-    "سەرۆکایەتی لە کوێیە؟",
-    "کەی وەرزی خوێندن دەستپێدەکات؟",
-    "دەوامی کارمەندان کەی بۆ کایە؟",
-    "کاتەکانی کتێبخانە لە کەیەوەیە؟",
-    "بەشەکانی کۆلێژی ئەندازیاری چین؟ ",
-    "تۆمار لەکوێیە؟ ",
-    "کرێی پاراڵێلی بەشەکان چەندە؟",
-    "کافتریای ناوەند لەکوێیە؟ "
-  ],
-  ar: [
-    "مبنى كلية الهندسة؟",
-    "أين موظفو الإحصاء؟",
-    "أين مجلس رؤساء الأقسام؟",
-    "متى يبدأ الفصل الدراسي؟",
-    "متى جلسات الموظفين؟",
-    "ما هي ساعات المكتبة؟",
-    "ما هي أقسام كلية الهندسة؟",
-    "أين التسجيل؟",
-    "أسعار البرنامج المتوازي",
-    "أين الكافتيريا المركزية؟"
-  ]
-};
-
-// UI text translations
-const translations = {
-  en: {
-    welcomeTitle: "How can I help you today?",
-    welcomeSubtitle: "I'm Haawall, your University of Sulaimani assistant. Ask me about courses, schedules, campus info, and more.",
-    prompts: [
-      { title: "Course Information", text: "What courses are available in Computer Engineering?" },
-      { title: "Campus Services", text: "When Does the next semester starts??" },
-      { title: "Registration Help", text: "How do I register for courses?" },
-      { title: "Campus Navigation", text: "Where is the Computer Engineering building?" },
-    ],
-    inputPlaceholder: "Message Haawall...",
-    faqHeader: "Frequently Asked Questions"
-  },
-  ku: {
-    welcomeTitle: "چۆن دەتوانم یارمەتیت بدەم؟",
-    welcomeSubtitle: "من هاوەڵم، یارمەتیدەری زانکۆی سلێمانی. پرسیارەکانت لەسەر وانەکان، کاتی خوێندن، زانیاری زانکۆ و زیاتر بپرسە.",
-    prompts: [
-      { title: "زانیاری وانە", text: "وانەکانی ئەندازیاری کۆمپیوتەر چییە؟" },
-      { title: "خزمەتگوزاری زانکۆ", text: "کەی دەوام دەستپێدەکاتەوە؟" },
-      { title: "یارمەتیدانی تۆمارکردن", text: "چۆن تۆمار دەکەم بۆ وانەکان؟" },
-      { title: "ڕێنوێنی زانکۆ", text: "بینای ئەندازیاری کۆمپیوتەر لە کوێیە؟" },
-    ],
-    inputPlaceholder: "...پەیامێک بنێرە بۆ هاوەڵ",
-    faqHeader: "پرسیارە دووبارەکان"
-  },
-  ar: {
-    welcomeTitle: "كيف يمكنني مساعدتك اليوم؟",
-    welcomeSubtitle: "أنا هاوال، مساعدك في جامعة السليمانية. اسألني عن الدورات والجداول ومعلومات الحرم الجامعي والمزيد.",
-    prompts: [
-      { title: "معلومات الدورة", text: "ما هي الدورات المتاحة في هندسة الحاسوب؟" },
-      { title: "خدمات الحرم الجامعي", text: "متى يبدأ الفصل الدراسي القادم؟" },
-      { title: "مساعدة التسجيل", text: "كيف أسجل في الدورات؟" },
-      { title: "التنقل في الحرم الجامعي", text: "أين يقع مبنى هندسة الحاسوب؟" },
-    ],
-    inputPlaceholder: "أرسل رسالة إلى هاوال...",
-    faqHeader: "الأسئلة الشائعة"
-  }
-};
-
-// Language dropdown functions
-function toggleLanguageMenu() {
-    const menu = document.getElementById('languageMenu');
-    const button = document.getElementById('langToggleBtn');
-    
-    languageMenuOpen = !languageMenuOpen;
-    
-    if (languageMenuOpen) {
-        menu.classList.add('show');
-        button.classList.add('active');
-    } else {
-        menu.classList.remove('show');
-        button.classList.remove('active');
-    }
-}
-
-function toggleLanguageMenuMobile() {
-    const menu = document.getElementById('languageMenuMobile');
-    const button = document.getElementById('langToggleBtnMobile');
-    
-    languageMenuMobileOpen = !languageMenuMobileOpen;
-    
-    if (languageMenuMobileOpen) {
-        menu.classList.add('show');
-        button.classList.add('active');
-    } else {
-        menu.classList.remove('show');
-        button.classList.remove('active');
-    }
-}
-
-function selectLanguage(langCode) {
-    // Desktop dropdown
-    document.querySelectorAll('#languageMenu .language-option').forEach(option => {
-        option.classList.remove('active');
-    });
-    document.querySelector(`#languageMenu [onclick="selectLanguage('${langCode}')"]`).classList.add('active');
-    
-    currentLang = langCode;
-    document.getElementById('langToggleBtn').querySelector('.current-lang').textContent = languages[langCode].name;
-    
-    //  mobile dropdown
-    syncMobileLanguage(langCode);
-    
-    toggleLanguageMenu();
-    updateUILanguage();
-}
-
-function selectLanguageMobile(langCode) {
-    // Mobile dropdown  
-    document.querySelectorAll('#languageMenuMobile .language-option').forEach(option => {
-        option.classList.remove('active');
-    });
-    document.querySelector(`#languageMenuMobile [onclick="selectLanguageMobile('${langCode}')"]`).classList.add('active');
-    
-    currentLang = langCode;
-    document.getElementById('langToggleBtnMobile').querySelector('.current-lang').textContent = languages[langCode].name;
-    
-    //desktop dropdown
-    syncDesktopLanguage(langCode);
-    
-    toggleLanguageMenuMobile();
-    updateUILanguage();
-}
-
-function syncMobileLanguage(langCode) {
-    document.querySelectorAll('#languageMenuMobile .language-option').forEach(option => {
-        option.classList.remove('active');
-    });
-    document.querySelector(`#languageMenuMobile [onclick="selectLanguageMobile('${langCode}')"]`).classList.add('active');
-    document.getElementById('langToggleBtnMobile').querySelector('.current-lang').textContent = languages[langCode].name;
-}
-
-function syncDesktopLanguage(langCode) {
-    document.querySelectorAll('#languageMenu .language-option').forEach(option => {
-        option.classList.remove('active');
-    });
-    document.querySelector(`#languageMenu [onclick="selectLanguage('${langCode}')"]`).classList.add('active');
-    document.getElementById('langToggleBtn').querySelector('.current-lang').textContent = languages[langCode].name;
-}
-
-function updateUILanguage() {
-    const t = translations[currentLang];
-
-    // welcome screen
-    document.querySelector('.welcome-title').innerText = t.welcomeTitle;
-    document.querySelector('.welcome-subtitle').innerText = t.welcomeSubtitle;
-    
-    // input placeholder
-    updateInputState();
-
-    // FAQ header
-    const faqHeader = document.querySelector('.faq-header');
-    if (faqHeader) {
-        faqHeader.textContent = t.faqHeader;
+      userMenu.innerHTML = menuHTML;
+      userMenuMobile.innerHTML = menuHTML;
+      mobileUserMenu.innerHTML = menuHTML;
     }
 
-    // Refresh FAQ list if open
-    if (faqOpen) {
-        populateFAQList();
-    }
-
-    // Update quick action buttons
-    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
-    quickActionBtns.forEach((btn, i) => {
-        btn.querySelector('.quick-action-title').innerText = t.prompts[i].title;
-        btn.querySelector('.quick-action-text').innerText = t.prompts[i].text;
-    });
-    
-    // typing status if it exists
-    const typingStatus = document.getElementById('typingStatus');
-    if (typingStatus) {
-        typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵامت دەداتەوە' 
-                                 : currentLang === 'ar' ? '...هاوال يجيب'
-                                 : 'Haawall is responding...';
-    }
-}
-
-// format text with basic HTML
-function formatMessage(message) {
-  // line breaks to HTML
-  message = message.replace(/\n/g, '<br>');
-  
-  // make numbered lists bold
-  message = message.replace(/^(\d+\.\s)/gm, '<strong>$1</strong>');
-  
-  // bullet points
-  message = message.replace(/^[-•]\s/gm, '• ');
-  
-  // bold text between **
-  message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
-  // make specific phrases bold
-  message = message.replace(/^(To get the most accurate.*?):/gm, '<strong>$1:</strong>');
-  message = message.replace(/^(For the most current.*?):/gm, '<strong>$1:</strong>');
-  
-  return message;
-}
-
-// improved kurdish text detection - only checks the actual content
-function detectKurdishText(text) {
-  // remove HTML tags first
-  const cleanText = text.replace(/<[^>]*>/g, '');
-  
-  // kurdish unicode ranges
-  const kurdishPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
-  
-  // count kurdish vs latin characters
-  const kurdishChars = (cleanText.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g) || []).length;
-  const latinChars = (cleanText.match(/[a-zA-Z]/g) || []).length;
-  const totalChars = kurdishChars + latinChars;
-  
-  // only apply RTL if kurdish characters make up more than 30% of the text
-  if (totalChars === 0) return false;
-  return (kurdishChars / totalChars) > 0.3;
-}
-
-// enable/disable input based on AI status
-function updateInputState() {
-    const input = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
-    
-    if (isAIResponding) {
-        // disable while AI responds
-        input.disabled = true;
-        input.classList.add('loading');
-        sendButton.disabled = true;
-        sendButton.classList.add('loading');
-        
-        // disable quick action buttons
-        quickActionBtns.forEach(btn => {
-            btn.classList.add('loading');
+    // Login form handler
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        const response = await fetch('/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
         });
         
-        // update placeholder
-        const originalPlaceholder = input.placeholder;
-        input.setAttribute('data-original-placeholder', originalPlaceholder);
-        input.placeholder = currentLang === 'ku' 
-            ? '...چاوەڕێ بکە تا هاوەڵ وەڵامت دەداتەوە'
-            : currentLang === 'ar' ? '...انتظر حتى يجيب هاوال'
-            : 'Please wait for Haawall to finish responding...';
-    } else {
-        // re-enable input
-        input.disabled = false;
-        input.classList.remove('loading');
-        sendButton.disabled = false;
-        sendButton.classList.remove('loading');
-        
-        // re-enable quick action buttons
-        quickActionBtns.forEach(btn => {
-            btn.classList.remove('loading');
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('access_token', result.access_token);
+          currentUser = {
+            user_type: result.user_type,
+            user_id: result.user_id,
+            email: email
+          };
+          isAuthenticated = true;
+          hideAuthForms();
+          hideAuthOverlay();
+          updateUserMenu();
+        } else {
+          const error = await response.json();
+          alert(error.detail || 'Login failed');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Connection error. Please try again.');
+      }
+    });
+
+    // Register form handler
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const full_name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password, full_name })
         });
         
-        // restore placeholder
-        const originalPlaceholder = input.getAttribute('data-original-placeholder');
-        if (originalPlaceholder) {
-            input.placeholder = originalPlaceholder;
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('access_token', result.access_token);
+          currentUser = {
+            user_type: result.user_type,
+            user_id: result.user_id,
+            email: email,
+            full_name: full_name
+          };
+          isAuthenticated = true;
+          hideAuthForms();
+          hideAuthOverlay();
+          updateUserMenu();
         } else {
-            input.placeholder = translations[currentLang].inputPlaceholder;
+          const error = await response.json();
+          alert(error.detail || 'Registration failed');
         }
-        
-        // focus for better UX
-        input.focus();
-    }
-}
-
-// show loading overlay
-function showLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.classList.add('show');
-    }
-}
-
-// hide loading overlay
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.classList.remove('show');
-    }
-}
-
-// message skeleton while loading
-function addMessageSkeleton() {
-    const messagesContainer = document.getElementById('messages');
-    const skeletonDiv = document.createElement('div');
-    skeletonDiv.className = 'message-skeleton';
-    skeletonDiv.id = 'messageSkeleton';
-    
-    skeletonDiv.innerHTML = `
-        <div class="skeleton-avatar">
-            <img src="static/images/uoswelcomelogo.png" alt="Haawall">
-        </div>
-        <div class="skeleton-content">
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line"></div>
-        </div>
-    `;
-    
-    messagesContainer.appendChild(skeletonDiv);
-    scrollToBottom();
-}
-//Free scrolling during AI response ->>. no forced scrolling
-function typeWriter(element, text, speed = 20, showCursor = true) {
-    element.innerHTML = '';
-    let i = 0;
-    
-    // User can now scroll freely during AI response
-    let userHasScrolled = false;
-    let isAtBottomBeforeTyping = isScrolledToBottom();
-    
-    //only apply RTL if the actual message content contains Kurdish text
-    const isKurdishContent = detectKurdishText(text);
-    if (isKurdishContent) {
-      element.classList.add('rtl-text');
-      element.parentElement.classList.add('rtl-message');
-    } else {
-      // Make sure to remove RTL classes for English content
-      element.classList.remove('rtl-text');
-      element.parentElement.classList.remove('rtl-message');
-    }
-    
-    // set AI responding state
-    isAIResponding = true;
-    isTypingComplete = false;
-    updateInputState();
-    
-    // add cursor styles if not there
-    if (!document.querySelector('#cursor-style')) {
-        const style = document.createElement('style');
-        style.id = 'cursor-style';
-        style.textContent = `
-            .typing-cursor {
-                display: inline-block;
-                background-color: #333;
-                width: 2px;
-                height: 1.2em;
-                margin-left: 2px;
-                animation: blink 1s infinite;
-            }
-            @keyframes blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0; }
-            }
-            
-            .ai-response-header {
-                font-weight: bold;
-                font-size: 1.1em;
-                margin-bottom: 8px;
-                color: #2c3e50;
-                border-bottom: 2px solid #3498db;
-                padding-bottom: 5px;
-                display: inline-block;
-            }
-            
-            .message.assistant .message-content {
-                line-height: 1.6;
-            }
-            
-            /* disabled input styles */
-            .input-container.disabled {
-                opacity: 0.6;
-                pointer-events: none;
-            }
-            
-            .message-input:disabled {
-                background-color: #f5f5f5;
-                cursor: not-allowed;
-            }
-            
-            .send-button:disabled {
-                background-color: #ccc;
-                cursor: not-allowed;
-            }
-            
-            /* typing status */
-            .typing-status {
-                position: absolute;
-                top: -25px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(52, 152, 219, 0.1);
-                color: #3498db;
-                padding: 5px 15px;
-                border-radius: 15px;
-                font-size: 12px;
-                font-weight: 500;
-                white-space: nowrap;
-                z-index: 100;
-            }
-            
-            /* Mobile adjustments */
-            @media (max-width: 768px) {
-                /* Mobile styles */
-            }
-            
-            /* RTL text - ONLY apply when content is actually Kurdish */
-            .rtl-text {
-                direction: rtl;
-                text-align: right;
-                font-family: 'Segoe UI', 'Tahoma', 'Arial Unicode MS', sans-serif;
-                line-height: 1.6;
-            }
-            
-            /* RTL message container */
-            .rtl-message {
-                direction: rtl;
-            }
-            
-            /* avatar position for RTL */
-            .rtl-message .message-avatar {
-                order: 2;
-                margin-left: 12px;
-                margin-right: 0;
-            }
-            
-            .rtl-message .message-content {
-                order: 1;
-            }
-            
-            /* fix lists for RTL */
-            .rtl-text ul, .rtl-text ol {
-                text-align: right;
-                direction: rtl;
-            }
-            
-            .rtl-text li {
-                text-align: right;
-            }
-            
-            /* Default LTR styling for English content */
-            .message.assistant .message-content:not(.rtl-text) {
-                direction: ltr;
-                text-align: left;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // add typing status
-    const inputArea = document.getElementById('inputArea');
-    const typingStatus = document.createElement('div');
-    typingStatus.className = 'typing-status';
-    typingStatus.id = 'typingStatus';
-    typingStatus.textContent = currentLang === 'ku' ? '...هاوەڵ وەڵام دەداتەوە    ' 
-                             : currentLang === 'ar' ? '...هاوال يجيب'
-                             : 'Haawall is responding...';
-    inputArea.appendChild(typingStatus);
-    
-    //Track user scrolling without interfering
-    const messagesContainer = document.getElementById('messages');
-    let scrollTimeout;
-    
-    const handleScroll = () => {
-        userHasScrolled = true;
-        clearTimeout(scrollTimeout);
-        
-        // reset scroll tracking after user stops scrolling
-        scrollTimeout = setTimeout(() => {
-            if (isScrolledToBottom()) {
-                userHasScrolled = false;
-            }
-        }, 1000);
-    };
-    
-    // 
-    messagesContainer.addEventListener('scroll', handleScroll, { passive: true });
-    
-    function type() {
-        if (i < text.length) {
-            const char = text.charAt(i);
-            let formattedText = formatMessage(text.substring(0, i + 1));
-            
-            // add header styling
-            if (i === 0 || (i > 0 && text.substring(0, i).includes('\n') && text.substring(i).trim().length > 0)) {
-                const lines = formattedText.split('<br>');
-                if (lines.length > 0 && lines[0].trim().length > 0) {
-                    lines[0] = `<div class="ai-response-header">${lines[0]}</div>`;
-                    formattedText = lines.join('<br>');
-                }
-            }
-            
-            element.innerHTML = formattedText;
-            
-            if (showCursor) {
-                element.innerHTML += '<span class="typing-cursor"></span>';
-            }
-            
-            i++;
-            
-            // variable typing speed
-            let currentSpeed = speed;
-            if (char === '.' || char === '!' || char === '?') {
-                currentSpeed = speed * 4; 
-            } else if (char === ',' || char === ';' || char === ':') {
-                currentSpeed = speed * 2; 
-            } else if (char === ' ') {
-                currentSpeed = speed * 0.3; 
-            }
-            
-            setTimeout(type, currentSpeed);
-            
-            //only auto-scroll if user was at bottom when typing started AND hasn't scrolled away
-            if (isAtBottomBeforeTyping && !userHasScrolled) {
-                scrollToBottom();
-            }
-        } else {
-            // typing done
-            isTypingComplete = true;
-            
-            // clean up
-            messagesContainer.removeEventListener('scroll', handleScroll);
-            
-            // remove typing status
-            const statusElement = document.getElementById('typingStatus');
-            if (statusElement) {
-                statusElement.remove();
-            }
-            
-            if (showCursor) {
-                setTimeout(() => {
-                    let finalText = formatMessage(text);
-                    // apply header styling
-                    const lines = finalText.split('<br>');
-                    if (lines.length > 0 && lines[0].trim().length > 0) {
-                        lines[0] = `<div class="ai-response-header">${lines[0]}</div>`;
-                        finalText = lines.join('<br>');
-                    }
-                    element.innerHTML = finalText;
-                    
-                    // Only scroll if user was at bottom and hasn't scrolled
-                    if (isAtBottomBeforeTyping && !userHasScrolled) {
-                        scrollToBottom();
-                    }
-                    
-                    // re-enable input
-                    isAIResponding = false;
-                    updateInputState();
-                }, 500); 
-            } else {
-                // re-enable input immediately
-                isAIResponding = false;
-                updateInputState();
-            }
-        }
-    }
-    
-    type();
-    
-    return new Promise(resolve => {
-        const checkComplete = () => {
-            if (i >= text.length) {
-                setTimeout(() => {
-                    isAIResponding = false;
-                    updateInputState();
-                    resolve();
-                }, showCursor ? 500 : 0);
-            } else {
-                setTimeout(checkComplete, 100);
-            }
-        };
-        checkComplete();
+      } catch (error) {
+        console.error('Registration error:', error);
+        alert('Connection error. Please try again.');
+      }
     });
-}
 
-//function to check if user is at bottom of scroll
-function isScrolledToBottom() {
-    const messagesContainer = document.getElementById('messages');
-    if (!messagesContainer) return true;
-    
-    const threshold = 50; // pixels from bottom
-    return messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + threshold;
-}
+    function logout() {
+      localStorage.removeItem('access_token');
+      currentUser = null;
+      isAuthenticated = false;
+      showAuthOverlay();
+      updateUserMenu();
+    }
 
-// toggle FAQ dropdown
-function toggleFAQ() {
-  const dropdown = document.getElementById('faqDropdown');
-  const button = document.getElementById('faqButton');
-  
-  faqOpen = !faqOpen;
-  
-  if (faqOpen) {
-    dropdown.classList.add('show');
-    button.style.transform = 'rotate(180deg)';
-    populateFAQList();
-  } else {
-    dropdown.classList.remove('show');
-    button.style.transform = 'rotate(0deg)';
-  }
-}
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdownMenu');
+      dropdown.classList.toggle('show');
+    }
 
-// fill FAQ list with questions
-function populateFAQList() {
-  const faqList = document.getElementById('faqList');
-  faqList.innerHTML = '';
-  
-  const currentFaqQuestions = faqQuestions[currentLang];
-  
-  currentFaqQuestions.forEach((question, index) => {
-    const faqItem = document.createElement('div');
-    faqItem.className = 'faq-item';
-    faqItem.textContent = question;
-    faqItem.onclick = () => {
-      sendFAQQuestion(question);
-      toggleFAQ();
-    };
-    faqList.appendChild(faqItem);
-  });
-}
+    function showProfile() {
+      if (currentUser.user_type === 'guest') {
+        alert('Please create an account to access profile features.');
+        return;
+      }
+       
+       window.location.href = '/profile';
+    }
 
-// send FAQ question
-function sendFAQQuestion(question) {
-  if (isAIResponding) {
-    return;
-  }
-  document.getElementById('messageInput').value = question;
-  sendMessage(question);
-}
+    function showChatHistory() {
+      // TODO: Implement chat history modal
+      alert('Chat history feature coming soon!');
+    }
 
-// toggle mobile menu
-function toggleMenu() {
-  const menu = document.getElementById('mobileMenu');
-  menu.classList.toggle('hidden');
-}
+    // Language toggle
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ku' : 'en';
+      const t = translations[currentLang];
 
-// handle enter key
-function handleKeyDown(event) {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    
-    // only send if not responding
-    if (!isAIResponding) {
+      document.getElementById('langSwitchBtn').innerText = t.switchText;
+      document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
+      
+      Object.keys(t).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = t[id];
+      });
+    }
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // FAQ toggle
+    function toggleFAQ() {
+      const dropdown = document.getElementById('faqDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Chat functionality
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      input.value = '';
+      hideWelcomeScreen();
+      addMessage(message, 'user');
+      showTypingIndicator();
+      
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify({ message })
+        });
+        
+        hideTypingIndicator();
+        
+        if (response.ok) {
+          const result = await response.json();
+          addMessage(result.response, 'assistant');
+        } else {
+          const error = await response.json();
+          addMessage(error.detail || 'Sorry, I encountered an error. Please try again.', 'assistant', true);
+        }
+      } catch (error) {
+        hideTypingIndicator();
+        addMessage('Connection error. Please check your internet and try again.', 'assistant', true);
+      }
+    }
+
+    function sendQuickMessage(message) {
+      document.getElementById('messageInput').value = message;
       sendMessage();
     }
-  }
-}
 
-// auto-resize textarea
-function adjustTextareaHeight() {
-  const textarea = document.getElementById('messageInput');
-  
-  // don't adjust if disabled
-  if (textarea.disabled) return;
-  
-  // reset height to calculate new height
-  textarea.style.height = 'auto';
-  
-  // set new height with max limit
-  const newHeight = Math.min(textarea.scrollHeight, 120);
-  textarea.style.height = newHeight + 'px';
-  
-  // update scroll after resize - only if user was at bottom
-  if (isScrolledToBottom()) {
-    requestAnimationFrame(() => {
-        scrollToBottom();
-    });
-  }
-}
-
-// handle mobile keyboard opening
-function handleInputFocus() {
-  const inputArea = document.getElementById('inputArea');
-  
-  if (window.innerWidth <= 768) {
-    inputArea.classList.add('keyboard-open');
-    
-    // Only scroll if user was at bottom
-    if (isScrolledToBottom()) {
-        setTimeout(() => scrollToBottom(), 100);
-        setTimeout(() => scrollToBottom(), 300);
-        setTimeout(() => scrollToBottom(), 500);
+    function addMessage(content, sender, isError = false) {
+      const messagesContainer = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = sender === 'user' ? 'U' : 'H';
+      
+      const messageContent = document.createElement('div');
+      messageContent.className = isError ? 'message-content error-message' : 'message-content';
+      messageContent.textContent = content;
+      
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(messageContent);
+      messagesContainer.appendChild(messageDiv);
+      
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-  }
-}
 
-// handle mobile keyboard closing
-function handleInputBlur() {
-  const inputArea = document.getElementById('inputArea');
-  
-  if (window.innerWidth <= 768) {
-    inputArea.classList.remove('keyboard-open');
-    
-    // Only scroll if user was at bottom
-    if (isScrolledToBottom()) {
-        setTimeout(() => {
-            scrollToBottom();
-        }, 400);
+    function hideWelcomeScreen() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
     }
-  }
-}
 
-// send example prompt
-function sendExamplePrompt(promptIndex) {
-  if (isAIResponding) {
-    // show user feedback
-    const warningMsg = currentLang === 'ku' 
-      ? 'تکایە چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە'
-      : currentLang === 'ar' ? 'يرجى الانتظار حتى ينهي هاوال الإجابة'
-      : 'Please wait for Haawall to finish responding';
-    
-    // could add a toast notification here
-    console.log(warningMsg);
-    return;
-  }
-  
-  const prompt = translations[currentLang].prompts[promptIndex].text;
-  document.getElementById('messageInput').value = prompt;
-  sendMessage(prompt);
-}
+    function showTypingIndicator() {
+      const messagesContainer = document.getElementById('messages');
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <div class="typing-avatar"></div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 
-// main send message function
-function sendMessage(customMessage = null) {
-  const input = document.getElementById('messageInput');
-  const sendButton = document.getElementById('sendButton');
-  const message = customMessage ?? input.value.trim();
-
-  // prevent sending if AI is responding
-  if (isAIResponding) {
-    // show warning
-    const warningMsg = currentLang === 'ku' 
-      ? 'تکایە چاوەڕێ بکە تا هاوەڵ وەڵام بداتەوە'
-      : currentLang === 'ar' ? 'يرجى الانتظار حتى ينهي هاوال الإجابة'
-      : 'Please wait for Haawall to finish responding';
-    
-    console.log(warningMsg);
-    return;
-  }
-
-  if (message === '') return;
-
-  // hide welcome screen
-  document.getElementById('welcomeScreen').classList.add('hidden');
-  
-  // set AI responding state
-  isAIResponding = true;
-  updateInputState();
-
-  addMessage(message, 'user');
-  input.value = '';
-  input.style.height = 'auto';
-
-  // show enhanced loading states
-  showTypingIndicator();
-  addMessageSkeleton();
-
-  fetch('/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ 
-      message: message,
-      instruction: "Please answer only the single question asked. Do not provide additional information or answer multiple questions at once."
-    })
-  })
-    .then(response => {
-      // remove skeleton on response
-      const skeleton = document.getElementById('messageSkeleton');
-      if (skeleton) {
-        skeleton.remove();
+    function hideTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) {
+        indicator.remove();
       }
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      hideTypingIndicator();
-      
-      // small delay for better UX
-      setTimeout(() => {
-        if (data.response) {
-          addMessage(data.response, 'assistant');
-        } else if (data.error) {
-          const errorMsg = currentLang === 'ku'
-            ? 'ببورە، هەڵەیەک ڕویدا: ' + data.error
-            : currentLang === 'ar' ? 'أعتذر، حدث خطأ: ' + data.error
-            : 'I apologize, but I encountered an error: ' + data.error;
-          addMessage(errorMsg, 'assistant', true);
-        } else {
-          const unexpectedMsg = currentLang === 'ku'
-            ? 'وەلامێکی نەزانراوە وەرگیرا. تکایە دواتر هەوڵبدەوە.'
-            : currentLang === 'ar' ? 'تم استلام رد غير متوقع. يرجى المحاولة مرة أخرى.'
-            : 'I received an unexpected response. Please try again.';
-          addMessage(unexpectedMsg, 'assistant', true);
-        }
-      }, 300);
-    })
-    .catch(error => {
-      // remove skeleton on error
-      const skeleton = document.getElementById('messageSkeleton');
-      if (skeleton) {
-        skeleton.remove();
-      }
-      
-      hideTypingIndicator();
-      console.error('Error:', error);
-      
-      setTimeout(() => {
-        const connectionErrorMsg = currentLang === 'ku'
-          ? 'کێشەیەک هەیە لەگەڵ بەستنی پەیوەندی. تکایە پەیوەندیدا بپشکنە و دواتر هەوڵبدەوە.'
-          : currentLang === 'ar' ? 'أواجه مشكلة في الاتصال الآن. يرجى التحقق من اتصالك والمحاولة مرة أخرى.'
-          : 'I\'m having trouble connecting right now. Please check your connection and try again.';
-        addMessage(connectionErrorMsg, 'assistant', true);
-      }, 300);
-    })
-    .finally(() => {
-      // ensure input is re-enabled
-      if (!isAIResponding) {
-        updateInputState();
+    }
+
+    // Input handling
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
       }
     });
-}
 
-// add message to chat with CORRECTED RTL support
-function addMessage(message, sender, isError = false) {
-  const messagesContainer = document.getElementById('messages');
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${sender}`;
+    // Auto-resize textarea
+    document.getElementById('messageInput').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
 
-  const avatar = document.createElement('div');
-  avatar.className = 'message-avatar';
-  avatar.textContent = sender === 'user' ? 'U' : '';
-
-  const content = document.createElement('div');
-  content.className = isError ? 'error-message' : 'message-content';
-  
-  //only apply RTL if the message actually contains Kurdish text
-  // Don't base it on UI language, base it on the actual content
-  if (sender === 'assistant' && detectKurdishText(message)) {
-    content.classList.add('rtl-text');
-    messageDiv.classList.add('rtl-message');
-  } else {
-    // Explicitly ensure LTR for non-Kurdish content
-    content.classList.remove('rtl-text');
-    messageDiv.classList.remove('rtl-message');
-  }
-  
-  messageDiv.appendChild(avatar);
-  messageDiv.appendChild(content);
-  messagesContainer.appendChild(messageDiv);
-
-  // show user messages immediately
-  if (sender === 'user') {
-    content.innerHTML = formatMessage(message);
-    // Only auto-scroll for user messages if they were at bottom
-    if (isScrolledToBottom()) {
-        scrollToBottom();
-    }
-  } else {
-    // use typewriter for AI responses
-    typeWriter(content, message, 20, true).then(() => {
-      // final scroll after typing - only if user didn't scroll away
-      if (isScrolledToBottom()) {
-          setTimeout(() => {
-              scrollToBottom();
-          }, 100);
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.matches('.user-btn')) {
+        const dropdown = document.getElementById('userDropdownMenu');
+        if (dropdown) dropdown.classList.remove('show');
+      }
+      
+      if (!e.target.closest('.faq-button') && !e.target.closest('.faq-dropdown')) {
+        document.getElementById('faqDropdown').classList.remove('show');
       }
     });
-  }
-}
 
-// scroll chat to bottom
-function scrollToBottom() {
-  const messagesContainer = document.getElementById('messages');
-  const inputArea = document.getElementById('inputArea');
-  
-  if (messagesContainer && inputArea) {
-    // get actual input area height
-    const inputAreaHeight = inputArea.getBoundingClientRect().height;
-    
-    // add extra padding
-    const extraPadding = 30;
-    
-    // set dynamic padding
-    messagesContainer.style.paddingBottom = `${inputAreaHeight + extraPadding}px`;
-    
-    // force scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    // Additional scroll for mobile - but only if needed
-    if (window.innerWidth <= 768) {
-      setTimeout(() => {
-        if (isScrolledToBottom()) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-      }, 50);
-    }
-  }
-}
-
-// show typing indicator
-function showTypingIndicator() {
-  const indicator = document.getElementById('typingIndicator');
-  if (indicator) {
-    indicator.style.display = 'flex';
-    
-    // Only scroll if user was at bottom
-    if (isScrolledToBottom()) {
-        setTimeout(() => scrollToBottom(), 50);
-        setTimeout(() => scrollToBottom(), 150);
-    }
-  }
-}
-
-// hide typing indicator
-function hideTypingIndicator() {
-  const indicator = document.getElementById('typingIndicator');
-  if (indicator) {
-    indicator.style.display = 'none';
-  }
-  
-  // Only scroll if user is at bottom
-  if (isScrolledToBottom()) {
-      setTimeout(() => scrollToBottom(), 50);
-  }
-}
-
-// mobile viewport fixes
-function initializeMobileFixes() {
-  // better viewport height for mobile browsers
-  function setViewportHeight() {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  
-  setViewportHeight();
-  
-  // handle resize with debouncing
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      setViewportHeight();
-      // Only scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          scrollToBottom();
-      }
-    }, 100);
-  });
-  
-  // handle orientation change
-  window.addEventListener('orientationchange', () => {
-    setTimeout(() => {
-      setViewportHeight();
-      // Only scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          scrollToBottom();
-      }
-    }, 700); 
-  });
-  
-  // detect keyboard open/close
-  let initialViewportHeight = window.innerHeight;
-  let keyboardOpen = false;
-  
-  window.addEventListener('resize', () => {
-    const currentHeight = window.innerHeight;
-    const heightDifference = initialViewportHeight - currentHeight;
-    
-    if (heightDifference > 150 && !keyboardOpen) {
-      // keyboard opened
-      keyboardOpen = true;
-      document.body.classList.add('keyboard-open');
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 300);
-          setTimeout(() => scrollToBottom(), 600);
-      }
-    } else if (heightDifference < 150 && keyboardOpen) {
-      // keyboard closed
-      keyboardOpen = false;
-      document.body.classList.remove('keyboard-open');
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 300);
-          setTimeout(() => scrollToBottom(), 600);
-      }
-    }
-  });
-}
-
-// iOS safari fixes
-function initializeIOSFixes() {
-  // prevent zoom on input focus
-  const viewportMeta = document.querySelector('meta[name="viewport"]');
-  if (viewportMeta) {
-    viewportMeta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0';
-  }
-  
-  // better focus handling for iOS
-  document.addEventListener('focusin', function(e) {
-    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 100);
-          setTimeout(() => scrollToBottom(), 400);
-          setTimeout(() => scrollToBottom(), 700);
-      }
-    }
-  });
-  
-  // handle iOS keyboard hiding
-  document.addEventListener('focusout', function(e) {
-    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 300);
-      }
-    }
-  });
-}
-
-// android fixes
-function initializeAndroidFixes() {
-  let originalHeight = window.innerHeight;
-  
-  window.addEventListener('resize', function() {
-    const currentHeight = window.innerHeight;
-    const diff = originalHeight - currentHeight;
-    
-    if (diff > 150) {
-      // keyboard is open
-      document.body.style.paddingBottom = '0px';
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 100);
-      }
-    } else {
-      // keyboard is closed
-      document.body.style.paddingBottom = '';
-      // Only auto-scroll if user was at bottom
-      if (isScrolledToBottom()) {
-          setTimeout(() => scrollToBottom(), 100);
-      }
-    }
-  });
-}
-
-// Close language dropdowns and FAQ when clicking outside
-document.addEventListener('click', function(event) {
-  const dropdown = document.getElementById('languageDropdown');
-  const dropdownMobile = document.getElementById('languageDropdownMobile');
-  const faqDropdown = document.getElementById('faqDropdown');
-  const faqButton = document.getElementById('faqButton');
-  
-  // Close language dropdowns
-  if (languageMenuOpen && dropdown && !dropdown.contains(event.target)) {
-    toggleLanguageMenu();
-  }
-  
-  if (languageMenuMobileOpen && dropdownMobile && !dropdownMobile.contains(event.target)) {
-    toggleLanguageMenuMobile();
-  }
-  
-  // Close FAQ dropdown
-  if (faqOpen && !faqDropdown.contains(event.target) && !faqButton.contains(event.target)) {
-    toggleFAQ();
-  }
-});
-
-// initialize when page loads
-document.addEventListener('DOMContentLoaded', function () {
-  // ensure input starts correctly
-  isAIResponding = false;
-  updateInputState();
-  
-  document.getElementById('messageInput').focus();
-  
-  //  styling to prevent message cutoff
-  const style = document.createElement('style');
-  style.textContent = `
-    .messages {
-      padding-bottom: 140px !important;
-      scroll-behavior: smooth;
-    }
-    
-    .chat-container {
-      padding-bottom: 0 !important;
-      position: relative;
-    }
-    
-    .message:last-child {
-      margin-bottom: 20px !important;
-    }
-    
-    .input-area {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 1000 !important;
-      background: white !important;
-      border-top: 1px solid #eee !important;
-      padding: 1rem !important;
-    }
-    
-    @media (max-width: 768px) {
-      .messages {
-        padding-bottom: 160px !important;
-      }
-      
-      .keyboard-open .messages {
-        padding-bottom: 200px !important;
-      }
-      
-      .input-area {
-        padding: 0.75rem !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  // mobile fixes
-  if (window.innerWidth <= 768) {
-    initializeMobileFixes();
-  }
-  
-  // iOS fixes
-  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    initializeIOSFixes();
-  }
-  
-  // android fixes
-  if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
-    initializeAndroidFixes();
-  }
-  
-  // Initial scroll setup - only if at bottom
-  if (isScrolledToBottom()) {
-      setTimeout(() => scrollToBottom(), 100);
-      setTimeout(() => scrollToBottom(), 300);
-      setTimeout(() => scrollToBottom(), 500);
-  }
-});
-</script>
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuthStatus();
+    });
+  </script>
 </body>
 </html>
+

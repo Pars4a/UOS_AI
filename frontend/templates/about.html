@@ -6,8 +6,6 @@
   <title>About - Haawall University Assistant</title>
   <link rel="shortcut icon" href="static/images/uos-icon.ico" type="image/x-icon">
   <link rel="stylesheet" href="static/styleabout.css">
-  <style>
-  </style>
 </head>
 
 <body>
@@ -24,61 +22,13 @@
       <div class="logo-icon"></div>
     </div>
   
-    <!-- right side controls -->
     <nav class="main-nav right desktop-only">
-      <!-- Desktop Language Dropdown -->
-      <div class="language-dropdown" id="languageDropdown">
-          <button class="lang-toggle" id="langToggleBtn" onclick="toggleLanguageMenu()">
-              <span class="current-lang">English</span>
-              <span class="arrow">▼</span>
-          </button>
-          
-          <div class="language-menu" id="languageMenu">
-              <div class="language-option active" onclick="selectLanguage('en')">
-                  <span class="language-flag">EN</span>
-                  <span class="language-name">English</span>
-                  <span class="language-check">✓</span>
-              </div>
-              <div class="language-option" onclick="selectLanguage('ku')">
-                  <span class="language-flag">KU</span>
-                  <span class="language-name">کوردی</span>
-                  <span class="language-check">✓</span>
-              </div>
-              <div class="language-option" onclick="selectLanguage('ar')">
-                  <span class="language-flag">AR</span>
-                  <span class="language-name">العربية</span>
-                  <span class="language-check">✓</span>
-              </div>
-          </div>
-      </div>
+      <button onclick="toggleLanguage()" id="langSwitchBtn" class="lang-toggle">کوردی</button>
       <a href="contact" class="nav-link contact-btn">Contact Us</a>
     </nav>
-    
+
     <div class="mobile-controls">
-      <div class="language-dropdown" id="languageDropdownMobile">
-          <button class="lang-toggle" id="langToggleBtnMobile" onclick="toggleLanguageMenuMobile()">
-              <span class="current-lang">English</span>
-              <span class="arrow">▼</span>
-          </button>
-          
-          <div class="language-menu" id="languageMenuMobile">
-              <div class="language-option active" onclick="selectLanguageMobile('en')">
-                  <span class="language-flag">EN</span>
-                  <span class="language-name">English</span>
-                  <span class="language-check">✓</span>
-              </div>
-              <div class="language-option" onclick="selectLanguageMobile('ku')">
-                  <span class="language-flag">KU</span>
-                  <span class="language-name">کوردی</span>
-                  <span class="language-check">✓</span>
-              </div>
-              <div class="language-option" onclick="selectLanguageMobile('ar')">
-                  <span class="language-flag">AR</span>
-                  <span class="language-name">العربية</span>
-                  <span class="language-check">✓</span>
-              </div>
-          </div>
-      </div>
+      <button onclick="toggleLanguage()" id="langSwitchBtnMobile" class="lang-toggle">کوردی</button>
     </div>
   
     <div class="mobile-menu hidden" id="mobileMenu">
@@ -145,6 +95,7 @@
           <div class="aim-icon"></div>
           <div class="aim-content">
             <h4 id="aim5Title">Reduce Administrative Workload</h4>
+
             <p id="aim5Text">By handling common questions automatically, our chatbot lightens the workload on university staff, allowing them to focus on more complex tasks and personalized student support.</p>
           </div>
         </div>
@@ -171,11 +122,10 @@
 
   <script>
     let currentLang = 'en';
-    const languages = ['en', 'ku', 'ar']; 
 
     const translations = {
       en: {
-        currentLangText: "English",
+        switchText: "کوردی",
         aboutTitle: "About Haawall",
         aboutSubtitle: "Your intelligent University of Sulaimani assistant, designed to make campus life easier and more accessible.",
         aboutBadge: "AI-Powered University Assistant",
@@ -201,7 +151,7 @@
         teamBadge: "Made for University of Sulaimani"
       },
       ku: {
-        currentLangText: "کوردی",
+        switchText: "English",
         aboutTitle: " دەربارەی هاوەڵ",
         aboutSubtitle: "یاریدەدەرە زیرەکەکەی زانکۆی سلێمانی، داڕێژراوە بۆ ئاسانکردنی ژیانی ئەکادیمی لە ڕێگەی تەکنەلۆژیای پێشکەوتووەوە",
         aboutBadge: " یاریدەدەری پێشکەوتوی زانکۆی ",
@@ -225,162 +175,27 @@
         teamTitle: " بە وریاییەوە دروستکراوە",
         teamDescription: "   هاوەڵ لەلایەن گروپێکی دڵسۆزەوە دروستکراوە کە بە پەرۆشن بۆ باشترکردنی ئەزموونی زانکۆ. ئێمە تەکنەلۆژیای پێشکەوتووی ئەی ئای لەگەڵ زانیارییەکی قووڵ لە ڕێکخستنی ئەکادیمی تێکەڵ دەکەین بۆ پەرەپێدانی ئامرازێک کە بەڕاستی سوود بە کۆمەڵگەی زانکۆ بگەیەنێت ",
         teamBadge: "دروستکراو بۆ زانکۆی سلێمانی"
-      },
-      ar: {
-        currentLangText: "العربية",
-        aboutTitle: "عن هاوال",
-        aboutSubtitle: "مساعدك الذكي في جامعة السليمانية، مصمم لجعل الحياة الجامعية أسهل وأكثر سهولة في الوصول.",
-        aboutBadge: "مساعد جامعي مدعوم بالذكاء الاصطناعي",
-        card1Title: "مساعد ذكي متطور",
-        card1Text: "يستخدم هاوال تكنولوجيا الذكاء الاصطناعي المتقدمة لفهم الأسئلة المتعلقة بالجامعة والإجابة عليها بدقة وسياق مفيد.",
-        card2Title: "مركز على الجامعة",
-        card2Text: "مصمم خصيصاً لطلاب وأعضاء هيئة التدريس وموظفي جامعة السليمانية مع معرفة شاملة بموارد وإجراءات الحرم الجامعي.",
-        aimsTitle: "مهمتنا وأهدافنا",
-        aim1Title: "تحسين تجربة الطالب",
-        aim1Text: "توفير وصول فوري لمعلومات الجامعة، مما يجعل حياة الطالب أكثر راحة وفعالية.",
-        aim2Title: "منصة بحثية رائعة",
-        aim2Text: "توفير نموذج ذكاء اصطناعي محلي للباحثين لإجراء بحوث متنوعة في الذكاء الاصطناعي.",
-        aim3Title: "دعم النجاح الأكاديمي",
-        aim3Text: "مساعدة الطلاب في العثور على المقررات وفهم المتطلبات والوصول إلى الموارد الأكاديمية بسهولة أكبر.",
-        aim4Title: "متاح ٧/٢٤",
-        aim4Text: "تقديم المساعدة على مدار الساعة للأسئلة العاجلة والدعم المستمر طوال العام الأكاديمي.",
-        aim5Title: "تقليل العبء الإداري",
-        aim5Text: "من خلال التعامل مع الأسئلة الشائعة تلقائياً، يخفف روبوت المحادثة العبء عن موظفي الجامعة، مما يتيح لهم التركيز على المهام الأكثر تعقيداً ودعم الطلاب الشخصي.",
-        aim6Title: "التحسن المستمر",
-        aim6Text: "التطور والتحسن بناءً على ملاحظات المستخدمين واحتياجات الجامعة المتغيرة لتقديم خدمة أفضل.",
-        teamTitle: "مبني بعناية",
-        teamDescription: "هاوال مطور من قبل فريق مخصص شغوف بتحسين تجربة الجامعة. نحن نجمع بين تكنولوجيا الذكاء الاصطناعي المتطورة والفهم العميق للبيئات الأكاديمية لإنشاء أداة تخدم مجتمع الجامعة حقاً.",
-        teamBadge: "صنع لجامعة السليمانية"
       }
     };
 
-    // hamburger menu
     function toggleMenu() {
       const menu = document.getElementById('mobileMenu');
       menu.classList.toggle('hidden');
     }
 
-    // desktop language dropdown functions
-    function toggleLanguageMenu() {
-      const menu = document.getElementById('languageMenu');
-      const toggle = document.getElementById('langToggleBtn');
-      
-      if (menu.classList.contains('show')) {
-        menu.classList.remove('show');
-        toggle.classList.remove('active');
-      } else {
-        menu.classList.add('show');
-        toggle.classList.add('active');
-      }
-    }
-
-    // Mobile language dropdown functions
-    function toggleLanguageMenuMobile() {
-      const menu = document.getElementById('languageMenuMobile');
-      const toggle = document.getElementById('langToggleBtnMobile');
-      
-      if (menu.classList.contains('show')) {
-        menu.classList.remove('show');
-        toggle.classList.remove('active');
-      } else {
-        menu.classList.add('show');
-        toggle.classList.add('active');
-      }
-    }
-
-    // Language selection for desktop
-    function selectLanguage(lang) {
-      currentLang = lang;
-      updateLanguage();
-      const menu = document.getElementById('languageMenu');
-      const toggle = document.getElementById('langToggleBtn');
-      menu.classList.remove('show');
-      toggle.classList.remove('active');
-      updateActiveLanguageOption();
-    }
-
-    // Language selection for mobile
-    function selectLanguageMobile(lang) {
-      currentLang = lang;
-      updateLanguage();
-      const menu = document.getElementById('languageMenuMobile');
-      const toggle = document.getElementById('langToggleBtnMobile');
-      menu.classList.remove('show');
-      toggle.classList.remove('active');
-      updateActiveLanguageOptionMobile();
-    }
-
-    // language content
-    function updateLanguage() {
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ku' : 'en';
       const t = translations[currentLang];
-      
-      //  current language text in dropdowns
-      document.querySelector('#langToggleBtn .current-lang').innerText = t.currentLangText;
-      document.querySelector('#langToggleBtnMobile .current-lang').innerText = t.currentLangText;
 
-      // U all text content
+      document.getElementById('langSwitchBtn').innerText = t.switchText;
+      document.getElementById('langSwitchBtnMobile').innerText = t.switchText;
+
       Object.keys(t).forEach(id => {
-        if (id !== 'currentLangText') {
-          const el = document.getElementById(id);
-          if (el) el.innerHTML = t[id];
-        }
-      });
-
-      // document direction for RTL languages
-      if (currentLang === 'ar' || currentLang === 'ku') {
-        document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif';
-      } else {
-        document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif';
-      }
-    }
-
-    //  active language option styling for desktop
-    function updateActiveLanguageOption() {
-      const options = document.querySelectorAll('#languageMenu .language-option');
-      options.forEach((option, index) => {
-        const langCode = ['en', 'ku', 'ar'][index];
-        if (langCode === currentLang) {
-          option.classList.add('active');
-        } else {
-          option.classList.remove('active');
-        }
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = t[id];
       });
     }
 
-    // Update active language option styling for mobile
-    function updateActiveLanguageOptionMobile() {
-      const options = document.querySelectorAll('#languageMenuMobile .language-option');
-      options.forEach((option, index) => {
-        const langCode = ['en', 'ku', 'ar'][index];
-        if (langCode === currentLang) {
-          option.classList.add('active');
-        } else {
-          option.classList.remove('active');
-        }
-      });
-    }
-
-    // closes dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-      const dropdown = document.getElementById('languageDropdown');
-      const dropdownMobile = document.getElementById('languageDropdownMobile');
-      
-      if (dropdown && !dropdown.contains(event.target)) {
-        const menu = document.getElementById('languageMenu');
-        const toggle = document.getElementById('langToggleBtn');
-        menu.classList.remove('show');
-        toggle.classList.remove('active');
-      }
-      
-      if (dropdownMobile && !dropdownMobile.contains(event.target)) {
-        const menu = document.getElementById('languageMenuMobile');
-        const toggle = document.getElementById('langToggleBtnMobile');
-        menu.classList.remove('show');
-        toggle.classList.remove('active');
-      }
-    });
-
-    // Scroll animations
     function handleScrollAnimations() {
       const elements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
 
@@ -398,12 +213,10 @@
       elements.forEach(el => observer.observe(el));
     }
 
-    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       handleScrollAnimations();
-      updateActiveLanguageOption();
-      updateActiveLanguageOptionMobile();
     });
+    
   </script>
 </body>
 </html>
